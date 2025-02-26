@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy::input::mouse::MouseButton;
 use bevy::window::PrimaryWindow;
-use crate::components::unit::{Selectable, Selected, Unit, SelectionRing};
+use crate::components::unit::{Selectable, Selected, SelectionRing};
 
 pub fn selection_system(
     mut commands: Commands,

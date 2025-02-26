@@ -6,9 +6,10 @@ mod components;
 mod resources;
 mod systems;
 
-use components::unit::{Selectable, Selected, Unit, WorkerAnimation};  // Added WorkerAnimation here
+use components::unit::{Selectable, Unit, WorkerAnimation, Velocity, MoveMarker};
 use systems::selection::{selection_system, highlight_selected};
 use systems::animation::animate_workers;
+use systems::movement::{move_command_system, movement_system, show_destination_markers};
 
 fn main() {
     App::new()
@@ -21,7 +22,14 @@ fn main() {
             ..Default::default()
         }))
         .add_systems(Startup, setup)
-        .add_systems(Update, (selection_system, highlight_selected, animate_workers))
+        .add_systems(Update, (
+            selection_system, 
+            highlight_selected, 
+            animate_workers,
+            move_command_system,
+            movement_system,
+            show_destination_markers,
+        ))
         .run();
 }
 
@@ -66,6 +74,11 @@ fn spawn_worker(commands: &mut Commands, asset_server: &Res<AssetServer>, positi
         Selectable,
         WorkerAnimation {
             timer: Timer::from_seconds(2.0, TimerMode::Repeating),
+        },
+        Velocity {
+            value: Vec2::ZERO,
+            target: None,
+            speed: 100.0,
         },
     ));
 }
