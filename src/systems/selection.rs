@@ -9,7 +9,7 @@ pub fn selection_system(
     camera_query: Query<(&Camera, &GlobalTransform)>,
     mouse_button_input: Res<Input<MouseButton>>,
     selectable_query: Query<(Entity, &Transform), With<Selectable>>,
-    mut selected_query: Query<Entity, With<Selected>>,
+    selected_query: Query<Entity, With<Selected>>, // Removed 'mut' as it's not needed
     selection_ring_query: Query<Entity, With<SelectionRing>>,
 ) {
     // Only process clicks
@@ -81,10 +81,7 @@ pub fn selection_system(
 pub fn highlight_selected(
     query: Query<(&Transform, Option<&Selected>), With<Selectable>>,
 ) {
-    for (transform, selected) in query.iter() {
-        // Instead of modifying sprites directly (which won't work well with image textures),
-        // we rely on the selection ring spawned in the selection_system
-        // and the animation system to provide visual feedback
+    for (_transform, selected) in query.iter() { // Added underscore to unused variable
         if selected.is_some() {
             // Selected units are highlighted by the selection ring
         }

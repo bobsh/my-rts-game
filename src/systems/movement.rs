@@ -57,8 +57,8 @@ pub fn move_command_system(
 pub fn movement_system(
     time: Res<Time>,
     mut query: Query<(&mut Velocity, &mut Transform)>,
-    mut commands: Commands,
-    asset_server: Res<AssetServer>,
+    _commands: Commands, // Added underscore to unused variable 
+    _asset_server: Res<AssetServer>, // Added underscore to unused variable
 ) {
     for (mut velocity, mut transform) in query.iter_mut() {
         if let Some(target) = velocity.target {
