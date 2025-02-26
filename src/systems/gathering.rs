@@ -2,9 +2,11 @@ use bevy::prelude::*;
 use bevy::input::mouse::MouseButton;
 use bevy::window::PrimaryWindow;
 
-use crate::components::unit::{Selected, Velocity}; // Remove Unit if it's unused
-use crate::components::resource::{ResourceNode, Gathering};
-use crate::resources::{PlayerResources, ResourceRegistry}; // Remove ResourceId if it's unused
+use crate::components::unit::{Selected, Velocity};
+use crate::components::resource::{ResourceNode, Gathering, GatheringState};
+use crate::resources::{PlayerResources, ResourceRegistry, ResourceId};
+// Import the components from animation
+use crate::systems::animation::{GatherEffect, FloatingText};
 
 // This system handles right-click on resources to start gathering
 pub fn resource_gathering_command(
@@ -49,8 +51,9 @@ pub fn resource_gathering_command(
                             target: resource_entity,
                             resource_id: resource.resource_id.clone(),
                             gather_timer: Timer::from_seconds(gather_time, TimerMode::Once),
-                            gather_amount: 5,  // Gather 5 resources at once
-                            return_position: None, // Will be set when we find a drop-off point
+                            gather_amount: 5,
+                            gather_state: GatheringState::MovingToResource,
+                            return_position: None,
                         });
                         
                         // Set velocity to move to resource
@@ -69,38 +72,74 @@ pub fn resource_gathering_command(
     }
 }
 
-// This system handles the actual gathering process
+// Enhanced gathering system
 pub fn gathering_system(
     time: Res<Time>,
     mut commands: Commands,
     mut player_resources: ResMut<PlayerResources>,
     mut gatherers: Query<(Entity, &mut Gathering, &Transform, &mut Velocity)>,
-    mut resource_nodes: Query<&mut ResourceNode>,
+    mut resource_nodes: Query<(&mut ResourceNode, &Transform)>,
+    asset_server: Res<AssetServer>,
 ) {
     for (entity, mut gathering, transform, mut velocity) in gatherers.iter_mut() {
-        // If we're not at the resource yet, keep moving toward it
-        if let Some(target) = velocity.target {
-            let distance = target.distance(transform.translation.truncate());
+        match gathering.gather_state {
+            GatheringState::MovingToResource => {
+                // Check if we've reached the resource
+                if let Some(_) = velocity.target {
+                    if let Ok((_, resource_transform)) = resource_nodes.get(gathering.target) {
+                        let distance = transform.translation.truncate().distance(resource_transform.translation.truncate());
+                        
+                        // If close enough to the resource, start harvesting
+                        if distance < 40.0 {
+                            velocity.target = None; // Stop moving
+                            gathering.gather_state = GatheringState::Harvesting;
+                            
+                            // Create a gathering effect
+                            spawn_gather_effect(&mut commands, &asset_server, resource_transform.translation);
+                        }
+                    } else {
+                        // Target resource no longer exists
+                        commands.entity(entity).remove::<Gathering>();
+                    }
+                }
+            },
             
-            // If close enough to the resource, start gathering
-            if distance < 20.0 {
-                velocity.target = None; // Stop moving
-                
+            GatheringState::Harvesting => {
                 // Progress the gathering timer
                 gathering.gather_timer.tick(time.delta());
                 
-                // If timer finished, gather resources
+                // If timer finished, collect resources
                 if gathering.gather_timer.finished() {
-                    if let Ok(mut resource) = resource_nodes.get_mut(gathering.target) {
+                    // First get the transform (immutable borrow)
+                    let resource_transform_opt = if let Ok((_, resource_transform)) = resource_nodes.get(gathering.target) {
+                        Some(resource_transform.translation)
+                    } else {
+                        None
+                    };
+                    
+                    // Now handle the mutable borrow separately
+                    if let Ok((mut resource, _)) = resource_nodes.get_mut(gathering.target) {
                         // Calculate how much we can actually gather
                         let gather_amount = gathering.gather_amount.min(resource.amount_remaining);
+                        let resource_id = resource.resource_id.clone();
                         
                         if gather_amount > 0 {
                             // Reduce resource amount
                             resource.amount_remaining -= gather_amount;
                             
                             // Add to player resources
-                            player_resources.add(&resource.resource_id, gather_amount);
+                            player_resources.add(&resource_id, gather_amount);
+                            
+                            // Create floating text showing gathered amount if we have the transform
+                            if let Some(resource_pos) = resource_transform_opt {
+                                spawn_resource_collected_text(
+                                    &mut commands, 
+                                    &asset_server, 
+                                    resource_pos,
+                                    gather_amount,
+                                    &resource_id
+                                );
+                            }
                             
                             // Reset timer for next gathering cycle
                             gathering.gather_timer.reset();
@@ -109,6 +148,7 @@ pub fn gathering_system(
                             if resource.amount_remaining == 0 {
                                 commands.entity(gathering.target).despawn();
                                 commands.entity(entity).remove::<Gathering>();
+                                return;
                             }
                         }
                     } else {
@@ -116,7 +156,115 @@ pub fn gathering_system(
                         commands.entity(entity).remove::<Gathering>();
                     }
                 }
-            }
+            },
+            
+            // Implement these states when you add buildings
+            GatheringState::ReturningResource => {},
+            GatheringState::DeliveringResource => {},
+        }
+    }
+}
+
+// Helper function to spawn a visual effect when gathering
+fn spawn_gather_effect(commands: &mut Commands, asset_server: &Res<AssetServer>, position: Vec3) {
+    // You could load different effect textures based on resource type
+    let effect_texture = asset_server.load("effects/gather_effect.png");
+    
+    commands.spawn((
+        SpriteBundle {
+            texture: effect_texture,
+            sprite: Sprite {
+                color: Color::rgba(1.0, 1.0, 1.0, 0.7),
+                custom_size: Some(Vec2::new(20.0, 20.0)),
+                ..default()
+            },
+            transform: Transform::from_translation(position + Vec3::new(0.0, 10.0, 0.1)),
+            ..default()
+        },
+        GatherEffect {
+            timer: Timer::from_seconds(0.5, TimerMode::Once),
+        },
+    ));
+}
+
+// Helper function to spawn floating text when resources are collected
+fn spawn_resource_collected_text(
+    commands: &mut Commands, 
+    asset_server: &Res<AssetServer>, 
+    position: Vec3, 
+    amount: u32,
+    resource_id: &ResourceId
+) {
+    let font = asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf");
+    
+    commands.spawn((
+        Text2dBundle {
+            text: Text::from_section(
+                format!("+{}", amount),
+                TextStyle {
+                    font,
+                    font_size: 16.0,
+                    color: Color::WHITE,
+                },
+            ).with_alignment(TextAlignment::Center),
+            transform: Transform::from_translation(position + Vec3::new(0.0, 20.0, 0.1)),
+            ..default()
+        },
+        FloatingText {
+            timer: Timer::from_seconds(1.0, TimerMode::Once),
+            velocity: Vec2::new(0.0, 20.0),
+            resource_id: resource_id.clone(),
+        },
+    ));
+}
+
+// System to animate gather effects
+pub fn animate_gather_effects(
+    time: Res<Time>,
+    mut commands: Commands,
+    mut query: Query<(Entity, &mut GatherEffect, &mut Transform, &mut Sprite)>,
+) {
+    for (entity, mut effect, mut transform, mut sprite) in query.iter_mut() {
+        effect.timer.tick(time.delta());
+        
+        // Fade out and scale up as timer progresses
+        let progress = effect.timer.percent();
+        sprite.color.set_a(1.0 - progress);
+        transform.scale = Vec3::splat(1.0 + progress * 0.5);
+        
+        // Remove when timer is finished
+        if effect.timer.finished() {
+            commands.entity(entity).despawn();
+        }
+    }
+}
+
+// System to animate floating text
+pub fn animate_floating_text(
+    time: Res<Time>,
+    mut commands: Commands,
+    mut query: Query<(Entity, &mut FloatingText, &mut Transform, &mut Text)>,
+    resource_registry: Res<ResourceRegistry>,
+) {
+    for (entity, mut floating_text, mut transform, mut text) in query.iter_mut() {
+        floating_text.timer.tick(time.delta());
+        
+        // Move the text upward
+        let delta = floating_text.velocity * time.delta_seconds();
+        transform.translation.x += delta.x;
+        transform.translation.y += delta.y;
+        
+        // Fade out as timer progresses
+        let progress = floating_text.timer.percent();
+        if let Some(resource_def) = resource_registry.get(&floating_text.resource_id) {
+            text.sections[0].style.color = resource_def.color.with_a(1.0 - progress);
+        } else {
+            text.sections[0].style.color = text.sections[0].style.color.with_a(1.0 - progress);
+        }
+        
+        // Remove when timer is finished
+        if floating_text.timer.finished() {
+            commands.entity(entity).despawn();
         }
     }
 }

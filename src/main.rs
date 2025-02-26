@@ -6,11 +6,11 @@ mod components;
 mod resources;
 mod systems;
 
-use components::unit::{Selectable, Unit, WorkerAnimation, Velocity, UnitAttributes};
+use components::unit::{Selectable, Unit, WorkerAnimation, WorkerAnimationState, Velocity, UnitAttributes};
 use components::resource::ResourceNode; // This should work now
 use resources::{PlayerResources, ResourceRegistry, ResourceId, GameState};
 use systems::selection::{selection_system, highlight_selected, animate_selection_rings, update_selection_ring_positions};
-use systems::animation::animate_workers;
+use systems::animation::{animate_workers, update_worker_animations, animate_gather_effects, animate_floating_text};
 use systems::movement::{move_command_system, movement_system, show_destination_markers};
 use systems::gathering::{resource_gathering_command, gathering_system};
 use systems::ui::{setup_ui, update_unit_info, update_resources_display};
@@ -42,6 +42,9 @@ fn main() {
             resource_gathering_command,
             gathering_system,
             update_resources_display,
+            update_worker_animations,  // Add this
+            animate_gather_effects,    // Add this
+            animate_floating_text,     // Add this
         ))
         .run();
 }
@@ -88,7 +91,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, resource_regist
     spawn_resource_node(&mut commands, &asset_server, &resource_registry, Vec2::new(-100.0, -250.0), &stone_id, 80);
 }
 
-// Add this function if it's not already defined
+// Update worker spawning with the new animation component
 fn spawn_worker(commands: &mut Commands, asset_server: &Res<AssetServer>, position: Vec2, texture_path: &str) {
     let texture = asset_server.load(texture_path);
     
@@ -103,6 +106,7 @@ fn spawn_worker(commands: &mut Commands, asset_server: &Res<AssetServer>, positi
         Selectable,
         WorkerAnimation {
             timer: Timer::from_seconds(2.0, TimerMode::Repeating),
+            state: WorkerAnimationState::Idle,  // Initialize with idle state
         },
         Velocity {
             value: Vec2::ZERO,

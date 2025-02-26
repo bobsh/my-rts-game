@@ -9,9 +9,20 @@ pub struct Selectable;
 #[derive(Component)]
 pub struct Selected;
 
+// Enhanced worker animation that supports different states
 #[derive(Component)]
 pub struct WorkerAnimation {
     pub timer: Timer,
+    pub state: WorkerAnimationState,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum WorkerAnimationState {
+    Idle,
+    Walking,
+    Mining,
+    Woodcutting,
+    Delivering,
 }
 
 // Update SelectionRing to include animation timer
