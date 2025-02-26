@@ -4,3 +4,4 @@ pub mod selection;
 pub mod animation;
 pub mod movement;
 pub mod ui;
+pub mod gathering;

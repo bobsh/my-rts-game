@@ -7,10 +7,13 @@ mod resources;
 mod systems;
 
 use components::unit::{Selectable, Unit, WorkerAnimation, Velocity, UnitAttributes};
+use components::resource::ResourceNode; // This should work now
+use resources::{PlayerResources, ResourceRegistry, ResourceId, GameState};
 use systems::selection::{selection_system, highlight_selected, animate_selection_rings, update_selection_ring_positions};
 use systems::animation::animate_workers;
 use systems::movement::{move_command_system, movement_system, show_destination_markers};
-use systems::ui::{setup_ui, update_unit_info};
+use systems::gathering::{resource_gathering_command, gathering_system};
+use systems::ui::{setup_ui, update_unit_info, update_resources_display};
 
 fn main() {
     App::new()
@@ -22,6 +25,9 @@ fn main() {
             }),
             ..Default::default()
         }))
+        .init_resource::<GameState>()
+        .init_resource::<PlayerResources>()
+        .init_resource::<ResourceRegistry>() // Initialize resource registry
         .add_systems(Startup, (setup, setup_ui))
         .add_systems(Update, (
             selection_system, 
@@ -33,11 +39,14 @@ fn main() {
             movement_system,
             show_destination_markers,
             update_unit_info,
+            resource_gathering_command,
+            gathering_system,
+            update_resources_display,
         ))
         .run();
 }
 
-fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
+fn setup(mut commands: Commands, asset_server: Res<AssetServer>, resource_registry: Res<ResourceRegistry>) {
     commands.spawn(Camera2dBundle::default());
 
     // Load the font
@@ -58,12 +67,22 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         ..Default::default()
     });
 
-    // Spawn worker units with different textures
+    // Spawn worker units
     spawn_worker(&mut commands, &asset_server, Vec2::new(-200.0, 0.0), "units/worker.png");
     spawn_worker(&mut commands, &asset_server, Vec2::new(0.0, 0.0), "units/worker.png");
     spawn_worker(&mut commands, &asset_server, Vec2::new(200.0, 0.0), "units/worker.png");
+
+    // Spawn resource nodes using the registry
+    let gold_id = ResourceId("gold".to_string());
+    let wood_id = ResourceId("wood".to_string());
+    let stone_id = ResourceId("stone".to_string());
+
+    spawn_resource_node(&mut commands, &asset_server, &resource_registry, Vec2::new(-300.0, 200.0), &gold_id, 100);
+    spawn_resource_node(&mut commands, &asset_server, &resource_registry, Vec2::new(0.0, 200.0), &wood_id, 150);
+    spawn_resource_node(&mut commands, &asset_server, &resource_registry, Vec2::new(300.0, 200.0), &stone_id, 125);
 }
 
+// Add this function if it's not already defined
 fn spawn_worker(commands: &mut Commands, asset_server: &Res<AssetServer>, position: Vec2, texture_path: &str) {
     let texture = asset_server.load(texture_path);
     
@@ -71,7 +90,7 @@ fn spawn_worker(commands: &mut Commands, asset_server: &Res<AssetServer>, positi
         SpriteBundle {
             texture,
             transform: Transform::from_translation(Vec3::new(position.x, position.y, 0.0))
-                .with_scale(Vec3::new(0.8, 0.8, 1.0)), // Scale as needed for your sprite size
+                .with_scale(Vec3::new(0.8, 0.8, 1.0)),
             ..Default::default()
         },
         Unit,
@@ -90,4 +109,37 @@ fn spawn_worker(commands: &mut Commands, asset_server: &Res<AssetServer>, positi
             max_health: 100.0,
         },
     ));
+}
+
+// Updated function to spawn resource nodes
+fn spawn_resource_node(
+    commands: &mut Commands, 
+    asset_server: &Res<AssetServer>,
+    resource_registry: &Res<ResourceRegistry>,
+    position: Vec2,
+    resource_id: &ResourceId,
+    amount: u32
+) {
+    // Get the resource definition from registry
+    if let Some(resource_def) = resource_registry.get(resource_id) {
+        let texture = asset_server.load(&resource_def.texture_path);
+        
+        commands.spawn((
+            SpriteBundle {
+                texture,
+                sprite: Sprite {
+                    color: resource_def.color,
+                    custom_size: Some(Vec2::new(60.0, 60.0)),
+                    ..default()
+                },
+                transform: Transform::from_translation(Vec3::new(position.x, position.y, 0.0)),
+                ..default()
+            },
+            ResourceNode {
+                resource_id: resource_id.clone(),
+                amount_remaining: amount,
+                max_amount: amount,
+            },
+        ));
+    }
 }
