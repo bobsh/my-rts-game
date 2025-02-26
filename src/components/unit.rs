@@ -33,3 +33,10 @@ pub struct Velocity {
 pub struct MoveMarker {
     pub timer: Timer,
 }
+
+#[derive(Component)]
+pub struct UnitAttributes {
+    pub name: String,
+    pub health: f32,
+    pub max_health: f32,
+}

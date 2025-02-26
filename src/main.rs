@@ -1,13 +1,16 @@
 use bevy::prelude::*;
 use bevy::window::WindowPlugin;
 
+mod assets;
 mod components;
+mod resources;
 mod systems;
 
-use components::unit::{Selectable, Unit, WorkerAnimation, Velocity};
+use components::unit::{Selectable, Unit, WorkerAnimation, Velocity, UnitAttributes};
 use systems::selection::{selection_system, highlight_selected, animate_selection_rings, update_selection_ring_positions};
 use systems::animation::animate_workers;
 use systems::movement::{move_command_system, movement_system, show_destination_markers};
+use systems::ui::{setup_ui, update_unit_info};
 
 fn main() {
     App::new()
@@ -19,16 +22,17 @@ fn main() {
             }),
             ..Default::default()
         }))
-        .add_systems(Startup, setup)
+        .add_systems(Startup, (setup, setup_ui))
         .add_systems(Update, (
             selection_system, 
             highlight_selected,
             animate_selection_rings,
-            update_selection_ring_positions, // Add this new system
+            update_selection_ring_positions,
             animate_workers,
             move_command_system,
             movement_system,
             show_destination_markers,
+            update_unit_info,
         ))
         .run();
 }
@@ -79,6 +83,11 @@ fn spawn_worker(commands: &mut Commands, asset_server: &Res<AssetServer>, positi
             value: Vec2::ZERO,
             target: None,
             speed: 100.0,
+        },
+        UnitAttributes {
+            name: "Worker".to_string(),
+            health: 100.0,
+            max_health: 100.0,
         },
     ));
 }
