@@ -6,6 +6,9 @@ mod components;
 mod resources;
 mod systems;
 
+use components::unit::{Selectable, Selected, Unit};
+use systems::selection::{selection_system, highlight_selected};
+
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins.set(WindowPlugin {
@@ -17,6 +20,7 @@ fn main() {
             ..Default::default()
         }))
         .add_systems(Startup, setup)
+        .add_systems(Update, (selection_system, highlight_selected))
         .run();
 }
 
@@ -29,14 +33,36 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     // Spawn the text
     commands.spawn(Text2dBundle {
         text: Text::from_section(
-            "Hello, World! This is a test.",
+            "Click on units to select them",
             TextStyle {
                 font: font_handle,
-                font_size: 50.0,
+                font_size: 30.0,
                 color: Color::WHITE,
             },
         )
         .with_alignment(TextAlignment::Center),
+        transform: Transform::from_translation(Vec3::new(0.0, 300.0, 0.0)),
         ..Default::default()
     });
+
+    // Spawn some units
+    spawn_unit(&mut commands, Vec2::new(-200.0, 0.0), Color::RED);
+    spawn_unit(&mut commands, Vec2::new(0.0, 0.0), Color::GREEN);
+    spawn_unit(&mut commands, Vec2::new(200.0, 0.0), Color::BLUE);
+}
+
+fn spawn_unit(commands: &mut Commands, position: Vec2, color: Color) {
+    commands.spawn((
+        SpriteBundle {
+            sprite: Sprite {
+                color,
+                custom_size: Some(Vec2::new(50.0, 50.0)),
+                ..Default::default()
+            },
+            transform: Transform::from_translation(Vec3::new(position.x, position.y, 0.0)),
+            ..Default::default()
+        },
+        Unit,
+        Selectable,
+    ));
 }
