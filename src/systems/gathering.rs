@@ -108,6 +108,21 @@ pub fn gathering_system(
                 // Progress the gathering timer
                 gathering.gather_timer.tick(time.delta());
                 
+                // First check if we're still close enough to the resource
+                let still_in_range = if let Ok((_, resource_transform)) = resource_nodes.get(gathering.target) {
+                    let distance = transform.translation.truncate().distance(resource_transform.translation.truncate());
+                    distance < 40.0 // Same distance threshold as when starting to harvest
+                } else {
+                    false // Resource no longer exists
+                };
+                
+                // If worker moved too far from resource, stop gathering
+                if !still_in_range {
+                    gathering.gather_state = GatheringState::MovingToResource;
+                    // Optional: add velocity.target = Some(...) to move back to the resource
+                    continue; // Skip to next worker
+                }
+                
                 // If timer finished, collect resources
                 if gathering.gather_timer.finished() {
                     // First get the transform (immutable borrow)
