@@ -136,6 +136,15 @@ pub fn gathering_system(
                 },
                 
                 GatheringState::Harvesting => {
+                    // Check if the worker has been given a new movement order
+                    // If they have a velocity target, it means they've been given a new movement command
+                    // and should stop gathering
+                    if velocity.target.is_some() {
+                        // Worker has been ordered to move elsewhere, stop gathering
+                        commands.entity(entity).remove::<Gathering>();
+                        continue;
+                    }
+                    
                     // Progress the gathering timer
                     gathering.gather_timer.tick(time.delta());
                     
