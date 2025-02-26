@@ -6,8 +6,9 @@ mod components;
 mod resources;
 mod systems;
 
-use components::unit::{Selectable, Selected, Unit};
+use components::unit::{Selectable, Selected, Unit, WorkerAnimation};  // Added WorkerAnimation here
 use systems::selection::{selection_system, highlight_selected};
+use systems::animation::animate_workers;
 
 fn main() {
     App::new()
@@ -20,7 +21,7 @@ fn main() {
             ..Default::default()
         }))
         .add_systems(Startup, setup)
-        .add_systems(Update, (selection_system, highlight_selected))
+        .add_systems(Update, (selection_system, highlight_selected, animate_workers))
         .run();
 }
 
@@ -45,12 +46,31 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         ..Default::default()
     });
 
-    // Spawn some units
-    spawn_unit(&mut commands, Vec2::new(-200.0, 0.0), Color::RED);
-    spawn_unit(&mut commands, Vec2::new(0.0, 0.0), Color::GREEN);
-    spawn_unit(&mut commands, Vec2::new(200.0, 0.0), Color::BLUE);
+    // Spawn worker units with different textures
+    spawn_worker(&mut commands, &asset_server, Vec2::new(-200.0, 0.0), "units/worker.png");
+    spawn_worker(&mut commands, &asset_server, Vec2::new(0.0, 0.0), "units/worker.png");
+    spawn_worker(&mut commands, &asset_server, Vec2::new(200.0, 0.0), "units/worker.png");
 }
 
+fn spawn_worker(commands: &mut Commands, asset_server: &Res<AssetServer>, position: Vec2, texture_path: &str) {
+    let texture = asset_server.load(texture_path);
+    
+    commands.spawn((
+        SpriteBundle {
+            texture,
+            transform: Transform::from_translation(Vec3::new(position.x, position.y, 0.0))
+                .with_scale(Vec3::new(0.8, 0.8, 1.0)), // Scale as needed for your sprite size
+            ..Default::default()
+        },
+        Unit,
+        Selectable,
+        WorkerAnimation {
+            timer: Timer::from_seconds(2.0, TimerMode::Repeating),
+        },
+    ));
+}
+
+// Keep the old spawn_unit function if you need colored units later
 fn spawn_unit(commands: &mut Commands, position: Vec2, color: Color) {
     commands.spawn((
         SpriteBundle {
