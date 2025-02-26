@@ -42,9 +42,9 @@ fn main() {
             resource_gathering_command,
             gathering_system,
             update_resources_display,
-            update_worker_animations,  // Add this
-            animate_gather_effects,    // Add this
-            animate_floating_text,     // Add this
+            update_worker_animations,
+            animate_gather_effects,
+            animate_floating_text,
         ))
         .run();
 }

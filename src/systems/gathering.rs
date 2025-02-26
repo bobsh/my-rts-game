@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 use bevy::input::mouse::MouseButton;
 use bevy::window::PrimaryWindow;
+use std::collections::HashMap;
 
 use crate::components::unit::{Selected, Velocity};
 use crate::components::resource::{ResourceNode, Gathering, GatheringState};
@@ -37,7 +38,7 @@ pub fn resource_gathering_command(
                 let distance = cursor_pos.distance(resource_pos);
                 
                 // If we clicked close enough to the resource
-                if distance < 50.0 {  // Adjust radius as needed
+                if distance < 70.0 {  // Increased from 50.0 for better click detection
                     // Get resource definition to determine gathering time
                     let gather_time = if let Some(resource_def) = resource_registry.get(&resource.resource_id) {
                         resource_def.gathering_time
@@ -77,105 +78,149 @@ pub fn gathering_system(
     time: Res<Time>,
     mut commands: Commands,
     mut player_resources: ResMut<PlayerResources>,
-    mut gatherers: Query<(Entity, &mut Gathering, &Transform, &mut Velocity)>,
-    mut resource_nodes: Query<(&mut ResourceNode, &Transform)>,
+    mut param_set: ParamSet<(
+        Query<(Entity, &mut Gathering, &mut Transform, &mut Velocity)>,
+        Query<(Entity, &mut ResourceNode, &Transform)>,
+    )>,
     asset_server: Res<AssetServer>,
 ) {
-    for (entity, mut gathering, transform, mut velocity) in gatherers.iter_mut() {
-        match gathering.gather_state {
-            GatheringState::MovingToResource => {
-                // Check if we've reached the resource
-                if let Some(_) = velocity.target {
-                    if let Ok((_, resource_transform)) = resource_nodes.get(gathering.target) {
-                        let distance = transform.translation.truncate().distance(resource_transform.translation.truncate());
-                        
-                        // If close enough to the resource, start harvesting
-                        if distance < 40.0 {
-                            velocity.target = None; // Stop moving
-                            gathering.gather_state = GatheringState::Harvesting;
+    // We need to iterate separately to avoid borrow issues with multiple queries
+    let mut gather_actions = Vec::new();
+
+    // First pass: check all gatherers and collect actions
+    {
+        // Get information from resources first into a local data structure
+        let mut resource_positions = HashMap::new();
+        let mut resource_ids = HashMap::new();
+        let mut resource_amounts = HashMap::new();
+        
+        {
+            let resource_query = param_set.p1();
+            for (entity, resource, transform) in resource_query.iter() {
+                resource_positions.insert(entity, transform.translation);
+                resource_ids.insert(entity, resource.resource_id.clone());
+                resource_amounts.insert(entity, resource.amount_remaining);
+            }
+        }
+        
+        // Now process gatherers using the cached resource data
+        let mut gatherer_query = param_set.p0();
+        for (entity, mut gathering, mut transform, mut velocity) in gatherer_query.iter_mut() {
+            match gathering.gather_state {
+                GatheringState::MovingToResource => {
+                    // Check if we've reached the resource
+                    if let Some(_) = velocity.target {
+                        if let Some(&resource_pos) = resource_positions.get(&gathering.target) {
+                            let distance = transform.translation.truncate().distance(resource_pos.truncate());
                             
-                            // Create a gathering effect
-                            spawn_gather_effect(&mut commands, &asset_server, resource_transform.translation);
+                            // If close enough to the resource, start harvesting
+                            if distance < 60.0 {  // Larger threshold for detection
+                                velocity.target = None; // Stop moving
+                                gathering.gather_state = GatheringState::Harvesting;
+                                
+                                // Move the worker closer to the resource for better visuals
+                                // Find the direction vector from resource to worker
+                                let dir = (transform.translation - resource_pos).normalize();
+                                // Position the worker at an ideal distance from the resource (30.0 units)
+                                let ideal_pos = resource_pos + dir * 30.0;
+                                transform.translation = ideal_pos;
+                                
+                                // Create a gathering effect
+                                spawn_gather_effect(&mut commands, &asset_server, resource_pos);
+                            }
+                        } else {
+                            // Target resource no longer exists
+                            commands.entity(entity).remove::<Gathering>();
                         }
-                    } else {
-                        // Target resource no longer exists
-                        commands.entity(entity).remove::<Gathering>();
                     }
-                }
-            },
-            
-            GatheringState::Harvesting => {
-                // Progress the gathering timer
-                gathering.gather_timer.tick(time.delta());
+                },
                 
-                // First check if we're still close enough to the resource
-                let still_in_range = if let Ok((_, resource_transform)) = resource_nodes.get(gathering.target) {
-                    let distance = transform.translation.truncate().distance(resource_transform.translation.truncate());
-                    distance < 40.0 // Same distance threshold as when starting to harvest
-                } else {
-                    false // Resource no longer exists
-                };
-                
-                // If worker moved too far from resource, stop gathering
-                if !still_in_range {
-                    gathering.gather_state = GatheringState::MovingToResource;
-                    // Optional: add velocity.target = Some(...) to move back to the resource
-                    continue; // Skip to next worker
-                }
-                
-                // If timer finished, collect resources
-                if gathering.gather_timer.finished() {
-                    // First get the transform (immutable borrow)
-                    let resource_transform_opt = if let Ok((_, resource_transform)) = resource_nodes.get(gathering.target) {
-                        Some(resource_transform.translation)
+                GatheringState::Harvesting => {
+                    // Progress the gathering timer
+                    gathering.gather_timer.tick(time.delta());
+                    
+                    // First check if we're still close enough to the resource
+                    let still_in_range = if let Some(&resource_pos) = resource_positions.get(&gathering.target) {
+                        let distance = transform.translation.truncate().distance(resource_pos.truncate());
+                        distance < 60.0  // Keep the same detection range
                     } else {
-                        None
+                        false // Resource no longer exists
                     };
                     
-                    // Now handle the mutable borrow separately
-                    if let Ok((mut resource, _)) = resource_nodes.get_mut(gathering.target) {
-                        // Calculate how much we can actually gather
-                        let gather_amount = gathering.gather_amount.min(resource.amount_remaining);
-                        let resource_id = resource.resource_id.clone();
+                    // If worker moved too far from resource, stop gathering
+                    if !still_in_range {
+                        gathering.gather_state = GatheringState::MovingToResource;
                         
-                        if gather_amount > 0 {
-                            // Reduce resource amount
-                            resource.amount_remaining -= gather_amount;
-                            
-                            // Add to player resources
-                            player_resources.add(&resource_id, gather_amount);
-                            
-                            // Create floating text showing gathered amount if we have the transform
-                            if let Some(resource_pos) = resource_transform_opt {
-                                spawn_resource_collected_text(
-                                    &mut commands, 
-                                    &asset_server, 
-                                    resource_pos,
-                                    gather_amount,
-                                    &resource_id
-                                );
-                            }
-                            
+                        // Set velocity to move back to the resource
+                        if let Some(&resource_pos) = resource_positions.get(&gathering.target) {
+                            // Find direction from resource to where worker should stand
+                            let dir = (transform.translation - resource_pos).normalize();
+                            // Target position is at ideal distance from resource
+                            let target_pos = resource_pos + dir * 30.0;
+                            velocity.target = Some(target_pos.truncate());
+                        }
+                        
+                        continue; // Skip to next worker
+                    }
+                    
+                    // If timer finished, collect resources
+                    if gathering.gather_timer.finished() {
+                        // Check if resource still exists
+                        if let Some(&resource_pos) = resource_positions.get(&gathering.target) {
+                            // Store gathering action for second pass
+                            gather_actions.push((entity, gathering.target, gathering.gather_amount, resource_pos));
                             // Reset timer for next gathering cycle
                             gathering.gather_timer.reset();
-                            
-                            // If resource is depleted, stop gathering and remove node
-                            if resource.amount_remaining == 0 {
-                                commands.entity(gathering.target).despawn();
-                                commands.entity(entity).remove::<Gathering>();
-                                return;
-                            }
+                        } else {
+                            // Resource no longer exists
+                            commands.entity(entity).remove::<Gathering>();
                         }
-                    } else {
-                        // Resource no longer exists
+                    }
+                },
+                
+                // Implement these states when you add buildings
+                GatheringState::ReturningResource => {},
+                GatheringState::DeliveringResource => {},
+            }
+        }
+    }
+
+    // Second pass: process all gather actions
+    {
+        let mut resource_query = param_set.p1();
+        
+        for (entity, resource_entity, gather_amount, resource_pos) in gather_actions {
+            if let Ok((_, mut resource, _)) = resource_query.get_mut(resource_entity) {
+                // Calculate how much we can actually gather
+                let amount = gather_amount.min(resource.amount_remaining);
+                let resource_id = resource.resource_id.clone();
+                
+                if amount > 0 {
+                    // Reduce resource amount
+                    resource.amount_remaining -= amount;
+                    
+                    // Add to player resources
+                    player_resources.add(&resource_id, amount);
+                    
+                    // Create floating text showing gathered amount
+                    spawn_resource_collected_text(
+                        &mut commands, 
+                        &asset_server, 
+                        resource_pos,
+                        amount,
+                        &resource_id
+                    );
+                    
+                    // If resource is depleted, stop gathering and remove node
+                    if resource.amount_remaining == 0 {
+                        commands.entity(resource_entity).despawn();
                         commands.entity(entity).remove::<Gathering>();
                     }
                 }
-            },
-            
-            // Implement these states when you add buildings
-            GatheringState::ReturningResource => {},
-            GatheringState::DeliveringResource => {},
+            } else {
+                // Resource no longer exists
+                commands.entity(entity).remove::<Gathering>();
+            }
         }
     }
 }
