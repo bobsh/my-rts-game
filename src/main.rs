@@ -7,7 +7,7 @@ mod resources;
 mod systems;
 
 use components::unit::{Selectable, Unit, WorkerAnimation, Velocity};
-use systems::selection::{selection_system, highlight_selected, animate_selection_rings};
+use systems::selection::{selection_system, highlight_selected, animate_selection_rings, update_selection_ring_positions};
 use systems::animation::animate_workers;
 use systems::movement::{move_command_system, movement_system, show_destination_markers};
 
@@ -25,7 +25,8 @@ fn main() {
         .add_systems(Update, (
             selection_system, 
             highlight_selected,
-            animate_selection_rings, // Add the new animation system
+            animate_selection_rings,
+            update_selection_ring_positions, // Add this new system
             animate_workers,
             move_command_system,
             movement_system,

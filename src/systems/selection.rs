@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy::input::mouse::MouseButton;
 use bevy::window::PrimaryWindow;
-use crate::components::unit::{Selectable, Selected, SelectionRing};
+use crate::components::unit::{Selectable, Selected, SelectionRing, Unit}; // Added Unit here
 
 pub fn selection_system(
     mut commands: Commands,
@@ -13,7 +13,7 @@ pub fn selection_system(
     selection_ring_query: Query<Entity, With<SelectionRing>>,
 ) {
     // Only process clicks
-    if (!mouse_button_input.just_pressed(MouseButton::Left)) {
+    if !mouse_button_input.just_pressed(MouseButton::Left) {
         return;
     }
 
@@ -74,6 +74,7 @@ pub fn selection_system(
                         SelectionRing {
                             timer: Timer::from_seconds(1.0, TimerMode::Repeating),
                             base_size,
+                            owner: entity,  // Store the entity this ring belongs to
                         },
                     ));
                     
@@ -87,9 +88,9 @@ pub fn selection_system(
 // Add a new system for animating the selection ring
 pub fn animate_selection_rings(
     time: Res<Time>,
-    mut query: Query<(&mut SelectionRing, &mut Transform, &mut Sprite)>,
+    mut query: Query<(&mut SelectionRing, &mut Sprite)>,
 ) {
-    for (mut ring, mut transform, mut sprite) in query.iter_mut() {
+    for (mut ring, mut sprite) in query.iter_mut() {
         ring.timer.tick(time.delta());
         
         // Calculate a pulsing effect
@@ -102,6 +103,37 @@ pub fn animate_selection_rings(
         // Also pulse the opacity
         let alpha = 0.4 + (ring.timer.percent() * std::f32::consts::PI * 2.0).cos() * 0.2;
         sprite.color.set_a(alpha);
+    }
+}
+
+// Fix the update_selection_ring_positions system using ParamSet
+pub fn update_selection_ring_positions(
+    mut params: ParamSet<(
+        Query<(&SelectionRing, &mut Transform)>,
+        Query<(Entity, &Transform), With<Unit>>
+    )>,
+) {
+    // First, collect the positions we need
+    let mut unit_positions: Vec<(Entity, Vec3)> = Vec::new();
+    
+    // Get all unit positions
+    for (entity, transform) in params.p1().iter() {
+        unit_positions.push((entity, transform.translation));
+    }
+    
+    // Update ring positions based on collected data
+    let mut ring_query = params.p0();
+    for (ring, mut ring_transform) in ring_query.iter_mut() {
+        // Find the matching unit
+        for (entity, position) in &unit_positions {
+            if ring.owner == *entity {
+                // Update ring position to match unit, but keep it slightly below (z-axis)
+                ring_transform.translation.x = position.x;
+                ring_transform.translation.y = position.y;
+                ring_transform.translation.z = position.z - 0.1;
+                break;
+            }
+        }
     }
 }
 
