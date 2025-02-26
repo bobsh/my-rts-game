@@ -1,9 +1,7 @@
 use bevy::prelude::*;
 use bevy::window::WindowPlugin;
 
-mod assets;
 mod components;
-mod resources;
 mod systems;
 
 use components::unit::{Selectable, Unit, WorkerAnimation, Velocity};
