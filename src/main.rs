@@ -77,9 +77,15 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, resource_regist
     let wood_id = ResourceId("wood".to_string());
     let stone_id = ResourceId("stone".to_string());
 
+    // Increased spacing between resource nodes
     spawn_resource_node(&mut commands, &asset_server, &resource_registry, Vec2::new(-300.0, 200.0), &gold_id, 100);
     spawn_resource_node(&mut commands, &asset_server, &resource_registry, Vec2::new(0.0, 200.0), &wood_id, 150);
     spawn_resource_node(&mut commands, &asset_server, &resource_registry, Vec2::new(300.0, 200.0), &stone_id, 125);
+    
+    // Additional resource nodes in different locations
+    spawn_resource_node(&mut commands, &asset_server, &resource_registry, Vec2::new(-200.0, -150.0), &gold_id, 75);
+    spawn_resource_node(&mut commands, &asset_server, &resource_registry, Vec2::new(150.0, -200.0), &wood_id, 100);
+    spawn_resource_node(&mut commands, &asset_server, &resource_registry, Vec2::new(-100.0, -250.0), &stone_id, 80);
 }
 
 // Add this function if it's not already defined
@@ -123,16 +129,19 @@ fn spawn_resource_node(
     // Get the resource definition from registry
     if let Some(resource_def) = resource_registry.get(resource_id) {
         let texture = asset_server.load(&resource_def.texture_path);
+        let font = asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf");
         
-        commands.spawn((
+        // Spawn the resource node entity
+        let resource_entity = commands.spawn((
             SpriteBundle {
                 texture,
                 sprite: Sprite {
                     color: resource_def.color,
-                    custom_size: Some(Vec2::new(60.0, 60.0)),
+                    custom_size: Some(Vec2::new(30.0, 30.0)),
                     ..default()
                 },
-                transform: Transform::from_translation(Vec3::new(position.x, position.y, 0.0)),
+                transform: Transform::from_translation(Vec3::new(position.x, position.y, -0.1))
+                    .with_scale(Vec3::new(0.5, 0.5, 1.0)),
                 ..default()
             },
             ResourceNode {
@@ -140,6 +149,20 @@ fn spawn_resource_node(
                 amount_remaining: amount,
                 max_amount: amount,
             },
-        ));
+        )).id();
+        
+        // Add a small label above the resource
+        commands.spawn(Text2dBundle {
+            text: Text::from_section(
+                resource_def.name.clone(),
+                TextStyle {
+                    font,
+                    font_size: 12.0,
+                    color: resource_def.color,
+                },
+            ).with_alignment(TextAlignment::Center),
+            transform: Transform::from_translation(Vec3::new(position.x, position.y + 20.0, 0.0)),
+            ..default()
+        });
     }
 }
