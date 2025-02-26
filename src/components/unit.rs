@@ -14,8 +14,12 @@ pub struct WorkerAnimation {
     pub timer: Timer,
 }
 
+// Update SelectionRing to include animation timer
 #[derive(Component)]
-pub struct SelectionRing;
+pub struct SelectionRing {
+    pub timer: Timer,
+    pub base_size: f32,
+}
 
 #[derive(Component, Default)]
 pub struct Velocity {

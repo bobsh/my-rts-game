@@ -9,11 +9,11 @@ pub fn selection_system(
     camera_query: Query<(&Camera, &GlobalTransform)>,
     mouse_button_input: Res<Input<MouseButton>>,
     selectable_query: Query<(Entity, &Transform), With<Selectable>>,
-    selected_query: Query<Entity, With<Selected>>, // Removed 'mut' as it's not needed
+    selected_query: Query<Entity, With<Selected>>,
     selection_ring_query: Query<Entity, With<SelectionRing>>,
 ) {
     // Only process clicks
-    if !mouse_button_input.just_pressed(MouseButton::Left) {
+    if (!mouse_button_input.just_pressed(MouseButton::Left)) {
         return;
     }
 
@@ -41,7 +41,7 @@ pub fn selection_system(
 
             // Check if we clicked on a selectable entity
             for (entity, transform) in selectable_query.iter() {
-                // Simple AABB collision detection - assuming 50x50 size for sprites
+                // Simple AABB collision detection - assuming 64x64 size for sprites
                 let sprite_size = Vec2::new(64.0, 64.0); // Adjust as needed for your sprite
                 let min_x = transform.translation.x - sprite_size.x / 2.0;
                 let max_x = transform.translation.x + sprite_size.x / 2.0;
@@ -53,12 +53,15 @@ pub fn selection_system(
                     // Add Selected component
                     commands.entity(entity).insert(Selected);
                     
-                    // Create selection ring
+                    // Base size for the selection ring - slightly larger than the unit
+                    let base_size = 70.0;
+                    
+                    // Create selection ring with animation timer
                     commands.spawn((
                         SpriteBundle {
                             sprite: Sprite {
-                                color: Color::rgba(0.2, 1.0, 0.2, 0.5),
-                                custom_size: Some(Vec2::new(70.0, 70.0)),
+                                color: Color::rgba(1.0, 0.2, 0.2, 0.5), // Red with 50% opacity
+                                custom_size: Some(Vec2::new(base_size, base_size)),
                                 ..default()
                             },
                             transform: Transform::from_translation(Vec3::new(
@@ -68,7 +71,10 @@ pub fn selection_system(
                             )),
                             ..default()
                         },
-                        SelectionRing,
+                        SelectionRing {
+                            timer: Timer::from_seconds(1.0, TimerMode::Repeating),
+                            base_size,
+                        },
                     ));
                     
                     break;
@@ -78,12 +84,34 @@ pub fn selection_system(
     }
 }
 
+// Add a new system for animating the selection ring
+pub fn animate_selection_rings(
+    time: Res<Time>,
+    mut query: Query<(&mut SelectionRing, &mut Transform, &mut Sprite)>,
+) {
+    for (mut ring, mut transform, mut sprite) in query.iter_mut() {
+        ring.timer.tick(time.delta());
+        
+        // Calculate a pulsing effect
+        let pulse_factor = 1.0 + (ring.timer.percent() * std::f32::consts::PI * 2.0).sin() * 0.1;
+        let current_size = ring.base_size * pulse_factor;
+        
+        // Update sprite size
+        sprite.custom_size = Some(Vec2::new(current_size, current_size));
+        
+        // Also pulse the opacity
+        let alpha = 0.4 + (ring.timer.percent() * std::f32::consts::PI * 2.0).cos() * 0.2;
+        sprite.color.set_a(alpha);
+    }
+}
+
 pub fn highlight_selected(
     query: Query<(&Transform, Option<&Selected>), With<Selectable>>,
 ) {
-    for (_transform, selected) in query.iter() { // Added underscore to unused variable
+    for (_transform, selected) in query.iter() {
         if selected.is_some() {
             // Selected units are highlighted by the selection ring
+            // This system is now mostly redundant with the animated ring
         }
     }
 }
