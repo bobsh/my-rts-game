@@ -52,7 +52,7 @@ impl Default for ResourceRegistry {
             name: "Stone".to_string(),
             color: Color::rgb(0.7, 0.7, 0.7),
             gathering_time: 2.0, // Corrected gathering time
-            icon_path: "resources/stone.png".to_string(), // Remove the "assets/" prefix
+            icon_path: "resources/stone/stone.png".to_string(), // Remove the "assets/" prefix
             value: 3,
         });
 
