@@ -124,8 +124,8 @@ pub fn animate_gather_effects(
         effect.timer.tick(time.delta());
         
         // Fade out and scale up as timer progresses
-        let progress = effect.timer.percent();
-        sprite.color.set_a(1.0 - progress);
+        let progress = effect.timer.fraction();
+        sprite.color = sprite.color.with_alpha(1.0 - progress);
         transform.scale = Vec3::splat(1.0 + progress * 0.5);
         
         // Remove when timer is finished
@@ -151,11 +151,11 @@ pub fn animate_floating_text(
         transform.translation.y += delta.y;
         
         // Fade out as timer progresses
-        let progress = floating_text.timer.percent();
+        let progress = floating_text.timer.fraction();
         if let Some(resource_def) = resource_registry.get(&floating_text.resource_id) {
-            text.sections[0].style.color = resource_def.color.with_a(1.0 - progress);
+            text.sections[0].style.color = resource_def.color.with_alpha(1.0 - progress);
         } else {
-            text.sections[0].style.color = text.sections[0].style.color.with_a(1.0 - progress);
+            text.sections[0].style.color = text.sections[0].style.color.with_alpha(1.0 - progress);
         }
         
         // Remove when timer is finished

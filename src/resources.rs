@@ -32,7 +32,7 @@ impl Default for ResourceRegistry {
         registry.register(ResourceDefinition {
             id: ResourceId("gold".to_string()),
             name: "Gold".to_string(),
-            color: Color::rgb(1.0, 0.84, 0.0),
+            color: Color::srgb(1.0, 0.84, 0.0),
             gathering_time: 3.0,
             icon_path: "resources/gold.png".to_string(),
             value: 5,
@@ -41,7 +41,7 @@ impl Default for ResourceRegistry {
         registry.register(ResourceDefinition {
             id: ResourceId("wood".to_string()),
             name: "Wood".to_string(),
-            color: Color::rgb(0.6, 0.4, 0.2), // Corrected color
+            color: Color::srgb(0.6, 0.4, 0.2), // Corrected color
             gathering_time: 1.5,
             icon_path: "resources/wood.png".to_string(), // Remove the "assets/" prefix
             value: 2,
@@ -50,7 +50,7 @@ impl Default for ResourceRegistry {
         registry.register(ResourceDefinition {
             id: ResourceId("stone".to_string()),
             name: "Stone".to_string(),
-            color: Color::rgb(0.7, 0.7, 0.7),
+            color: Color::srgb(0.7, 0.7, 0.7),
             gathering_time: 2.0, // Corrected gathering time
             icon_path: "resources/stone/stone.png".to_string(), // Remove the "assets/" prefix
             value: 3,

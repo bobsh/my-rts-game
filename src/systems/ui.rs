@@ -21,7 +21,7 @@ pub fn setup_ui(mut commands: Commands, asset_server: Res<AssetServer>, resource
                     flex_direction: FlexDirection::Column,
                     ..default()
                 },
-                background_color: BackgroundColor(Color::rgba(0.1, 0.1, 0.1, 0.8)),
+                background_color: BackgroundColor(Color::srgba(0.1, 0.1, 0.1, 0.8)),
                 ..default()
             },
             UnitInfoPanel,
@@ -94,7 +94,7 @@ pub fn setup_ui(mut commands: Commands, asset_server: Res<AssetServer>, resource
                     align_items: AlignItems::Center,
                     ..default()
                 },
-                background_color: BackgroundColor(Color::rgba(0.1, 0.1, 0.1, 0.8)),
+                background_color: BackgroundColor(Color::srgba(0.1, 0.1, 0.1, 0.8)),
                 ..default()
             },
             ResourcesDisplay,
@@ -221,7 +221,7 @@ pub fn update_inventory_ui(
                     flex_direction: FlexDirection::Column,
                     ..default()
                 },
-                background_color: Color::rgba(0.1, 0.1, 0.1, 0.8).into(),
+                background_color: Color::srgba(0.1, 0.1, 0.1, 0.8).into(),
                 ..default()
             },
             InventoryUI,
@@ -274,7 +274,7 @@ pub fn update_inventory_ui(
                         align_items: AlignItems::Center,
                         ..default()
                     },
-                    background_color: Color::rgba(0.2, 0.2, 0.2, 0.6).into(),
+                    background_color: Color::srgba(0.2, 0.2, 0.2, 0.6).into(),
                     image: UiImage { 
                         texture: asset_server.load("resources/empty_slot.png"),
                         ..default()

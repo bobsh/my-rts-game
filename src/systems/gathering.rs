@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 use bevy::input::mouse::MouseButton;
+use bevy::input::ButtonInput;
 use bevy::window::PrimaryWindow;
 use std::collections::HashMap;
 
@@ -16,7 +17,7 @@ pub fn resource_gathering_command(
     mut commands: Commands,
     window_query: Query<&Window, With<PrimaryWindow>>,
     camera_query: Query<(&Camera, &GlobalTransform)>,
-    mouse_button_input: Res<Input<MouseButton>>,
+    mouse_button_input: Res<ButtonInput<MouseButton>>,
     selected_units: Query<(Entity, &Transform), With<Selected>>,
     resource_nodes: Query<(Entity, &Transform, &ResourceNode)>,
     resource_registry: Res<ResourceRegistry>,
@@ -262,7 +263,7 @@ fn spawn_gather_effect(commands: &mut Commands, asset_server: &Res<AssetServer>,
         SpriteBundle {
             texture: effect_texture,
             sprite: Sprite {
-                color: Color::rgba(1.0, 1.0, 1.0, 0.7),
+                color: Color::srgba(1.0, 1.0, 1.0, 0.7),
                 custom_size: Some(Vec2::new(20.0, 20.0)),
                 ..default()
             },
@@ -287,14 +288,20 @@ fn spawn_resource_collected_text(
     
     commands.spawn((
         Text2dBundle {
-            text: Text::from_section(
-                format!("+{}", amount),
-                TextStyle {
-                    font,
-                    font_size: 16.0,
-                    color: Color::WHITE,
-                },
-            ).with_alignment(TextAlignment::Center),
+            text: Text {
+                sections: vec![
+                    TextSection::new(
+                        format!("+{}", amount),
+                        TextStyle {
+                            font,
+                            font_size: 16.0,
+                            color: Color::WHITE,
+                        },
+                    )
+                ],
+                justify: JustifyText::Center,
+                ..default()
+            },
             transform: Transform::from_translation(position + Vec3::new(0.0, 20.0, 0.1)),
             ..default()
         },
@@ -317,8 +324,8 @@ pub fn animate_gather_effects(
         effect.timer.tick(time.delta());
         
         // Fade out and scale up as timer progresses
-        let progress = effect.timer.percent();
-        sprite.color.set_a(1.0 - progress);
+        let progress = effect.timer.fraction();
+        sprite.color = sprite.color.with_alpha(1.0 - progress);
         transform.scale = Vec3::splat(1.0 + progress * 0.5);
         
         // Remove when timer is finished
@@ -345,11 +352,11 @@ pub fn animate_floating_text(
         transform.translation.y += delta.y;
         
         // Fade out as timer progresses
-        let progress = floating_text.timer.percent();
+        let progress = floating_text.timer.fraction();
         if let Some(resource_def) = resource_registry.get(&floating_text.resource_id) {
-            text.sections[0].style.color = resource_def.color.with_a(1.0 - progress);
+            text.sections[0].style.color = resource_def.color.with_alpha(1.0 - progress);
         } else {
-            text.sections[0].style.color = text.sections[0].style.color.with_a(1.0 - progress);
+            text.sections[0].style.color = text.sections[0].style.color.with_alpha(1.0 - progress);
         }
         
         // Remove when timer is finished

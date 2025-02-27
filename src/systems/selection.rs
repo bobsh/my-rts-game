@@ -1,13 +1,14 @@
 use bevy::prelude::*;
 use bevy::input::mouse::MouseButton;
 use bevy::window::PrimaryWindow;
+use bevy::input::ButtonInput;
 use crate::components::unit::{Selectable, Selected, SelectionRing, Unit}; // Added Unit here
 
 pub fn selection_system(
     mut commands: Commands,
     window_query: Query<&Window, With<PrimaryWindow>>,
     camera_query: Query<(&Camera, &GlobalTransform)>,
-    mouse_button_input: Res<Input<MouseButton>>,
+    mouse_button_input: Res<ButtonInput<MouseButton>>,
     selectable_query: Query<(Entity, &Transform), With<Selectable>>,
     selected_query: Query<Entity, With<Selected>>,
     selection_ring_query: Query<Entity, With<SelectionRing>>,
@@ -60,7 +61,7 @@ pub fn selection_system(
                     commands.spawn((
                         SpriteBundle {
                             sprite: Sprite {
-                                color: Color::rgba(1.0, 0.2, 0.2, 0.5), // Red with 50% opacity
+                                color: Color::srgba(1.0, 0.2, 0.2, 0.5), // Red with 50% opacity
                                 custom_size: Some(Vec2::new(base_size, base_size)),
                                 ..default()
                             },
@@ -94,15 +95,15 @@ pub fn animate_selection_rings(
         ring.timer.tick(time.delta());
         
         // Calculate a pulsing effect
-        let pulse_factor = 1.0 + (ring.timer.percent() * std::f32::consts::PI * 2.0).sin() * 0.1;
+        let pulse_factor = 1.0 + (ring.timer.fraction() * std::f32::consts::PI * 2.0).sin() * 0.1;
         let current_size = ring.base_size * pulse_factor;
         
         // Update sprite size
         sprite.custom_size = Some(Vec2::new(current_size, current_size));
         
         // Also pulse the opacity
-        let alpha = 0.4 + (ring.timer.percent() * std::f32::consts::PI * 2.0).cos() * 0.2;
-        sprite.color.set_a(alpha);
+        let alpha = 0.4 + (ring.timer.fraction() * std::f32::consts::PI * 2.0).cos() * 0.2;
+        sprite.color = sprite.color.with_alpha(alpha);
     }
 }
 

@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 use bevy::window::WindowPlugin;
+use bevy::text::JustifyText;
 
 mod assets;
 mod components;
@@ -60,23 +61,28 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, resource_regist
 
     // Spawn the text
     commands.spawn(Text2dBundle {
-        text: Text::from_section(
-            "Click on units to select them",
-            TextStyle {
-                font: font_handle,
-                font_size: 30.0,
-                color: Color::WHITE,
-            },
-        )
-        .with_alignment(TextAlignment::Center),
+        text: Text {
+            sections: vec![
+                TextSection::new(
+                    "Click on units to select them",
+                    TextStyle {
+                        font: font_handle,
+                        font_size: 30.0,
+                        color: Color::WHITE,
+                    },
+                )
+            ],
+            justify: JustifyText::Center,
+            ..default()
+        },
         transform: Transform::from_translation(Vec3::new(0.0, 300.0, 0.0)),
         ..Default::default()
     });
 
     // Spawn worker units
-    spawn_worker(&mut commands, &asset_server, Vec2::new(-200.0, 0.0), "units/jungleman/jungleman.png", 1);
-    spawn_worker(&mut commands, &asset_server, Vec2::new(0.0, 0.0), "units/jungleman/jungleman.png", 2);
-    spawn_worker(&mut commands, &asset_server, Vec2::new(200.0, 0.0), "units/jungleman/jungleman.png", 3);
+    spawn_worker(&mut commands, &asset_server, Vec2::new(-200.0, 0.0), "units/jungleman/jungleman.png".to_string(), 1);
+    spawn_worker(&mut commands, &asset_server, Vec2::new(0.0, 0.0), "units/jungleman/jungleman.png".to_string(), 2);
+    spawn_worker(&mut commands, &asset_server, Vec2::new(200.0, 0.0), "units/jungleman/jungleman.png".to_string(), 3);
 
     // Spawn resource nodes using the registry
     let gold_id = ResourceId("gold".to_string());
@@ -95,8 +101,8 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, resource_regist
 }
 
 // Update worker spawning with the new animation component
-fn spawn_worker(commands: &mut Commands, asset_server: &Res<AssetServer>, position: Vec2, texture_path: &str, i: usize) {
-    let texture = asset_server.load(texture_path);
+fn spawn_worker(commands: &mut Commands, asset_server: &Res<AssetServer>, position: Vec2, texture_path: String, i: usize) {
+    let texture = asset_server.load(&texture_path);
     
     let _worker_entity = commands
         .spawn((
@@ -164,14 +170,20 @@ fn spawn_resource_node(
         
         // Add a small label above the resource
         commands.spawn(Text2dBundle {
-            text: Text::from_section(
-                resource_def.name.clone(),
-                TextStyle {
-                    font,
-                    font_size: 12.0,
-                    color: resource_def.color,
-                },
-            ).with_alignment(TextAlignment::Center),
+            text: Text {
+                sections: vec![
+                    TextSection::new(
+                        resource_def.name.clone(),
+                        TextStyle {
+                            font,
+                            font_size: 16.0,
+                            color: Color::WHITE,
+                        },
+                    )
+                ],
+                justify: JustifyText::Center,
+                ..default()
+            },
             transform: Transform::from_translation(Vec3::new(position.x, position.y + 20.0, 0.0)),
             ..default()
         });

@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 use bevy::input::mouse::MouseButton;
 use bevy::window::PrimaryWindow;
+use bevy::input::ButtonInput;
 use crate::components::unit::{Selected, Velocity, MoveMarker};
 
 // This system handles right-click commands for selected units
@@ -8,7 +9,7 @@ pub fn move_command_system(
     mut commands: Commands,
     window_query: Query<&Window, With<PrimaryWindow>>,
     camera_query: Query<(&Camera, &GlobalTransform)>,
-    mouse_button_input: Res<Input<MouseButton>>,
+    mouse_button_input: Res<ButtonInput<MouseButton>>,
     mut query: Query<(&mut Velocity, &mut Transform), With<Selected>>,
 ) {
     // Only process right-clicks
@@ -32,7 +33,7 @@ pub fn move_command_system(
             commands.spawn((
                 SpriteBundle {
                     sprite: Sprite {
-                        color: Color::rgba(0.2, 0.8, 0.2, 0.7),
+                        color: Color::srgba(0.2, 0.8, 0.2, 0.7),
                         custom_size: Some(Vec2::new(15.0, 15.0)),
                         ..default()
                     },
@@ -98,8 +99,8 @@ pub fn show_destination_markers(
         marker.timer.tick(time.delta());
         
         // Fade out the marker as the timer progresses
-        let alpha = 1.0 - marker.timer.percent();
-        sprite.color.set_a(alpha);
+        let alpha = 1.0 - marker.timer.fraction();
+        sprite.color = sprite.color.with_alpha(alpha);
         
         // Remove marker when timer is finished
         if marker.timer.finished() {
