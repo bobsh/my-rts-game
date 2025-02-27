@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use crate::resources::ResourceId;
 
 #[derive(Component)]
 pub struct UnitInfoPanel;
@@ -15,6 +16,14 @@ pub struct UnitSpeedText;
 #[derive(Component)]
 pub struct ResourcesDisplay;
 
-// Generic component to identify resource text elements
 #[derive(Component)]
-pub struct ResourceText(pub String); // Store resource ID
+pub struct ResourceText(pub String);
+
+#[derive(Component)]
+pub struct InventoryUI;
+
+#[derive(Component)]
+pub struct InventorySlot {
+    pub resource_id: Option<ResourceId>,
+    pub entity_owner: Entity,
+}

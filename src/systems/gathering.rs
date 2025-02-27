@@ -8,6 +8,8 @@ use crate::components::resource::{ResourceNode, Gathering, GatheringState};
 use crate::resources::{PlayerResources, ResourceRegistry, ResourceId};
 // Import the components from animation
 use crate::systems::animation::{GatherEffect, FloatingText};
+// Add this import at the top
+use crate::components::inventory::Inventory;
 
 // This system handles right-click on resources to start gathering
 pub fn resource_gathering_command(
@@ -79,7 +81,7 @@ pub fn gathering_system(
     mut commands: Commands,
     mut player_resources: ResMut<PlayerResources>,
     mut param_set: ParamSet<(
-        Query<(Entity, &mut Gathering, &mut Transform, &mut Velocity)>,
+        Query<(Entity, &mut Gathering, &mut Transform, &mut Velocity, &mut Inventory)>,
         Query<(Entity, &mut ResourceNode, &Transform)>,
     )>,
     asset_server: Res<AssetServer>,
@@ -105,7 +107,7 @@ pub fn gathering_system(
         
         // Now process gatherers using the cached resource data
         let mut gatherer_query = param_set.p0();
-        for (entity, mut gathering, mut transform, mut velocity) in gatherer_query.iter_mut() {
+        for (entity, mut gathering, mut transform, mut velocity, mut inventory) in gatherer_query.iter_mut() {
             match gathering.gather_state {
                 GatheringState::MovingToResource => {
                     // Check if we've reached the resource
@@ -145,6 +147,13 @@ pub fn gathering_system(
                         continue;
                     }
                     
+                    // Check if inventory is full
+                    if inventory.is_full() {
+                        // In a future implementation, we'd transition to returning to base
+                        // For now, just notify the player that inventory is full
+                        continue;
+                    }
+                    
                     // Progress the gathering timer
                     gathering.gather_timer.tick(time.delta());
                     
@@ -176,8 +185,21 @@ pub fn gathering_system(
                     if gathering.gather_timer.finished() {
                         // Check if resource still exists
                         if let Some(&resource_pos) = resource_positions.get(&gathering.target) {
-                            // Store gathering action for second pass
-                            gather_actions.push((entity, gathering.target, gathering.gather_amount, resource_pos));
+                            if let Some(&resource_amount) = resource_amounts.get(&gathering.target) {
+                                if resource_amount > 0 {
+                                    // Calculate how much we can actually gather
+                                    let gather_amount = gathering.gather_amount.min(resource_amount);
+                                    
+                                    // Try to add to inventory
+                                    let amount_added = inventory.add(&gathering.resource_id, gather_amount);
+                                    
+                                    if amount_added > 0 {
+                                        // Store action to reduce resource amount
+                                        gather_actions.push((entity, gathering.target, amount_added, resource_pos));
+                                    }
+                                }
+                            }
+                            
                             // Reset timer for next gathering cycle
                             gathering.gather_timer.reset();
                         } else {
@@ -207,9 +229,6 @@ pub fn gathering_system(
                 if amount > 0 {
                     // Reduce resource amount
                     resource.amount_remaining -= amount;
-                    
-                    // Add to player resources
-                    player_resources.add(&resource_id, amount);
                     
                     // Create floating text showing gathered amount
                     spawn_resource_collected_text(

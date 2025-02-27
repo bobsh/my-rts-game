@@ -13,7 +13,10 @@ use systems::selection::{selection_system, highlight_selected, animate_selection
 use systems::animation::{animate_workers, update_worker_animations, animate_gather_effects, animate_floating_text};
 use systems::movement::{move_command_system, movement_system, show_destination_markers};
 use systems::gathering::{resource_gathering_command, gathering_system};
-use systems::ui::{setup_ui, update_unit_info, update_resources_display};
+use systems::ui::{setup_ui, update_unit_info, update_resources_display, update_inventory_ui};
+
+use components::unit::Worker;
+use components::inventory::Inventory;
 
 fn main() {
     App::new()
@@ -45,6 +48,7 @@ fn main() {
             update_worker_animations,
             animate_gather_effects,
             animate_floating_text,
+            update_inventory_ui,
         ))
         .run();
 }
@@ -71,9 +75,9 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, resource_regist
     });
 
     // Spawn worker units
-    spawn_worker(&mut commands, &asset_server, Vec2::new(-200.0, 0.0), "units/worker.png");
-    spawn_worker(&mut commands, &asset_server, Vec2::new(0.0, 0.0), "units/worker.png");
-    spawn_worker(&mut commands, &asset_server, Vec2::new(200.0, 0.0), "units/worker.png");
+    spawn_worker(&mut commands, &asset_server, Vec2::new(-200.0, 0.0), "units/worker.png", 1);
+    spawn_worker(&mut commands, &asset_server, Vec2::new(0.0, 0.0), "units/worker.png", 2);
+    spawn_worker(&mut commands, &asset_server, Vec2::new(200.0, 0.0), "units/worker.png", 3);
 
     // Spawn resource nodes using the registry
     let gold_id = ResourceId("gold".to_string());
@@ -92,33 +96,37 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, resource_regist
 }
 
 // Update worker spawning with the new animation component
-fn spawn_worker(commands: &mut Commands, asset_server: &Res<AssetServer>, position: Vec2, texture_path: &str) {
+fn spawn_worker(commands: &mut Commands, asset_server: &Res<AssetServer>, position: Vec2, texture_path: &str, i: usize) {
     let texture = asset_server.load(texture_path);
     
-    commands.spawn((
-        SpriteBundle {
-            texture,
-            transform: Transform::from_translation(Vec3::new(position.x, position.y, 0.0))
-                .with_scale(Vec3::new(0.8, 0.8, 1.0)),
-            ..Default::default()
-        },
-        Unit,
-        Selectable,
-        WorkerAnimation {
-            timer: Timer::from_seconds(2.0, TimerMode::Repeating),
-            state: WorkerAnimationState::Idle,  // Initialize with idle state
-        },
-        Velocity {
-            value: Vec2::ZERO,
-            target: None,
-            speed: 100.0,
-        },
-        UnitAttributes {
-            name: "Worker".to_string(),
-            health: 100.0,
-            max_health: 100.0,
-        },
-    ));
+    let worker_entity = commands
+        .spawn((
+            SpriteBundle {
+                texture,
+                transform: Transform::from_translation(Vec3::new(position.x, position.y, 0.0))
+                    .with_scale(Vec3::new(0.8, 0.8, 1.0)),
+                ..Default::default()
+            },
+            Name::new(format!("Worker {}", i)),
+            Unit,
+            Selectable,
+            WorkerAnimation {
+                timer: Timer::from_seconds(2.0, TimerMode::Repeating),
+                state: WorkerAnimationState::Idle,  // Initialize with idle state
+            },
+            Velocity {
+                value: Vec2::ZERO,
+                target: None,
+                speed: 100.0,
+            },
+            UnitAttributes {
+                name: format!("Worker {}", i),
+                health: 100.0,
+                max_health: 100.0,
+            },
+            Inventory::new(20), // Each worker can carry 20 resource units
+        ))
+        .id();
 }
 
 // Updated function to spawn resource nodes
@@ -132,7 +140,7 @@ fn spawn_resource_node(
 ) {
     // Get the resource definition from registry
     if let Some(resource_def) = resource_registry.get(resource_id) {
-        let texture = asset_server.load(&resource_def.texture_path);
+        let texture = asset_server.load(&resource_def.icon_path); // Use icon_path
         let font = asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf");
         
         // Spawn the resource node entity

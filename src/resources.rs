@@ -11,8 +11,8 @@ pub struct ResourceDefinition {
     pub id: ResourceId,
     pub name: String,
     pub color: Color,
-    pub texture_path: String,
     pub gathering_time: f32,  // Time in seconds to gather one unit
+    pub icon_path: String,    // Path to the resource icon
     pub value: u32,           // Base value/importance
 }
 
@@ -33,17 +33,17 @@ impl Default for ResourceRegistry {
             id: ResourceId("gold".to_string()),
             name: "Gold".to_string(),
             color: Color::rgb(1.0, 0.84, 0.0),
-            texture_path: "resources/gold.png".to_string(),
             gathering_time: 3.0,
+            icon_path: "resources/gold.png".to_string(),
             value: 5,
         });
 
         registry.register(ResourceDefinition {
             id: ResourceId("wood".to_string()),
             name: "Wood".to_string(),
-            color: Color::rgb(0.65, 0.4, 0.2),
-            texture_path: "resources/wood.png".to_string(),
+            color: Color::rgb(0.6, 0.4, 0.2), // Corrected color
             gathering_time: 1.5,
+            icon_path: "resources/wood.png".to_string(), // Remove the "assets/" prefix
             value: 2,
         });
 
@@ -51,8 +51,8 @@ impl Default for ResourceRegistry {
             id: ResourceId("stone".to_string()),
             name: "Stone".to_string(),
             color: Color::rgb(0.7, 0.7, 0.7),
-            texture_path: "resources/stone.png".to_string(),
-            gathering_time: 2.5,
+            gathering_time: 2.0, // Corrected gathering time
+            icon_path: "resources/stone.png".to_string(), // Remove the "assets/" prefix
             value: 3,
         });
 

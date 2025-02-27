@@ -3,5 +3,6 @@ pub mod position;
 pub mod velocity;
 pub mod health;
 pub mod unit;
+pub mod resource;
 pub mod ui;
-pub mod resource;  // Add this line
+pub mod inventory;  // Add this line
