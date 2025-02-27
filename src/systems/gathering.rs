@@ -79,7 +79,7 @@ pub fn resource_gathering_command(
 pub fn gathering_system(
     time: Res<Time>,
     mut commands: Commands,
-    mut player_resources: ResMut<PlayerResources>,
+    _player_resources: ResMut<PlayerResources>,
     mut param_set: ParamSet<(
         Query<(Entity, &mut Gathering, &mut Transform, &mut Velocity, &mut Inventory)>,
         Query<(Entity, &mut ResourceNode, &Transform)>,
@@ -307,6 +307,7 @@ fn spawn_resource_collected_text(
 }
 
 // System to animate gather effects
+#[allow(dead_code)]
 pub fn animate_gather_effects(
     time: Res<Time>,
     mut commands: Commands,
@@ -328,6 +329,7 @@ pub fn animate_gather_effects(
 }
 
 // System to animate floating text
+#[allow(dead_code)]
 pub fn animate_floating_text(
     time: Res<Time>,
     mut commands: Commands,

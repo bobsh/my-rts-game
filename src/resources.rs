@@ -81,6 +81,7 @@ pub struct PlayerResources {
 }
 
 impl PlayerResources {
+    #[allow(dead_code)]
     pub fn add(&mut self, resource_id: &ResourceId, amount: u32) {
         *self.resources.entry(resource_id.clone()).or_insert(0) += amount;
     }
@@ -89,10 +90,12 @@ impl PlayerResources {
         self.resources.get(resource_id).copied().unwrap_or(0)
     }
     
+    #[allow(dead_code)]
     pub fn has_enough(&self, resource_id: &ResourceId, amount: u32) -> bool {
         self.get(resource_id) >= amount
     }
     
+    #[allow(dead_code)]
     pub fn spend(&mut self, resource_id: &ResourceId, amount: u32) -> bool {
         let current = self.get(resource_id);
         if current >= amount {
@@ -103,6 +106,7 @@ impl PlayerResources {
         }
     }
     
+    #[allow(dead_code)]
     pub fn all(&self) -> &HashMap<ResourceId, u32> {
         &self.resources
     }

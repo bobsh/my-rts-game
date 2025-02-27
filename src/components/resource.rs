@@ -24,6 +24,8 @@ pub struct Gathering {
 pub enum GatheringState {
     MovingToResource,
     Harvesting,
+    #[allow(dead_code)]
     ReturningResource,
+    #[allow(dead_code)]
     DeliveringResource,
 }

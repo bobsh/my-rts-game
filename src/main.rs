@@ -15,7 +15,6 @@ use systems::movement::{move_command_system, movement_system, show_destination_m
 use systems::gathering::{resource_gathering_command, gathering_system};
 use systems::ui::{setup_ui, update_unit_info, update_resources_display, update_inventory_ui};
 
-use components::unit::Worker;
 use components::inventory::Inventory;
 
 fn main() {
@@ -99,7 +98,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, resource_regist
 fn spawn_worker(commands: &mut Commands, asset_server: &Res<AssetServer>, position: Vec2, texture_path: &str, i: usize) {
     let texture = asset_server.load(texture_path);
     
-    let worker_entity = commands
+    let _worker_entity = commands
         .spawn((
             SpriteBundle {
                 texture,
@@ -144,7 +143,7 @@ fn spawn_resource_node(
         let font = asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf");
         
         // Spawn the resource node entity
-        let resource_entity = commands.spawn((
+        let _resource_entity = commands.spawn((
             SpriteBundle {
                 texture,
                 sprite: Sprite {
