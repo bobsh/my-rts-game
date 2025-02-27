@@ -75,7 +75,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, resource_regist
 
     // Spawn worker units
     spawn_worker(&mut commands, &asset_server, Vec2::new(-200.0, 0.0), "units/worker.png", 1);
-    spawn_worker(&mut commands, &asset_server, Vec2::new(0.0, 0.0), "units/worker.png", 2);
+    spawn_worker(&mut commands, &asset_server, Vec2::new(0.0, 0.0), "units/jungleman/jungleman.png", 2);
     spawn_worker(&mut commands, &asset_server, Vec2::new(200.0, 0.0), "units/worker.png", 3);
 
     // Spawn resource nodes using the registry
