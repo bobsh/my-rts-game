@@ -51,7 +51,3 @@ pub struct UnitAttributes {
     pub health: f32,
     pub max_health: f32,
 }
-
-// Add the Worker component
-#[derive(Component)]
-pub struct Worker;
