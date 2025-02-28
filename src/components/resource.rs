@@ -5,7 +5,8 @@ use crate::resources::ResourceId;
 pub struct ResourceNode {
     pub resource_id: ResourceId,
     pub amount_remaining: u32,
-    pub max_amount: u32,
+    #[allow(dead_code)]
+    pub max_amount: u32,  // Will be used for UI progress bars
 }
 
 // Updated Gathering component with states
@@ -16,6 +17,7 @@ pub struct Gathering {
     pub gather_timer: Timer,
     pub gather_amount: u32,
     pub gather_state: GatheringState,
+    #[allow(dead_code)]
     pub return_position: Option<Vec3>, // Will be used when we add buildings
 }
 
@@ -24,8 +26,7 @@ pub struct Gathering {
 pub enum GatheringState {
     MovingToResource,
     Harvesting,
-    #[allow(dead_code)]
     ReturningResource,
     #[allow(dead_code)]
-    DeliveringResource,
+    DeliveringResource,  // Will be used when implementing building resource delivery
 }

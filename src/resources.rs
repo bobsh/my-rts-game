@@ -13,7 +13,8 @@ pub struct ResourceDefinition {
     pub color: Color,
     pub gathering_time: f32,  // Time in seconds to gather one unit
     pub icon_path: String,    // Path to the resource icon
-    pub value: u32,           // Base value/importance
+    #[allow(dead_code)]
+    pub value: u32,           // Base value/importance for later game mechanics
 }
 
 // Registry of all resource types in the game
@@ -115,7 +116,8 @@ impl PlayerResources {
 // Game state (keep this if you need it)
 #[derive(Resource)]
 pub struct GameState {
-    pub paused: bool,
+    #[allow(dead_code)]
+    pub paused: bool,  // Will be used for pause functionality
 }
 
 impl Default for GameState {
