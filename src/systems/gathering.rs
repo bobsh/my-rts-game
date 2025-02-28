@@ -150,8 +150,18 @@ pub fn gathering_system(
                     
                     // Check if inventory is full
                     if inventory.is_full() {
-                        // In a future implementation, we'd transition to returning to base
-                        // For now, just notify the player that inventory is full
+                        // Set the gathering state to indicate we're done
+                        gathering.gather_state = GatheringState::ReturningResource;
+
+                        // Important: Reset velocity to stop the drift
+                        velocity.value = Vec2::ZERO;
+
+                        // Clear any movement target that might be active
+                        velocity.target = None;
+
+                        // Optionally, provide visual feedback that the worker is full
+                        info!("Worker inventory full: {} units", inventory.capacity());
+
                         continue;
                     }
                     
