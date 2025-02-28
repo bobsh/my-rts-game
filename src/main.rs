@@ -56,29 +56,6 @@ fn main() {
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>, resource_registry: Res<ResourceRegistry>) {
     commands.spawn(Camera2dBundle::default());
 
-    // Load the font
-    let font_handle = asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf");
-
-    // Spawn the text
-    commands.spawn(Text2dBundle {
-        text: Text {
-            sections: vec![
-                TextSection::new(
-                    "Click on units to select them",
-                    TextStyle {
-                        font: font_handle,
-                        font_size: 30.0,
-                        color: Color::WHITE,
-                    },
-                )
-            ],
-            justify: JustifyText::Center,
-            ..default()
-        },
-        transform: Transform::from_translation(Vec3::new(0.0, 300.0, 0.0)),
-        ..Default::default()
-    });
-
     // Spawn worker units
     spawn_worker(&mut commands, &asset_server, Vec2::new(-200.0, 0.0), "units/jungleman/jungleman.png".to_string(), 1);
     spawn_worker(&mut commands, &asset_server, Vec2::new(0.0, 0.0), "units/jungleman/jungleman.png".to_string(), 2);
