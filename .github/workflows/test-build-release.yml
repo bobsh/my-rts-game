@@ -71,7 +71,7 @@ jobs:
         shell: pwsh
 
       - name: Upload ZIP
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: windows-zip
           path: my-rts-game-nightly-${{ steps.timestamp.outputs.value }}.zip
@@ -132,7 +132,7 @@ jobs:
         shell: pwsh
 
       - name: Upload Installer
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: windows-installer
           path: installer/*.exe
