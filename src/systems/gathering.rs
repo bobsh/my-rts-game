@@ -12,13 +12,6 @@ use crate::systems::animation::{GatherEffect, FloatingText};
 // Add this import at the top
 use crate::components::inventory::Inventory;
 
-// Add at the top of the file near other type definitions
-
-type GatheringParamSet = ParamSet<(
-    Query<(Entity, &mut Gathering, &mut Transform, &mut Velocity, &mut Inventory)>,
-    Query<(Entity, &mut ResourceNode, &Transform)>
-)>;
-
 // This system handles right-click on resources to start gathering
 pub fn resource_gathering_command(
     mut commands: Commands,
@@ -84,11 +77,15 @@ pub fn resource_gathering_command(
 }
 
 // Enhanced gathering system
+#[allow(clippy::type_complexity)]
 pub fn gathering_system(
     time: Res<Time>,
     mut commands: Commands,
     _player_resources: ResMut<PlayerResources>,
-    mut param_set: GatheringParamSet,
+    mut param_set: ParamSet<(
+        Query<(Entity, &mut Gathering, &mut Transform, &mut Velocity, &mut Inventory)>,
+        Query<(Entity, &mut ResourceNode, &Transform)>
+    )>,
     asset_server: Res<AssetServer>,
 ) {
     // We need to iterate separately to avoid borrow issues with multiple queries
