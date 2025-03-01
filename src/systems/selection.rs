@@ -4,6 +4,11 @@ use bevy::window::PrimaryWindow;
 use bevy::input::ButtonInput;
 use crate::components::unit::{Selectable, Selected, SelectionRing, Unit}; // Added Unit here
 
+type SelectionParamSet = ParamSet<(
+    Query<(&SelectionRing, &mut Transform)>,
+    Query<(Entity, &Transform), With<Unit>>
+)>;
+
 pub fn selection_system(
     mut commands: Commands,
     window_query: Query<&Window, With<PrimaryWindow>>,
@@ -109,10 +114,7 @@ pub fn animate_selection_rings(
 
 // Fix the update_selection_ring_positions system using ParamSet
 pub fn update_selection_ring_positions(
-    mut params: ParamSet<(
-        Query<(&SelectionRing, &mut Transform)>,
-        Query<(Entity, &Transform), With<Unit>>
-    )>,
+    mut params: SelectionParamSet,
 ) {
     // First, collect the positions we need
     let mut unit_positions: Vec<(Entity, Vec3)> = Vec::new();

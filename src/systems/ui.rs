@@ -4,6 +4,12 @@ use crate::components::unit::{Selected, UnitAttributes, Velocity};
 use crate::components::inventory::Inventory;
 use crate::resources::{PlayerResources, ResourceRegistry};
 
+type UiTextParamSet = ParamSet<(
+    Query<&mut Text, With<UnitNameText>>,
+    Query<&mut Text, With<UnitHealthText>>,
+    Query<&mut Text, With<UnitSpeedText>>
+)>;
+
 pub fn setup_ui(mut commands: Commands, asset_server: Res<AssetServer>, resource_registry: Res<ResourceRegistry>) {
     let font = asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf");
     
@@ -120,11 +126,7 @@ pub fn setup_ui(mut commands: Commands, asset_server: Res<AssetServer>, resource
 
 pub fn update_unit_info(
     selected_units: Query<(&UnitAttributes, &Velocity), With<Selected>>,
-    mut text_query: ParamSet<(
-        Query<&mut Text, With<UnitNameText>>,
-        Query<&mut Text, With<UnitHealthText>>,
-        Query<&mut Text, With<UnitSpeedText>>
-    )>,
+    mut text_query: UiTextParamSet,
 ) {
     // Get the selected unit info (if any)
     let selected_info = selected_units.get_single().ok();
