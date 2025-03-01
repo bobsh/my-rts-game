@@ -29,6 +29,10 @@ jobs:
 
       - name: Cache Rust dependencies
         uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true
+          shared-key: "windows-build"
+          save-if: ${{ github.ref == 'refs/heads/main' || github.event_name == 'schedule' }}
 
       - name: Run tests
         run: cargo test
@@ -49,9 +53,20 @@ jobs:
 
       - name: Cache Rust dependencies
         uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true
+          shared-key: "windows-build"
+          save-if: ${{ github.ref == 'refs/heads/main' || github.event_name == 'schedule' }}
+
+      - name: Configure Cargo settings
+        run: |
+          echo "CARGO_INCREMENTAL=0" >> $env:GITHUB_ENV
+          echo "CARGO_NET_RETRY=10" >> $env:GITHUB_ENV
+          echo "CARGO_BUILD_JOBS=8" >> $env:GITHUB_ENV  # Adjust based on runner resources
+        shell: pwsh
 
       - name: Build Release
-        run: cargo build --release
+        run: cargo build --profile ci --no-default-features --features bevy/default_fonts,bevy/bevy_asset,bevy/bevy_sprite,bevy/bevy_ui,bevy/bevy_text
         
       - name: Create game directory structure
         run: |
