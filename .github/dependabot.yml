@@ -14,10 +14,7 @@ updates:
           - "*"
         exclude-patterns:
           - "bevy*"
-    open-pull-requests-limit: 10
-    labels:
-      - "dependencies"
-      - "rust"
+    open-pull-requests-limit: 15
     commit-message:
       prefix: "cargo"
       include: "scope"
@@ -32,9 +29,6 @@ updates:
         patterns:
           - "*"
     open-pull-requests-limit: 15
-    labels:
-      - "dependencies"
-      - "github-actions"
     commit-message:
       prefix: "github-actions"
       include: "scope"
