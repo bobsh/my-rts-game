@@ -145,12 +145,12 @@ jobs:
           @"
           #define MyAppName "My RTS Game"
           #define MyAppVersion "nightly-$timestamp"
-          #define MyAppPublisher "Your Name"
+          #define MyAppPublisher "Me"
           #define MyAppURL "https://github.com/${{ github.repository }}"
           #define MyAppExeName "my-rts-game.exe"
 
           [Setup]
-          AppId={{YOUR_UNIQUE_APP_ID_HERE}
+          AppId={{c8b3976e-4dd1-4591-8544-2c638855de99}}
           AppName={#MyAppName}
           AppVersion={#MyAppVersion}
           AppPublisher={#MyAppPublisher}
