@@ -62,7 +62,7 @@ jobs:
 
       - name: Generate timestamp
         id: timestamp
-        run: echo "::set-output name=value::$(Get-Date -Format 'yyyyMMdd-HHmmss')"
+        run: echo "value=$(Get-Date -Format 'yyyyMMdd-HHmmss')" >> $env:GITHUB_OUTPUT
         shell: pwsh
 
       - name: Create ZIP Archive
@@ -148,7 +148,7 @@ jobs:
         run: echo "value=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_OUTPUT
 
       - name: Download all artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
 
       - name: Create Nightly Release
         uses: softprops/action-gh-release@v1
