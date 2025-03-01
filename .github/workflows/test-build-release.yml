@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          lfs: true  # Add this line to enable LFS support
 
       - name: Install Linux dependencies
         run: |
@@ -55,6 +57,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          lfs: true  # Add this line to enable LFS support
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
@@ -136,7 +140,7 @@ jobs:
 
       - name: Install Inno Setup using Chocolatey
         run: |
-          choco install -y innosetup
+          choco upgrade -y innosetup
         shell: powershell
 
       - name: Create Inno Setup Script
