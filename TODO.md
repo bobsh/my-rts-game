@@ -4,6 +4,7 @@
 - [x] Upgrade to Bevy 0.14
 - [x] Fix worker movement bug - prevent workers from drifting downward after filling their inventory
 - [x] Build an exe file for Windows
+- [x] Add a dependabot setup
 - [ ] Add an icon for the game
 - [ ] Add a splash screen
 - [ ] Add a main menu
