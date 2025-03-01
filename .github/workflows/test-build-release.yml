@@ -33,8 +33,6 @@ jobs:
         with:
           cache-on-failure: true
           shared-key: "${{ runner.os }}-rust-${{ hashFiles('**/Cargo.lock') }}"
-          restore-keys: |
-            ${{ runner.os }}-rust-
 
       - name: Debug cache info
         run: |
@@ -67,8 +65,6 @@ jobs:
         with:
           cache-on-failure: true
           shared-key: "${{ runner.os }}-rust-${{ hashFiles('**/Cargo.lock') }}"
-          restore-keys: |
-            ${{ runner.os }}-rust-
 
       - name: Debug cache info
         run: |
