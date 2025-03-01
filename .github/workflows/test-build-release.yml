@@ -31,8 +31,7 @@ jobs:
         uses: Swatinem/rust-cache@v2
         with:
           cache-on-failure: true
-          shared-key: "windows-build"
-          save-if: ${{ github.ref == 'refs/heads/main' || github.event_name == 'schedule' }}
+          shared-key: "linux-build"
 
       - name: Run tests
         run: cargo test
@@ -56,7 +55,6 @@ jobs:
         with:
           cache-on-failure: true
           shared-key: "windows-build"
-          save-if: ${{ github.ref == 'refs/heads/main' || github.event_name == 'schedule' }}
 
       - name: Configure Cargo settings
         run: |
@@ -70,10 +68,37 @@ jobs:
         
       - name: Create game directory structure
         run: |
-          mkdir -p dist/assets
+          # Create base dist directory
+          mkdir -p dist
+          
+          # Copy executable
+          Write-Host "Copying executable..."
           copy target\ci\my-rts-game.exe dist\
-          if (Test-Path -Path assets) { xcopy assets dist\assets\ /E /I /Y }
+          
+          # Copy assets to the correct structure - extract from assets/ to dist/
+          if (Test-Path -Path assets) {
+            Write-Host "Copying assets to distribution folder..."
+            # Get all files in assets directory
+            Get-ChildItem -Path assets -Recurse -File | ForEach-Object {
+              # Get relative path from assets directory
+              $relativePath = $_.FullName.Substring((Get-Item -Path "assets").FullName.Length + 1)
+              # Create target directory
+              $targetDir = Join-Path -Path "dist" -ChildPath (Split-Path -Path $relativePath)
+              if (-not (Test-Path -Path $targetDir)) {
+                New-Item -Path $targetDir -ItemType Directory | Out-Null
+              }
+              # Copy file
+              Copy-Item -Path $_.FullName -Destination (Join-Path -Path "dist" -ChildPath $relativePath) -Force
+            }
+          }
+          
+          # Copy documentation
           if (Test-Path -Path README.md) { copy README.md dist\ }
+          
+          # List final directory structure for debugging
+          Write-Host "Final directory structure:"
+          Get-ChildItem -Path dist -Recurse -File | Select-Object FullName
+        shell: pwsh
 
       - name: Generate timestamp
         id: timestamp
@@ -131,9 +156,9 @@ jobs:
           Source: "dist\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
           [Icons]
-          Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
+          Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{app}"
           Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
-          Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
+          Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{app}"; Tasks: desktopicon
 
           [Run]
           Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
