@@ -91,11 +91,10 @@ jobs:
           name: windows-zip
           path: my-rts-game-nightly-${{ steps.timestamp.outputs.value }}.zip
 
-      - name: Download Inno Setup
+      - name: Install Inno Setup using Chocolatey
         run: |
-          Invoke-WebRequest -Uri "https://files.jrsoftware.org/is/6/innosetup-6.2.2.exe" -OutFile innosetup.exe
-          Start-Process -FilePath "innosetup.exe" -ArgumentList "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-" -Wait
-        shell: pwsh
+          choco install -y innosetup
+        shell: powershell
 
       - name: Create Inno Setup Script
         run: |
