@@ -77,13 +77,14 @@ pub fn resource_gathering_command(
 }
 
 // Enhanced gathering system
+#[allow(clippy::type_complexity)]
 pub fn gathering_system(
     time: Res<Time>,
     mut commands: Commands,
     _player_resources: ResMut<PlayerResources>,
     mut param_set: ParamSet<(
         Query<(Entity, &mut Gathering, &mut Transform, &mut Velocity, &mut Inventory)>,
-        Query<(Entity, &mut ResourceNode, &Transform)>,
+        Query<(Entity, &mut ResourceNode, &Transform)>
     )>,
     asset_server: Res<AssetServer>,
 ) {
@@ -112,7 +113,7 @@ pub fn gathering_system(
             match gathering.gather_state {
                 GatheringState::MovingToResource => {
                     // Check if we've reached the resource
-                    if let Some(_) = velocity.target {
+                    if velocity.target.is_some() {
                         if let Some(&resource_pos) = resource_positions.get(&gathering.target) {
                             let distance = transform.translation.truncate().distance(resource_pos.truncate());
                             

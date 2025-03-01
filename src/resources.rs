@@ -114,16 +114,8 @@ impl PlayerResources {
 }
 
 // Game state (keep this if you need it)
-#[derive(Resource)]
+#[derive(Resource, Default)]
 pub struct GameState {
     #[allow(dead_code)]
     pub paused: bool,  // Will be used for pause functionality
-}
-
-impl Default for GameState {
-    fn default() -> Self {
-        GameState {
-            paused: false,
-        }
-    }
 }

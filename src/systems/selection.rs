@@ -108,11 +108,14 @@ pub fn animate_selection_rings(
 }
 
 // Fix the update_selection_ring_positions system using ParamSet
-pub fn update_selection_ring_positions(
+#[allow(clippy::type_complexity)]
+pub fn update_selection_ring(
+    // Function parameters including your ParamSet
     mut params: ParamSet<(
         Query<(&SelectionRing, &mut Transform)>,
         Query<(Entity, &Transform), With<Unit>>
     )>,
+    // ... rest of function parameters
 ) {
     // First, collect the positions we need
     let mut unit_positions: Vec<(Entity, Vec3)> = Vec::new();

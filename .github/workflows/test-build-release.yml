@@ -1,0 +1,219 @@
+name: Test, Build and Release
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 0 * * *'  # Run every day at midnight UTC for nightly builds
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libasound2-dev libudev-dev pkg-config
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+
+      - name: Cache Rust dependencies
+        id: rust-cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true
+          shared-key: "${{ runner.os }}-rust-${{ hashFiles('**/Cargo.lock') }}"
+
+      - name: Debug cache info
+        run: |
+          echo "Runner OS: ${{ runner.os }}"
+          echo "Rust version: $(rustc --version)"
+          echo "Cargo.lock hash: ${{ hashFiles('**/Cargo.lock') }}"
+          echo "Cache saved: ${{ steps.rust-cache.outputs.cache-hit != 'true' }}"
+        shell: bash
+
+      - name: Run tests
+        run: cargo test
+
+      - name: Run clippy
+        run: cargo clippy -- -D warnings
+
+  build-windows:
+    name: Build Windows
+    needs: test  # This ensures tests must pass before build starts
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust dependencies
+        id: rust-cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true
+          shared-key: "${{ runner.os }}-rust-${{ hashFiles('**/Cargo.lock') }}"
+
+      - name: Debug cache info
+        run: |
+          echo "Runner OS: ${{ runner.os }}"
+          echo "Rust version: $(rustc --version)"
+          echo "Cargo.lock hash: ${{ hashFiles('**/Cargo.lock') }}"
+          echo "Cache saved: ${{ steps.rust-cache.outputs.cache-hit != 'true' }}"
+        shell: pwsh
+
+      - name: Configure Cargo settings
+        run: |
+          echo "CARGO_INCREMENTAL=0" >> $env:GITHUB_ENV
+          echo "CARGO_NET_RETRY=10" >> $env:GITHUB_ENV
+          echo "CARGO_BUILD_JOBS=8" >> $env:GITHUB_ENV  # Adjust based on runner resources
+        shell: pwsh
+
+      - name: Build Release
+        run: cargo build --profile ci
+        
+      - name: Create game directory structure
+        run: |
+          # Create base dist directory
+          mkdir -p dist
+          
+          # Copy executable
+          Write-Host "Copying executable..."
+          copy target\ci\my-rts-game.exe dist\
+          
+          # Copy assets to the correct structure - extract from assets/ to dist/
+          if (Test-Path -Path assets) {
+            Write-Host "Copying assets to distribution folder..."
+            # Get all files in assets directory
+            Get-ChildItem -Path assets -Recurse -File | ForEach-Object {
+              # Get relative path from assets directory
+              $relativePath = $_.FullName.Substring((Get-Item -Path "assets").FullName.Length + 1)
+              # Create target directory
+              $targetDir = Join-Path -Path "dist" -ChildPath (Split-Path -Path $relativePath)
+              if (-not (Test-Path -Path $targetDir)) {
+                New-Item -Path $targetDir -ItemType Directory | Out-Null
+              }
+              # Copy file
+              Copy-Item -Path $_.FullName -Destination (Join-Path -Path "dist" -ChildPath $relativePath) -Force
+            }
+          }
+          
+          # Copy documentation
+          if (Test-Path -Path README.md) { copy README.md dist\ }
+          
+          # List final directory structure for debugging
+          Write-Host "Final directory structure:"
+          Get-ChildItem -Path dist -Recurse -File | Select-Object FullName
+        shell: pwsh
+
+      - name: Generate timestamp
+        id: timestamp
+        run: echo "value=$(Get-Date -Format 'yyyyMMdd-HHmmss')" >> $env:GITHUB_OUTPUT
+        shell: pwsh
+
+      - name: Create ZIP Archive
+        run: |
+          Compress-Archive -Path dist\* -DestinationPath my-rts-game-nightly-${{ steps.timestamp.outputs.value }}.zip
+        shell: pwsh
+
+      - name: Upload ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-zip
+          path: my-rts-game-nightly-${{ steps.timestamp.outputs.value }}.zip
+
+      - name: Install Inno Setup using Chocolatey
+        run: |
+          choco install -y innosetup
+        shell: powershell
+
+      - name: Create Inno Setup Script
+        run: |
+          $timestamp = "${{ steps.timestamp.outputs.value }}"
+          @"
+          #define MyAppName "My RTS Game"
+          #define MyAppVersion "nightly-$timestamp"
+          #define MyAppPublisher "Me"
+          #define MyAppURL "https://github.com/${{ github.repository }}"
+          #define MyAppExeName "my-rts-game.exe"
+
+          [Setup]
+          AppId={{c8b3976e-4dd1-4591-8544-2c638855de99}}
+          AppName={#MyAppName}
+          AppVersion={#MyAppVersion}
+          AppPublisher={#MyAppPublisher}
+          AppPublisherURL={#MyAppURL}
+          DefaultDirName={autopf}\{#MyAppName}
+          DefaultGroupName={#MyAppName}
+          AllowNoIcons=yes
+          Compression=lzma
+          SolidCompression=yes
+          OutputDir=installer
+          OutputBaseFilename=my-rts-game-setup-{#MyAppVersion}
+          ArchitecturesInstallIn64BitMode=x64
+
+          [Languages]
+          Name: "english"; MessagesFile: "compiler:Default.isl"
+
+          [Tasks]
+          Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
+
+          [Files]
+          Source: "dist\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+
+          [Icons]
+          Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{app}"
+          Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
+          Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{app}"; Tasks: desktopicon
+
+          [Run]
+          Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
+          "@ | Out-File -FilePath installer.iss -Encoding utf8
+        shell: pwsh
+
+      - name: Compile Installer
+        run: |
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer.iss
+        shell: pwsh
+
+      - name: Upload Installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-installer
+          path: installer/*.exe
+
+  create-release:
+    name: Create Release
+    needs: build-windows
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate timestamp for release name
+        id: timestamp
+        run: echo "value=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_OUTPUT
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Create Nightly Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: "Nightly Build ${{ steps.timestamp.outputs.value }}"
+          tag_name: "nightly-${{ steps.timestamp.outputs.value }}"
+          files: |
+            windows-installer/*.exe
+            windows-zip/*.zip
+          prerelease: true
+          generate_release_notes: true

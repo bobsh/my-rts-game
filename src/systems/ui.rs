@@ -118,6 +118,7 @@ pub fn setup_ui(mut commands: Commands, asset_server: Res<AssetServer>, resource
     });
 }
 
+#[allow(clippy::type_complexity)]
 pub fn update_unit_info(
     selected_units: Query<(&UnitAttributes, &Velocity), With<Selected>>,
     mut text_query: ParamSet<(
