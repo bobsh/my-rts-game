@@ -66,12 +66,12 @@ jobs:
         shell: pwsh
 
       - name: Build Release
-        run: cargo build --profile ci --no-default-features --features bevy/default_fonts,bevy/bevy_asset,bevy/bevy_sprite,bevy/bevy_ui,bevy/bevy_text
+        run: cargo build --profile ci
         
       - name: Create game directory structure
         run: |
           mkdir -p dist/assets
-          copy target\release\my-rts-game.exe dist\
+          copy target\ci\my-rts-game.exe dist\
           if (Test-Path -Path assets) { xcopy assets dist\assets\ /E /I /Y }
           if (Test-Path -Path README.md) { copy README.md dist\ }
 
