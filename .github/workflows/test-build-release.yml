@@ -28,10 +28,21 @@ jobs:
           components: clippy
 
       - name: Cache Rust dependencies
+        id: rust-cache
         uses: Swatinem/rust-cache@v2
         with:
           cache-on-failure: true
-          shared-key: "linux-build"
+          shared-key: "${{ runner.os }}-rust-${{ hashFiles('**/Cargo.lock') }}"
+          restore-keys: |
+            ${{ runner.os }}-rust-
+
+      - name: Debug cache info
+        run: |
+          echo "Runner OS: ${{ runner.os }}"
+          echo "Rust version: $(rustc --version)"
+          echo "Cargo.lock hash: ${{ hashFiles('**/Cargo.lock') }}"
+          echo "Cache saved: ${{ steps.rust-cache.outputs.cache-hit != 'true' }}"
+        shell: bash
 
       - name: Run tests
         run: cargo test
@@ -51,10 +62,21 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Cache Rust dependencies
+        id: rust-cache
         uses: Swatinem/rust-cache@v2
         with:
           cache-on-failure: true
-          shared-key: "windows-build"
+          shared-key: "${{ runner.os }}-rust-${{ hashFiles('**/Cargo.lock') }}"
+          restore-keys: |
+            ${{ runner.os }}-rust-
+
+      - name: Debug cache info
+        run: |
+          echo "Runner OS: ${{ runner.os }}"
+          echo "Rust version: $(rustc --version)"
+          echo "Cargo.lock hash: ${{ hashFiles('**/Cargo.lock') }}"
+          echo "Cache saved: ${{ steps.rust-cache.outputs.cache-hit != 'true' }}"
+        shell: pwsh
 
       - name: Configure Cargo settings
         run: |
