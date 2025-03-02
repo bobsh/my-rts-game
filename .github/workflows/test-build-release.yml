@@ -90,27 +90,28 @@ jobs:
         
       - name: Create game directory structure
         run: |
-          # Create base dist directory
-          mkdir -p dist/assets
+          # Create base dist directory (without assets subdirectory)
+          mkdir -p dist
           
           # Copy executable
           Write-Host "Copying executable..."
           copy target\ci\my-rts-game.exe dist\
           
-          # Copy assets to correct structure - keep them under an "assets" folder
+          # Extract assets contents directly into dist
           if (Test-Path -Path assets) {
             Write-Host "Copying assets to distribution folder..."
-            # Get all files in assets directory
-            Get-ChildItem -Path assets -Recurse -File | ForEach-Object {
-              # Get relative path from assets directory
-              $relativePath = $_.FullName.Substring((Get-Item -Path "assets").FullName.Length + 1)
-              # Create target directory (under dist/assets)
-              $targetDir = Join-Path -Path "dist/assets" -ChildPath (Split-Path -Path $relativePath)
-              if (-not (Test-Path -Path $targetDir)) {
-                New-Item -Path $targetDir -ItemType Directory | Out-Null
+            # List all directories directly under assets
+            Get-ChildItem -Path assets -Directory | ForEach-Object {
+              $dirName = $_.Name
+              Write-Host "Copying asset directory: $dirName"
+              
+              # Create the directory in dist
+              if (-not (Test-Path -Path "dist\$dirName")) {
+                New-Item -Path "dist\$dirName" -ItemType Directory | Out-Null
               }
-              # Copy file
-              Copy-Item -Path $_.FullName -Destination (Join-Path -Path "dist/assets" -ChildPath $relativePath) -Force
+              
+              # Copy recursively from assets\dirName to dist\dirName
+              xcopy "assets\$dirName" "dist\$dirName" /E /I /Y
             }
           }
           
