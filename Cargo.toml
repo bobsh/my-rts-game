@@ -12,11 +12,14 @@ lto = "thin"
 
 [dependencies]
 bevy = { version = "0.14.2", default-features = false, features = [
-    "bevy_asset",
-    "bevy_sprite", 
-    "bevy_ui",
-    "bevy_text",
-    "bevy_render",
-    "bevy_core_pipeline",
-    "default_font"  # Note: singular "font", not "fonts"
+  "bevy_asset",
+  "bevy_sprite", 
+  "bevy_ui",
+  "bevy_text",
+  "bevy_render",
+  "bevy_core_pipeline",
+  "default_font",
+  "png",
+  "bevy_winit",        # Window handling
+  "bevy_gizmos",       # Debugging visualization
 ]}

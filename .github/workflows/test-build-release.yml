@@ -90,29 +90,23 @@ jobs:
         
       - name: Create game directory structure
         run: |
-          # Create base dist directory (without assets subdirectory)
+          # Create base dist directory WITH assets subdirectory
           mkdir -p dist
+          mkdir -p dist\assets
           
           # Copy executable
           Write-Host "Copying executable..."
           copy target\ci\my-rts-game.exe dist\
           
-          # Extract assets contents directly into dist
+          # Copy all assets to dist/assets
           if (Test-Path -Path assets) {
-            Write-Host "Copying assets to distribution folder..."
-            # List all directories directly under assets
-            Get-ChildItem -Path assets -Directory | ForEach-Object {
-              $dirName = $_.Name
-              Write-Host "Copying asset directory: $dirName"
-              
-              # Create the directory in dist
-              if (-not (Test-Path -Path "dist\$dirName")) {
-                New-Item -Path "dist\$dirName" -ItemType Directory | Out-Null
-              }
-              
-              # Copy recursively from assets\dirName to dist\dirName
-              xcopy "assets\$dirName" "dist\$dirName" /E /I /Y
-            }
+            Write-Host "Copying complete assets folder to distribution..."
+            xcopy "assets\*" "dist\assets\" /E /I /Y
+            
+            # Verify the assets were copied
+            Write-Host "Verifying asset files..."
+            $assetCount = (Get-ChildItem -Path dist\assets -Recurse -File).Count
+            Write-Host "Copied $assetCount asset files"
           }
           
           # Copy documentation
