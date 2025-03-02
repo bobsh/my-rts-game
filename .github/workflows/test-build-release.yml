@@ -78,6 +78,13 @@ jobs:
           echo "Cache saved: ${{ steps.rust-cache.outputs.cache-hit != 'true' }}"
         shell: pwsh
 
+      - name: Configure sparse index
+        run: |
+          mkdir -p .cargo
+          echo '[registries.crates-io]' > .cargo\config.toml
+          echo 'protocol = "sparse"' >> .cargo\config.toml
+        shell: pwsh
+
       - name: Configure Cargo settings
         run: |
           echo "CARGO_INCREMENTAL=0" >> $env:GITHUB_ENV
