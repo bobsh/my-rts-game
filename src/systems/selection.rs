@@ -54,31 +54,6 @@ pub fn selection_system(
                     // Add Selected component
                     commands.entity(entity).insert(Selected);
                     
-                    // Base size for the selection ring - slightly larger than the unit
-                    let base_size = 70.0;
-                    
-                    // Create selection ring with animation timer
-                    commands.spawn((
-                        SpriteBundle {
-                            sprite: Sprite {
-                                color: Color::srgba(1.0, 0.2, 0.2, 0.5), // Red with 50% opacity
-                                custom_size: Some(Vec2::new(base_size, base_size)),
-                                ..default()
-                            },
-                            transform: Transform::from_translation(Vec3::new(
-                                transform.translation.x,
-                                transform.translation.y,
-                                transform.translation.z - 0.1
-                            )),
-                            ..default()
-                        },
-                        SelectionRing {
-                            timer: Timer::from_seconds(1.0, TimerMode::Repeating),
-                            base_size,
-                            owner: entity,  // Store the entity this ring belongs to
-                        },
-                    ));
-                    
                     break;
                 }
             }
@@ -149,5 +124,26 @@ pub fn highlight_selected(
             // Selected units are highlighted by the selection ring
             // This system is now mostly redundant with the animated ring
         }
+    }
+}
+
+pub fn draw_selection_boxes(
+    mut gizmos: Gizmos,
+    selection_query: Query<&Transform, With<Selected>>,
+) {
+    for transform in selection_query.iter() {
+        // Get position from transform
+        let position = transform.translation.truncate();
+        
+        // Use a consistent size for selection boxes (adjust as needed)
+        let size = Vec2::new(70.0, 70.0);
+        
+        // Draw just the outline in green (no fill)
+        gizmos.rect_2d(
+            position,
+            0.0, // No rotation
+            size,
+            Color::srgb(0.0, 1.0, 0.0), // Green
+        );
     }
 }

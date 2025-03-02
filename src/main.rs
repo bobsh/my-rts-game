@@ -10,7 +10,7 @@ mod systems;
 use components::unit::{Selectable, Unit, WorkerAnimation, WorkerAnimationState, Velocity, UnitAttributes};
 use components::resource::ResourceNode;
 use resources::{PlayerResources, ResourceRegistry, ResourceId, GameState};
-use systems::selection::{selection_system, highlight_selected, animate_selection_rings, update_selection_ring};
+use systems::selection::{selection_system, highlight_selected, animate_selection_rings, update_selection_ring, draw_selection_boxes};
 use systems::animation::{animate_workers, update_worker_animations, animate_gather_effects, animate_floating_text};
 use systems::movement::{move_command_system, movement_system, show_destination_markers};
 use systems::gathering::{resource_gathering_command, gathering_system};
@@ -35,6 +35,7 @@ fn main() {
         .add_systems(Update, (
             selection_system, 
             highlight_selected,
+            draw_selection_boxes,
             animate_selection_rings,
             update_selection_ring,
             animate_workers,
