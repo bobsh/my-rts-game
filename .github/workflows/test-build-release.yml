@@ -89,15 +89,30 @@ jobs:
         run: |
           echo "CARGO_INCREMENTAL=0" >> $env:GITHUB_ENV
           echo "CARGO_NET_RETRY=10" >> $env:GITHUB_ENV
-          echo "CARGO_BUILD_JOBS=8" >> $env:GITHUB_ENV  # Adjust based on runner resources
+          echo "CARGO_BUILD_JOBS=8" >> $env:GITHUB_ENV
+
+          # For PR testing, add prefer-dynamic to speed up builds
+          if ('${{ github.event_name }}' -eq 'pull_request') {
+            echo "RUSTFLAGS=-C prefer-dynamic" >> $env:GITHUB_ENV
+          }
         shell: pwsh
 
-      - name: Build Release
+      - name: Build
         run: |
-          cargo build --profile ci -v 2>&1 | ForEach-Object {
-            $timestamp = Get-Date -Format "HH:mm:ss.fff"
-            "$timestamp $_"
+          # Choose build profile based on event type
+          $buildProfile = if ('${{ github.event_name }}' -in @('schedule', 'workflow_dispatch', 'release')) {
+            # For nightly and manual builds, use fully optimized profile
+            Write-Host "Building OPTIMIZED release (schedule/manual trigger)"
+            "release-optimized"
+          } else {
+            # For PR and branch testing, use faster CI profile
+            Write-Host "Building FAST CI build (PR/branch testing)"
+            "ci"
           }
+
+          # Build with the selected profile
+          cargo build --profile $buildProfile -v 2>&1 | % { "$(Get-Date -Format 'HH:mm:ss.fff') $_" }
+        shell: pwsh
 
       - name: Create game directory structure
         run: |
