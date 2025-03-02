@@ -94,7 +94,7 @@ jobs:
 
       - name: Build Release
         run: |
-          cargo build --profile ci -v | ForEach-Object {
+          cargo build --profile ci -v 2>&1 | ForEach-Object {
             $timestamp = Get-Date -Format "HH:mm:ss.fff"
             "$timestamp $_"
           }
