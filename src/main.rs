@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use bevy::window::{PrimaryWindow, WindowPlugin};
+use bevy::window::WindowPlugin;
 use bevy::text::JustifyText;
 use bevy::winit::WinitWindows;
 
