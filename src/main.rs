@@ -32,7 +32,7 @@ fn main() {
         .init_resource::<GameState>()
         .init_resource::<PlayerResources>()
         .init_resource::<ResourceRegistry>()
-        .add_systems(Startup, (setup, setup_ui, setup_window_icon, setup_backgroun))
+        .add_systems(Startup, (setup, setup_ui, setup_window_icon, setup_background))
         .add_systems(Update, (
             selection_system,
             highlight_selected,
