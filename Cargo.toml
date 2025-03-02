@@ -6,9 +6,16 @@ edition = "2021"
 [profile.ci]
 inherits = "release"
 debug = false
-opt-level = 2
+opt-level = 1
 codegen-units = 16
-lto = "thin"
+lto = "off"  # Must be explicitly off to work with prefer-dynamic on Windows
+
+[profile.release-optimized]
+inherits = "release"
+debug = false
+opt-level = 3
+codegen-units = 1
+lto = "fat"  # Full optimization for actual releases
 
 [dependencies]
 bevy = "0.14.2"
