@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 use bevy::window::WindowPlugin;
 use bevy::text::JustifyText;
+use bevy::winit::WinitWindows;
 
 mod assets;
 mod components;
@@ -31,7 +32,7 @@ fn main() {
         .init_resource::<GameState>()
         .init_resource::<PlayerResources>()
         .init_resource::<ResourceRegistry>()
-        .add_systems(Startup, (setup, setup_ui))
+        .add_systems(Startup, (setup, setup_ui, setup_window_icon))
         .add_systems(Update, (
             selection_system, 
             highlight_selected,
@@ -165,5 +166,37 @@ fn spawn_resource_node(
             transform: Transform::from_translation(Vec3::new(position.x, position.y + 20.0, 0.0)),
             ..default()
         });
+    }
+}
+
+// Add this system to your startup systems
+fn setup_window_icon(
+    windows: Query<Entity, With<bevy::window::PrimaryWindow>>,
+    winit_windows: NonSend<WinitWindows>,
+) {
+    let window_entity = windows.single();
+    
+    // Get the actual winit window
+    let Some(primary) = winit_windows.get_window(window_entity) else {
+        return;
+    };
+    
+    // Load the icon
+    let icon_path = "assets/icons/quillbrainstars/quillbrainstars-64x64.png"; // Use PNG for runtime
+    let icon_bytes = std::fs::read(icon_path).unwrap_or_else(|_| {
+        println!("Failed to load icon");
+        Vec::new()
+    });
+    
+    // Create the icon
+    if let Ok(image) = image::load_from_memory(&icon_bytes) {
+        let rgba = image.into_rgba8();
+        let (width, height) = rgba.dimensions();
+        let rgba_bytes = rgba.into_raw();
+        
+        if let Ok(icon) = winit::window::Icon::from_rgba(rgba_bytes, width, height) {
+            primary.set_window_icon(Some(icon));
+            println!("Set window icon successfully!");
+        }
     }
 }
