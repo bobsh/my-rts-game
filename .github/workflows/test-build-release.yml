@@ -93,7 +93,11 @@ jobs:
         shell: pwsh
 
       - name: Build Release
-        run: cargo build --profile ci -v
+        run: |
+          cargo build --profile ci -v | ForEach-Object {
+            $timestamp = Get-Date -Format "HH:mm:ss.fff"
+            "$timestamp $_"
+          }
 
       - name: Create game directory structure
         run: |
