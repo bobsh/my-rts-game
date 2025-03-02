@@ -11,23 +11,4 @@ codegen-units = 16
 lto = "thin"
 
 [dependencies]
-bevy = { version = "0.14.2", default-features = false, features = [
-  "bevy_asset",
-  "bevy_sprite", 
-  "bevy_ui",
-  "bevy_text",
-  "bevy_render",
-  "bevy_core_pipeline",
-  "default_font",
-  "png",
-  "bevy_winit",        # Window handling
-  "bevy_gizmos",       # Debugging visualization
-]}
-
-# Add Linux-specific dependencies
-[target.'cfg(target_os = "linux")'.dependencies]
-bevy = { version = "0.14.2", default-features = false, features = [
-  "x11",              # X11 display server support
-  "wayland",          # Wayland display server support
-  "accesskit_unix"    # Accessibility features for Unix
-]}
+bevy = { version = "0.14.2" }
