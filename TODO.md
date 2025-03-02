@@ -10,7 +10,7 @@
 - [x] Change the selection box from a red transparent rectangle to a green outline that is drawn behind the sprite
 - [x] Add an icon for the game
 - [x] Add a sample texture for the background
-- [x] Make PR testing faster and release more optimized but slower
+- [x] Make PR testing faster
 - [ ] Add complete unit tests for each .rs file
 - [ ] Add a splash screen
 - [ ] Add a main menu
