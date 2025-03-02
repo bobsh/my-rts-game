@@ -19,24 +19,19 @@ use systems::ui::{setup_ui, update_unit_info, update_resources_display, update_i
 use components::inventory::Inventory;
 
 fn main() {
-    // Load icon bytes at compile time
-    let icon_bytes = include_bytes!("../assets/icons/quillbrainstars/quillbrainstars-64x64.png");
-    
     App::new()
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
                 title: "My RTS Game".to_string(),
                 resolution: (1280.0, 720.0).into(),
-                // No icon setting here
                 ..Default::default()
             }),
             ..Default::default()
         }))
-        .insert_resource(MyGameIcon(icon_bytes.to_vec()))
         .init_resource::<GameState>()
         .init_resource::<PlayerResources>()
         .init_resource::<ResourceRegistry>()
-        .add_systems(Startup, (setup_window_icon, setup, setup_ui))
+        .add_systems(Startup, (setup, setup_ui))
         .add_systems(Update, (
             selection_system, 
             highlight_selected,
@@ -57,28 +52,6 @@ fn main() {
             update_inventory_ui,
         ))
         .run();
-}
-
-#[derive(Resource)]
-struct MyGameIcon(Vec<u8>);
-
-fn setup_window_icon(
-    icon_data: Res<MyGameIcon>,
-    winit_windows: NonSend<bevy::winit::WinitWindows>, 
-    primary_windows: Query<Entity, With<PrimaryWindow>>,
-) {
-    if let Ok(window_entity) = primary_windows.get_single() {
-        if let Some(window) = winit_windows.get_window(window_entity) {
-            // Create the icon - the winit crate must be added to your dependencies
-            if let Ok(icon) = winit::window::Icon::from_rgba(
-                icon_data.0.clone(), 
-                64, 
-                64
-            ) {
-                window.set_window_icon(Some(icon));
-            }
-        }
-    }
 }
 
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>, resource_registry: Res<ResourceRegistry>) {

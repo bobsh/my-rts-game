@@ -13,3 +13,6 @@ lto = "thin"
 [dependencies]
 bevy = "0.14.2"
 winit = "0.30"
+
+[build-dependencies]
+winres = "0.1"
