@@ -7,6 +7,7 @@
 - [x] Add a dependabot setup
 - [x] Setup test framework
 - [x] Windows Installer based executable fails with invalid path to assets
+- [ ] Change the selection box from a red transparent rectangle to a green outline that is drawn behind the sprite
 - [ ] Add complete unit tests for each .rs file
 - [ ] Add an icon for the game
 - [ ] Add a splash screen
