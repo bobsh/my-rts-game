@@ -86,32 +86,32 @@ jobs:
         shell: pwsh
 
       - name: Build Release
-        run: cargo build --profile ci
-        
+        run: cargo build --profile ci -v
+
       - name: Create game directory structure
         run: |
           # Create base dist directory WITH assets subdirectory
           mkdir -p dist
           mkdir -p dist\assets
-          
+
           # Copy executable
           Write-Host "Copying executable..."
           copy target\ci\my-rts-game.exe dist\
-          
+
           # Copy all assets to dist/assets
           if (Test-Path -Path assets) {
             Write-Host "Copying complete assets folder to distribution..."
             xcopy "assets\*" "dist\assets\" /E /I /Y
-            
+
             # Verify the assets were copied
             Write-Host "Verifying asset files..."
             $assetCount = (Get-ChildItem -Path dist\assets -Recurse -File).Count
             Write-Host "Copied $assetCount asset files"
           }
-          
+
           # Copy documentation
           if (Test-Path -Path README.md) { copy README.md dist\ }
-          
+
           # List final directory structure for debugging
           Write-Host "Final directory structure:"
           Get-ChildItem -Path dist -Recurse -File | Select-Object FullName
