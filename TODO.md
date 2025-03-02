@@ -6,6 +6,7 @@
 - [x] Build an exe file for Windows
 - [x] Add a dependabot setup
 - [x] Setup test framework
+- [x] Windows Installer based executable fails with invalid path to assets
 - [ ] Add complete unit tests for each .rs file
 - [ ] Add an icon for the game
 - [ ] Add a splash screen

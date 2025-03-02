@@ -16,11 +16,13 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          lfs: true  # Add this line to enable LFS support
 
       - name: Install Linux dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libasound2-dev libudev-dev pkg-config
+          sudo apt-get install -y libasound2-dev libudev-dev pkg-config libx11-dev libxcb-shape0-dev libxcb-xfixes0-dev libwayland-dev libxkbcommon-dev
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
@@ -55,6 +57,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          lfs: true  # Add this line to enable LFS support
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
@@ -86,28 +90,23 @@ jobs:
         
       - name: Create game directory structure
         run: |
-          # Create base dist directory
+          # Create base dist directory WITH assets subdirectory
           mkdir -p dist
+          mkdir -p dist\assets
           
           # Copy executable
           Write-Host "Copying executable..."
           copy target\ci\my-rts-game.exe dist\
           
-          # Copy assets to the correct structure - extract from assets/ to dist/
+          # Copy all assets to dist/assets
           if (Test-Path -Path assets) {
-            Write-Host "Copying assets to distribution folder..."
-            # Get all files in assets directory
-            Get-ChildItem -Path assets -Recurse -File | ForEach-Object {
-              # Get relative path from assets directory
-              $relativePath = $_.FullName.Substring((Get-Item -Path "assets").FullName.Length + 1)
-              # Create target directory
-              $targetDir = Join-Path -Path "dist" -ChildPath (Split-Path -Path $relativePath)
-              if (-not (Test-Path -Path $targetDir)) {
-                New-Item -Path $targetDir -ItemType Directory | Out-Null
-              }
-              # Copy file
-              Copy-Item -Path $_.FullName -Destination (Join-Path -Path "dist" -ChildPath $relativePath) -Force
-            }
+            Write-Host "Copying complete assets folder to distribution..."
+            xcopy "assets\*" "dist\assets\" /E /I /Y
+            
+            # Verify the assets were copied
+            Write-Host "Verifying asset files..."
+            $assetCount = (Get-ChildItem -Path dist\assets -Recurse -File).Count
+            Write-Host "Copied $assetCount asset files"
           }
           
           # Copy documentation
@@ -136,7 +135,7 @@ jobs:
 
       - name: Install Inno Setup using Chocolatey
         run: |
-          choco install -y innosetup
+          choco upgrade -y innosetup
         shell: powershell
 
       - name: Create Inno Setup Script
