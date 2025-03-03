@@ -1,8 +1,8 @@
 // src/systems/map.rs
 
-use bevy::prelude::*;
 use crate::components::resource::ResourceNode;
 use crate::resources::{ResourceId, ResourceRegistry};
+use bevy::prelude::*;
 
 /// Sets up the tiled grass background for the game world
 pub fn setup_background(mut commands: Commands, asset_server: Res<AssetServer>) {
@@ -20,31 +20,31 @@ pub fn setup_background(mut commands: Commands, asset_server: Res<AssetServer>) 
     let tiles_y = (screen_height / tile_size).ceil() as i32;
 
     // Create parent entity to hold all background tiles
-    let background = commands.spawn((
-        SpatialBundle::default(),
-        Name::new("Background Container"),
-    )).id();
+    let background = commands
+        .spawn((SpatialBundle::default(), Name::new("Background Container")))
+        .id();
 
     // Create a grid of background tiles
     for y in -tiles_y..=tiles_y {
         for x in -tiles_x..=tiles_x {
-            commands.spawn((
-                SpriteBundle {
-                    texture: grass_texture.clone(),
-                    sprite: Sprite {
-                        custom_size: Some(Vec2::new(tile_size, tile_size)),
+            commands
+                .spawn((
+                    SpriteBundle {
+                        texture: grass_texture.clone(),
+                        sprite: Sprite {
+                            custom_size: Some(Vec2::new(tile_size, tile_size)),
+                            ..Default::default()
+                        },
+                        transform: Transform::from_translation(Vec3::new(
+                            x as f32 * tile_size,
+                            y as f32 * tile_size,
+                            -100.0, // Behind other elements
+                        )),
                         ..Default::default()
                     },
-                    transform: Transform::from_translation(Vec3::new(
-                        x as f32 * tile_size,
-                        y as f32 * tile_size,
-                        -100.0, // Behind other elements
-                    )),
-                    ..Default::default()
-                },
-                Name::new(format!("Grass Tile {},{}", x, y)),
-            ))
-            .set_parent(background);
+                    Name::new(format!("Grass Tile {},{}", x, y)),
+                ))
+                .set_parent(background);
         }
     }
 }
@@ -56,7 +56,7 @@ pub fn spawn_resource_node(
     resource_registry: &Res<ResourceRegistry>,
     position: Vec2,
     resource_id: &ResourceId,
-    amount: u32
+    amount: u32,
 ) {
     // Get the resource definition from registry
     if let Some(resource_def) = resource_registry.get(resource_id) {
@@ -64,38 +64,38 @@ pub fn spawn_resource_node(
         let font = asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf");
 
         // Spawn the resource node entity
-        let _resource_entity = commands.spawn((
-            SpriteBundle {
-                texture,
-                sprite: Sprite {
-                    color: resource_def.color,
-                    custom_size: Some(Vec2::new(30.0, 30.0)),
+        let _resource_entity = commands
+            .spawn((
+                SpriteBundle {
+                    texture,
+                    sprite: Sprite {
+                        color: resource_def.color,
+                        custom_size: Some(Vec2::new(30.0, 30.0)),
+                        ..default()
+                    },
+                    transform: Transform::from_translation(Vec3::new(position.x, position.y, -0.1))
+                        .with_scale(Vec3::new(0.5, 0.5, 1.0)),
                     ..default()
                 },
-                transform: Transform::from_translation(Vec3::new(position.x, position.y, -0.1))
-                    .with_scale(Vec3::new(0.5, 0.5, 1.0)),
-                ..default()
-            },
-            ResourceNode {
-                resource_id: resource_id.clone(),
-                amount_remaining: amount,
-                max_amount: amount,
-            },
-        )).id();
+                ResourceNode {
+                    resource_id: resource_id.clone(),
+                    amount_remaining: amount,
+                    max_amount: amount,
+                },
+            ))
+            .id();
 
         // Add a small label above the resource
         commands.spawn(Text2dBundle {
             text: Text {
-                sections: vec![
-                    TextSection::new(
-                        resource_def.name.clone(),
-                        TextStyle {
-                            font,
-                            font_size: 16.0,
-                            color: Color::WHITE,
-                        },
-                    )
-                ],
+                sections: vec![TextSection::new(
+                    resource_def.name.clone(),
+                    TextStyle {
+                        font,
+                        font_size: 16.0,
+                        color: Color::WHITE,
+                    },
+                )],
                 justify: JustifyText::Center,
                 ..default()
             },

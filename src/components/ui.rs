@@ -1,5 +1,5 @@
-use bevy::prelude::*;
 use crate::resources::ResourceId;
+use bevy::prelude::*;
 
 #[derive(Component)]
 pub struct UnitInfoPanel;

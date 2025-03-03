@@ -30,7 +30,7 @@ pub enum WorkerAnimationState {
 pub struct SelectionRing {
     pub timer: Timer,
     pub base_size: f32,
-    pub owner: Entity,  // Add this to track which entity this ring belongs to
+    pub owner: Entity, // Add this to track which entity this ring belongs to
 }
 
 #[derive(Component, Default)]

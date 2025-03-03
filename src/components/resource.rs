@@ -1,12 +1,12 @@
-use bevy::prelude::*;
 use crate::resources::ResourceId;
+use bevy::prelude::*;
 
 #[derive(Component)]
 pub struct ResourceNode {
     pub resource_id: ResourceId,
     pub amount_remaining: u32,
     #[allow(dead_code)]
-    pub max_amount: u32,  // Will be used for UI progress bars
+    pub max_amount: u32, // Will be used for UI progress bars
 }
 
 // Updated Gathering component with states
@@ -28,5 +28,5 @@ pub enum GatheringState {
     Harvesting,
     ReturningResource,
     #[allow(dead_code)]
-    DeliveringResource,  // Will be used when implementing building resource delivery
+    DeliveringResource, // Will be used when implementing building resource delivery
 }
