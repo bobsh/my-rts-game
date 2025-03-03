@@ -50,7 +50,7 @@ pub fn move_command_system(
             ));
 
             // Set target for all selected units
-            for (mut velocity, _) in query.iter_mut() {
+            for (mut velocity, _) in &mut query {
                 velocity.target = Some(target_pos);
                 velocity.speed = 100.0;
             }
@@ -65,7 +65,7 @@ pub fn movement_system(
     _commands: Commands,             // Added underscore to unused variable
     _asset_server: Res<AssetServer>, // Added underscore to unused variable
 ) {
-    for (mut velocity, mut transform) in query.iter_mut() {
+    for (mut velocity, mut transform) in &mut query {
         if let Some(target) = velocity.target {
             let current_pos = transform.translation.truncate();
             let to_target = target - current_pos;
@@ -99,7 +99,7 @@ pub fn show_destination_markers(
     mut markers_query: Query<(Entity, &mut MoveMarker, &mut Sprite)>,
 ) {
     // Update existing markers
-    for (entity, mut marker, mut sprite) in markers_query.iter_mut() {
+    for (entity, mut marker, mut sprite) in &mut markers_query {
         marker.timer.tick(time.delta());
 
         // Fade out the marker as the timer progresses

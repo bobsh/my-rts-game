@@ -42,7 +42,7 @@ pub fn setup_background(mut commands: Commands, asset_server: Res<AssetServer>) 
                         )),
                         ..Default::default()
                     },
-                    Name::new(format!("Grass Tile {},{}", x, y)),
+                    Name::new(format!("Grass Tile {x},{y}")),
                 ))
                 .set_parent(background);
         }

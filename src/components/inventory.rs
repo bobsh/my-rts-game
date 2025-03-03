@@ -61,27 +61,27 @@ impl Inventory {
     }
 
     // Check if inventory is full
-    pub fn is_full(&self) -> bool {
+    pub const fn is_full(&self) -> bool {
         self.used_capacity >= self.capacity
     }
 
     #[allow(dead_code)]
-    pub fn is_empty(&self) -> bool {
+    pub const fn is_empty(&self) -> bool {
         self.used_capacity == 0
     }
 
     #[allow(dead_code)]
-    pub fn used_capacity(&self) -> u32 {
+    pub const fn used_capacity(&self) -> u32 {
         self.used_capacity
     }
 
     #[allow(dead_code)]
-    pub fn capacity(&self) -> u32 {
+    pub const fn capacity(&self) -> u32 {
         self.capacity
     }
 
     // Get all resources in inventory
-    pub fn resources(&self) -> &HashMap<ResourceId, u32> {
+    pub const fn resources(&self) -> &HashMap<ResourceId, u32> {
         &self.resources
     }
 }

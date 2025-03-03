@@ -108,7 +108,7 @@ impl PlayerResources {
     }
 
     #[allow(dead_code)]
-    pub fn all(&self) -> &HashMap<ResourceId, u32> {
+    pub const fn all(&self) -> &HashMap<ResourceId, u32> {
         &self.resources
     }
 }

@@ -172,7 +172,7 @@ fn spawn_worker(
                     .with_scale(Vec3::new(0.8, 0.8, 1.0)),
                 ..Default::default()
             },
-            Name::new(format!("Worker {}", i)),
+            Name::new(format!("Worker {i}")),
             Unit,
             Selectable,
             WorkerAnimation {
@@ -185,7 +185,7 @@ fn spawn_worker(
                 speed: 100.0,
             },
             UnitAttributes {
-                name: format!("Worker {}", i),
+                name: format!("Worker {i}"),
                 health: 100.0,
                 max_health: 100.0,
             },

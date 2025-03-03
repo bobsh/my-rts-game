@@ -157,7 +157,7 @@ pub fn update_unit_info(
                 attributes.health, attributes.max_health, health_percent
             );
         } else {
-            health_text.sections[0].value = "".to_string();
+            health_text.sections[0].value = String::new();
         }
     }
 
@@ -167,7 +167,7 @@ pub fn update_unit_info(
         if let Some((_, velocity)) = selected_info {
             speed_text.sections[0].value = format!("Speed: {:.0}", velocity.speed);
         } else {
-            speed_text.sections[0].value = "".to_string();
+            speed_text.sections[0].value = String::new();
         }
     }
 }
@@ -177,7 +177,7 @@ pub fn update_resources_display(
     resource_registry: Res<ResourceRegistry>,
     mut text_query: Query<(&mut Text, &ResourceText)>,
 ) {
-    for (mut text, resource_text) in text_query.iter_mut() {
+    for (mut text, resource_text) in &mut text_query {
         let resource_id = crate::resources::ResourceId(resource_text.0.clone());
         let amount = player_resources.get(&resource_id);
 
@@ -334,7 +334,7 @@ pub fn update_inventory_ui(
     }
 
     // Update existing inventory slots
-    for (mut ui_image, mut slot, children) in inventory_slots.iter_mut() {
+    for (mut ui_image, mut slot, children) in &mut inventory_slots {
         // Only update slots belonging to the selected entity
         if slot.entity_owner != selected_entity {
             slot.entity_owner = selected_entity;
@@ -344,7 +344,7 @@ pub fn update_inventory_ui(
             // Update quantity text
             if let Some(&child) = children.first() {
                 if let Ok(mut text) = text_query.get_mut(child) {
-                    text.sections[0].value = "".to_string();
+                    text.sections[0].value = String::new();
                 }
             }
         }
@@ -393,7 +393,7 @@ pub fn update_inventory_ui(
                 // Clear quantity text
                 if let Some(&child) = children.first() {
                     if let Ok(mut text) = text_query.get_mut(child) {
-                        text.sections[0].value = "".to_string();
+                        text.sections[0].value = String::new();
                     }
                 }
             }

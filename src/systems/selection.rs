@@ -69,18 +69,18 @@ pub fn animate_selection_rings(
     time: Res<Time>,
     mut query: Query<(&mut SelectionRing, &mut Sprite)>,
 ) {
-    for (mut ring, mut sprite) in query.iter_mut() {
+    for (mut ring, mut sprite) in &mut query {
         ring.timer.tick(time.delta());
 
         // Calculate a pulsing effect
-        let pulse_factor = 1.0 + (ring.timer.fraction() * std::f32::consts::PI * 2.0).sin() * 0.1;
+        let pulse_factor = (ring.timer.fraction() * std::f32::consts::PI * 2.0).sin().mul_add(0.1, 1.0);
         let current_size = ring.base_size * pulse_factor;
 
         // Update sprite size
         sprite.custom_size = Some(Vec2::new(current_size, current_size));
 
         // Also pulse the opacity
-        let alpha = 0.4 + (ring.timer.fraction() * std::f32::consts::PI * 2.0).cos() * 0.2;
+        let alpha = (ring.timer.fraction() * std::f32::consts::PI * 2.0).cos().mul_add(0.2, 0.4);
         sprite.color = sprite.color.with_alpha(alpha);
     }
 }
@@ -105,7 +105,7 @@ pub fn update_selection_ring(
 
     // Update ring positions based on collected data
     let mut ring_query = params.p0();
-    for (ring, mut ring_transform) in ring_query.iter_mut() {
+    for (ring, mut ring_transform) in &mut ring_query {
         // Find the matching unit
         for (entity, position) in &unit_positions {
             if ring.owner == *entity {

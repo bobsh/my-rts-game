@@ -118,7 +118,7 @@ pub fn gathering_system(
         // Now process gatherers using the cached resource data
         let mut gatherer_query = param_set.p0();
         for (entity, mut gathering, mut transform, mut velocity, mut inventory) in
-            gatherer_query.iter_mut()
+            &mut gatherer_query
         {
             match gathering.gather_state {
                 GatheringState::MovingToResource => {
@@ -327,7 +327,7 @@ fn spawn_resource_collected_text(
         Text2dBundle {
             text: Text {
                 sections: vec![TextSection::new(
-                    format!("+{}", amount),
+                    format!("+{amount}"),
                     TextStyle {
                         font,
                         font_size: 16.0,
@@ -355,13 +355,13 @@ pub fn animate_gather_effects(
     mut commands: Commands,
     mut query: Query<(Entity, &mut GatherEffect, &mut Transform, &mut Sprite)>,
 ) {
-    for (entity, mut effect, mut transform, mut sprite) in query.iter_mut() {
+    for (entity, mut effect, mut transform, mut sprite) in &mut query {
         effect.timer.tick(time.delta());
 
         // Fade out and scale up as timer progresses
         let progress = effect.timer.fraction();
         sprite.color = sprite.color.with_alpha(1.0 - progress);
-        transform.scale = Vec3::splat(1.0 + progress * 0.5);
+        transform.scale = Vec3::splat(progress.mul_add(0.5, 1.0));
 
         // Remove when timer is finished
         if effect.timer.finished() {
@@ -378,7 +378,7 @@ pub fn animate_floating_text(
     mut query: Query<(Entity, &mut FloatingText, &mut Transform, &mut Text)>,
     resource_registry: Res<ResourceRegistry>,
 ) {
-    for (entity, mut floating_text, mut transform, mut text) in query.iter_mut() {
+    for (entity, mut floating_text, mut transform, mut text) in &mut query {
         floating_text.timer.tick(time.delta());
 
         // Move the text upward
