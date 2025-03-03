@@ -3,7 +3,6 @@ use bevy::window::WindowPlugin;
 use bevy::text::JustifyText;
 use bevy::winit::WinitWindows;
 
-mod assets;
 mod components;
 mod resources;
 mod systems;
