@@ -1,6 +1,5 @@
 use bevy::prelude::*;
 use bevy::window::WindowPlugin;
-use bevy::text::JustifyText;
 use bevy::winit::WinitWindows;
 
 mod components;
@@ -8,13 +7,13 @@ mod resources;
 mod systems;
 
 use components::unit::{Selectable, Unit, WorkerAnimation, WorkerAnimationState, Velocity, UnitAttributes};
-use components::resource::ResourceNode;
 use resources::{PlayerResources, ResourceRegistry, ResourceId, GameState};
 use systems::selection::{selection_system, highlight_selected, animate_selection_rings, update_selection_ring, draw_selection_boxes};
 use systems::animation::{animate_workers, update_worker_animations, animate_gather_effects, animate_floating_text};
 use systems::movement::{move_command_system, movement_system, show_destination_markers};
 use systems::gathering::{resource_gathering_command, gathering_system};
 use systems::ui::{setup_ui, update_unit_info, update_resources_display, update_inventory_ui};
+use systems::map::{setup_background, spawn_resource_node}; // Add this import
 
 use components::inventory::Inventory;
 
@@ -112,62 +111,6 @@ fn spawn_worker(commands: &mut Commands, asset_server: &Res<AssetServer>, positi
         .id();
 }
 
-// Updated function to spawn resource nodes
-fn spawn_resource_node(
-    commands: &mut Commands,
-    asset_server: &Res<AssetServer>,
-    resource_registry: &Res<ResourceRegistry>,
-    position: Vec2,
-    resource_id: &ResourceId,
-    amount: u32
-) {
-    // Get the resource definition from registry
-    if let Some(resource_def) = resource_registry.get(resource_id) {
-        let texture = asset_server.load(&resource_def.icon_path); // Use icon_path
-        let font = asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf");
-
-        // Spawn the resource node entity
-        let _resource_entity = commands.spawn((
-            SpriteBundle {
-                texture,
-                sprite: Sprite {
-                    color: resource_def.color,
-                    custom_size: Some(Vec2::new(30.0, 30.0)),
-                    ..default()
-                },
-                transform: Transform::from_translation(Vec3::new(position.x, position.y, -0.1))
-                    .with_scale(Vec3::new(0.5, 0.5, 1.0)),
-                ..default()
-            },
-            ResourceNode {
-                resource_id: resource_id.clone(),
-                amount_remaining: amount,
-                max_amount: amount,
-            },
-        )).id();
-
-        // Add a small label above the resource
-        commands.spawn(Text2dBundle {
-            text: Text {
-                sections: vec![
-                    TextSection::new(
-                        resource_def.name.clone(),
-                        TextStyle {
-                            font,
-                            font_size: 16.0,
-                            color: Color::WHITE,
-                        },
-                    )
-                ],
-                justify: JustifyText::Center,
-                ..default()
-            },
-            transform: Transform::from_translation(Vec3::new(position.x, position.y + 20.0, 0.0)),
-            ..default()
-        });
-    }
-}
-
 // Add this system to your startup systems
 fn setup_window_icon(
     windows: Query<Entity, With<bevy::window::PrimaryWindow>>,
@@ -196,51 +139,6 @@ fn setup_window_icon(
         if let Ok(icon) = winit::window::Icon::from_rgba(rgba_bytes, width, height) {
             primary.set_window_icon(Some(icon));
             println!("Set window icon successfully!");
-        }
-    }
-}
-
-// Add this function to main.rs after your existing setup functions
-fn setup_background(mut commands: Commands, asset_server: Res<AssetServer>) {
-    // Load the grass texture
-    let grass_texture = asset_server.load("terrain/grass1/grass1.png");
-
-    // Texture size is 1024x1024
-    let tile_size = 256.0_f32; // Use smaller tiles for more repetition
-
-    // Calculate how many tiles we need to cover the screen plus some extra
-    let screen_width = 1280.0_f32 + 512.0_f32; // Screen width plus buffer
-    let screen_height = 720.0_f32 + 512.0_f32; // Screen height plus buffer
-
-    let tiles_x = (screen_width / tile_size).ceil() as i32;
-    let tiles_y = (screen_height / tile_size).ceil() as i32;
-
-    // Create parent entity to hold all background tiles
-    let background = commands.spawn((
-        SpatialBundle::default(),
-        Name::new("Background Container"),
-    )).id();
-
-    // Create a grid of background tiles
-    for y in -tiles_y..=tiles_y {
-        for x in -tiles_x..=tiles_x {
-            commands.spawn((
-                SpriteBundle {
-                    texture: grass_texture.clone(),
-                    sprite: Sprite {
-                        custom_size: Some(Vec2::new(tile_size, tile_size)),
-                        ..Default::default()
-                    },
-                    transform: Transform::from_translation(Vec3::new(
-                        x as f32 * tile_size,
-                        y as f32 * tile_size,
-                        -100.0, // Behind other elements
-                    )),
-                    ..Default::default()
-                },
-                Name::new(format!("Grass Tile {},{}", x, y)),
-            ))
-            .set_parent(background);
         }
     }
 }
