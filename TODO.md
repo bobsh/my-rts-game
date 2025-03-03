@@ -12,6 +12,7 @@
 - [x] Add a sample texture for the background
 - [x] Make PR testing faster
 - [x] Cleanup some code and files that are not used
+- [x] Run windows tests as well in CI
 - [ ] Add trees, mines and quarries and mine resources from them
 - [ ] Add complete unit tests for each .rs file
 - [ ] Add a splash screen

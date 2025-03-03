@@ -11,18 +11,32 @@ on:
 
 jobs:
   test:
-    name: Run Tests
-    runs-on: ubuntu-latest
+    name: Run Tests (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+      fail-fast: false  # Continue with other platforms if one fails
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          lfs: true  # Add this line to enable LFS support
+          lfs: true
 
+      # Install Linux dependencies conditionally
       - name: Install Linux dependencies
+        if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
           sudo apt-get install -y libasound2-dev libudev-dev pkg-config libx11-dev libxcb-shape0-dev libxcb-xfixes0-dev libwayland-dev libxkbcommon-dev
+
+      # Configure sparse index for faster builds
+      - name: Configure sparse index
+        shell: bash
+        run: |
+          mkdir -p .cargo
+          echo '[registries.crates-io]' > .cargo/config.toml
+          echo 'protocol = "sparse"' >> .cargo/config.toml
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
@@ -35,14 +49,6 @@ jobs:
         with:
           cache-on-failure: true
           shared-key: "${{ runner.os }}-rust-${{ hashFiles('**/Cargo.lock') }}"
-
-      - name: Debug cache info
-        run: |
-          echo "Runner OS: ${{ runner.os }}"
-          echo "Rust version: $(rustc --version)"
-          echo "Cargo.lock hash: ${{ hashFiles('**/Cargo.lock') }}"
-          echo "Cache saved: ${{ steps.rust-cache.outputs.cache-hit != 'true' }}"
-        shell: bash
 
       - name: Run tests
         run: cargo test
