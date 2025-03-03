@@ -16,8 +16,8 @@ pub fn setup_background(mut commands: Commands, asset_server: Res<AssetServer>) 
     let screen_width = 1280.0_f32 + 512.0_f32; // Screen width plus buffer
     let screen_height = 720.0_f32 + 512.0_f32; // Screen height plus buffer
 
-    let tiles_x = ((screen_width / tile_size) as f32).ceil() as i32;
-    let tiles_y = ((screen_height / tile_size) as f32).ceil() as i32;
+    let tiles_x = (screen_width / tile_size).ceil() as i32;
+    let tiles_y = (screen_height / tile_size).ceil() as i32;
 
     // Create parent entity to hold all background tiles
     let background = commands.spawn((
