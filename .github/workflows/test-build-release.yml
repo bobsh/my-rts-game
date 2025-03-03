@@ -233,7 +233,7 @@ jobs:
         uses: actions/download-artifact@v4
 
       - name: Create Nightly Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           name: "Nightly Build ${{ steps.timestamp.outputs.value }}"
           tag_name: "nightly-${{ steps.timestamp.outputs.value }}"
