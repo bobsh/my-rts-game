@@ -60,6 +60,7 @@ jobs:
     name: Build Windows
     needs: test  # This ensures tests must pass before build starts
     runs-on: windows-latest
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
