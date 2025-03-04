@@ -126,13 +126,24 @@ jobs:
 
       - name: Create game directory structure
         run: |
+          # Choose build profile based on event type
+          $buildProfile = if ('${{ github.event_name }}' -in @('schedule', 'workflow_dispatch', 'release')) {
+            # For nightly and manual builds, use fully optimized profile
+            Write-Host "Building OPTIMIZED release (schedule/manual trigger)"
+            "release-optimized"
+          } else {
+            # For PR and branch testing, use faster CI profile
+            Write-Host "Building FAST CI build (PR/branch testing)"
+            "ci"
+          }
+
           # Create base dist directory WITH assets subdirectory
           mkdir -p dist
           mkdir -p dist\assets
 
           # Copy executable
           Write-Host "Copying executable..."
-          copy target\release\my-rts-game.exe dist\
+          copy target\$buildProfile\my-rts-game.exe dist\
 
           # Copy all assets to dist/assets
           if (Test-Path -Path assets) {
