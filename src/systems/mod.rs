@@ -1,7 +1,8 @@
 // This file will contain your game logic systems
 
-pub mod selection;
 pub mod animation;
-pub mod movement;
-pub mod ui;
 pub mod gathering;
+pub mod map;
+pub mod movement;
+pub mod selection;
+pub mod ui;

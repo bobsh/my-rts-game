@@ -56,6 +56,9 @@ jobs:
       - name: Run clippy
         run: cargo clippy -- -D warnings
 
+      - name: Check code formatting
+        run: cargo fmt -- --check
+
   build-windows:
     name: Build Windows
     needs: test  # This ensures tests must pass before build starts

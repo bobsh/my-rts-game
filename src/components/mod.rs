@@ -1,5 +1,5 @@
 // This file will define components used in the game
-pub mod unit;
+pub mod inventory;
 pub mod resource;
 pub mod ui;
-pub mod inventory;  // Add this line
+pub mod unit; // Add this line
