@@ -132,7 +132,7 @@ jobs:
 
           # Copy executable
           Write-Host "Copying executable..."
-          copy target\ci\my-rts-game.exe dist\
+          copy target\release\my-rts-game.exe dist\
 
           # Copy all assets to dist/assets
           if (Test-Path -Path assets) {
