@@ -22,7 +22,6 @@ pub enum WorkerAnimationState {
     Walking,
     Mining,
     Woodcutting,
-    Delivering,
 }
 
 // Update SelectionRing to include animation timer

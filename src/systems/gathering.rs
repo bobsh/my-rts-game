@@ -59,7 +59,6 @@ pub fn resource_gathering_command(
                             gather_timer: Timer::from_seconds(gather_time, TimerMode::Once),
                             gather_amount: 5,
                             gather_state: GatheringState::MovingToResource,
-                            return_position: None,
                         });
 
                         // Set velocity to move to resource
@@ -249,7 +248,6 @@ pub fn gathering_system(
 
                 // Implement these states when you add buildings
                 GatheringState::ReturningResource => {}
-                GatheringState::DeliveringResource => {}
             }
         }
     }
@@ -346,57 +344,4 @@ fn spawn_resource_collected_text(
             resource_id: resource_id.clone(),
         },
     ));
-}
-
-// System to animate gather effects
-#[allow(dead_code)]
-pub fn animate_gather_effects(
-    time: Res<Time>,
-    mut commands: Commands,
-    mut query: Query<(Entity, &mut GatherEffect, &mut Transform, &mut Sprite)>,
-) {
-    for (entity, mut effect, mut transform, mut sprite) in &mut query {
-        effect.timer.tick(time.delta());
-
-        // Fade out and scale up as timer progresses
-        let progress = effect.timer.fraction();
-        sprite.color = sprite.color.with_alpha(1.0 - progress);
-        transform.scale = Vec3::splat(progress.mul_add(0.5, 1.0));
-
-        // Remove when timer is finished
-        if effect.timer.finished() {
-            commands.entity(entity).despawn();
-        }
-    }
-}
-
-// System to animate floating text
-#[allow(dead_code)]
-pub fn animate_floating_text(
-    time: Res<Time>,
-    mut commands: Commands,
-    mut query: Query<(Entity, &mut FloatingText, &mut Transform, &mut Text)>,
-    resource_registry: Res<ResourceRegistry>,
-) {
-    for (entity, mut floating_text, mut transform, mut text) in &mut query {
-        floating_text.timer.tick(time.delta());
-
-        // Move the text upward
-        let delta = floating_text.velocity * time.delta_seconds();
-        transform.translation.x += delta.x;
-        transform.translation.y += delta.y;
-
-        // Fade out as timer progresses
-        let progress = floating_text.timer.fraction();
-        if let Some(resource_def) = resource_registry.get(&floating_text.resource_id) {
-            text.sections[0].style.color = resource_def.color.with_alpha(1.0 - progress);
-        } else {
-            text.sections[0].style.color = text.sections[0].style.color.with_alpha(1.0 - progress);
-        }
-
-        // Remove when timer is finished
-        if floating_text.timer.finished() {
-            commands.entity(entity).despawn();
-        }
-    }
 }

@@ -13,8 +13,6 @@ pub struct ResourceDefinition {
     pub color: Color,
     pub gathering_time: f32, // Time in seconds to gather one unit
     pub icon_path: String,   // Path to the resource icon
-    #[allow(dead_code)]
-    pub value: u32, // Base value/importance for later game mechanics
 }
 
 // Registry of all resource types in the game
@@ -36,7 +34,6 @@ impl Default for ResourceRegistry {
             color: Color::srgb(1.0, 0.84, 0.0),
             gathering_time: 3.0,
             icon_path: "resources/gold.png".to_string(),
-            value: 5,
         });
 
         registry.register(ResourceDefinition {
@@ -45,7 +42,6 @@ impl Default for ResourceRegistry {
             color: Color::srgb(0.6, 0.4, 0.2), // Corrected color
             gathering_time: 1.5,
             icon_path: "resources/wood.png".to_string(), // Remove the "assets/" prefix
-            value: 2,
         });
 
         registry.register(ResourceDefinition {
@@ -54,7 +50,6 @@ impl Default for ResourceRegistry {
             color: Color::srgb(0.7, 0.7, 0.7),
             gathering_time: 2.0, // Corrected gathering time
             icon_path: "resources/stone/stone.png".to_string(), // Remove the "assets/" prefix
-            value: 3,
         });
 
         registry
@@ -82,33 +77,7 @@ pub struct PlayerResources {
 }
 
 impl PlayerResources {
-    #[allow(dead_code)]
-    pub fn add(&mut self, resource_id: &ResourceId, amount: u32) {
-        *self.resources.entry(resource_id.clone()).or_insert(0) += amount;
-    }
-
     pub fn get(&self, resource_id: &ResourceId) -> u32 {
         self.resources.get(resource_id).copied().unwrap_or(0)
-    }
-
-    #[allow(dead_code)]
-    pub fn has_enough(&self, resource_id: &ResourceId, amount: u32) -> bool {
-        self.get(resource_id) >= amount
-    }
-
-    #[allow(dead_code)]
-    pub fn spend(&mut self, resource_id: &ResourceId, amount: u32) -> bool {
-        let current = self.get(resource_id);
-        if current >= amount {
-            self.resources.insert(resource_id.clone(), current - amount);
-            true
-        } else {
-            false
-        }
-    }
-
-    #[allow(dead_code)]
-    pub const fn all(&self) -> &HashMap<ResourceId, u32> {
-        &self.resources
     }
 }

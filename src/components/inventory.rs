@@ -37,7 +37,6 @@ impl Inventory {
         amount_to_add
     }
 
-    #[allow(dead_code)]
     pub fn remove(&mut self, resource_id: &ResourceId, amount: u32) -> u32 {
         if let Some(current_amount) = self.resources.get_mut(resource_id) {
             let amount_to_remove = amount.min(*current_amount);
@@ -55,7 +54,6 @@ impl Inventory {
         }
     }
 
-    #[allow(dead_code)]
     pub fn get_amount(&self, resource_id: &ResourceId) -> u32 {
         *self.resources.get(resource_id).unwrap_or(&0)
     }
@@ -65,17 +63,14 @@ impl Inventory {
         self.used_capacity >= self.capacity
     }
 
-    #[allow(dead_code)]
     pub const fn is_empty(&self) -> bool {
         self.used_capacity == 0
     }
 
-    #[allow(dead_code)]
     pub const fn used_capacity(&self) -> u32 {
         self.used_capacity
     }
 
-    #[allow(dead_code)]
     pub const fn capacity(&self) -> u32 {
         self.capacity
     }

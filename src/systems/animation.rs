@@ -44,15 +44,6 @@ pub fn animate_workers(time: Res<Time>, mut query: Query<(&mut WorkerAnimation, 
                         Quat::from_rotation_z(-0.1)
                     };
                 }
-                WorkerAnimationState::Delivering => {
-                    // Delivering animation - slight up/down motion
-                    transform.translation.y +=
-                        if transform.translation.y > transform.translation.y - 2.0 {
-                            -2.0
-                        } else {
-                            2.0
-                        };
-                }
             }
         }
     }
@@ -84,7 +75,6 @@ pub fn update_worker_animations(
                     }
                 }
                 GatheringState::ReturningResource => WorkerAnimationState::Walking,
-                GatheringState::DeliveringResource => WorkerAnimationState::Delivering,
             }
         } else if velocity.target.is_some() {
             // If not gathering but moving
@@ -103,8 +93,7 @@ pub fn update_worker_animations(
                 WorkerAnimationState::Mining => 0.5,      // Faster for mining
                 WorkerAnimationState::Woodcutting => 0.8, // Slower for wood cutting
                 WorkerAnimationState::Walking => 0.3,     // Fast for walking
-                WorkerAnimationState::Delivering => 0.4,
-                WorkerAnimationState::Idle => 2.0, // Slow for idle
+                WorkerAnimationState::Idle => 2.0,        // Slow for idle
             };
 
             // Reset timer with new duration
