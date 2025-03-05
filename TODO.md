@@ -18,6 +18,8 @@
 - [x] Fix formatting, and add format testing to CI
 - [x] Add a tree asset
 - [x] Fix nightly builds
+- [x] Think about map system
+- [x] Move some more things out of main.rs
 - [ ] Add trees, mines and quarries and mine resources from them
 - [ ] Add complete unit tests for each .rs file
 - [ ] Add a splash screen
