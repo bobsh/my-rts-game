@@ -13,15 +13,15 @@ use systems::animation::{
     animate_floating_text, animate_gather_effects, animate_workers, update_worker_animations,
 };
 use systems::gathering::{gathering_system, resource_gathering_command};
-use systems::map::{setup_background};
+use systems::map::setup_background;
 use systems::movement::{move_command_system, movement_system, show_destination_markers};
-use systems::scene::{setup_scene};
+use systems::scene::setup_scene;
 use systems::selection::{
     animate_selection_rings, draw_selection_boxes, highlight_selected, selection_system,
     update_selection_ring,
 };
 use systems::ui::{setup_ui, update_inventory_ui, update_resources_display, update_unit_info};
-use systems::window::{setup_window_icon};
+use systems::window::setup_window_icon;
 
 fn main() {
     App::new()
@@ -38,12 +38,7 @@ fn main() {
         .init_resource::<ResourceRegistry>()
         .add_systems(
             Startup,
-            (
-                setup_scene,
-                setup_ui,
-                setup_window_icon,
-                setup_background,
-            ),
+            (setup_scene, setup_ui, setup_window_icon, setup_background),
         )
         .add_systems(
             Update,
