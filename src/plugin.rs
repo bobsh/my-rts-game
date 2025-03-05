@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::app::{App, Plugin, Startup, Update};
 
 use crate::resources::{PlayerResources, ResourceRegistry};
 use crate::systems::animation::{

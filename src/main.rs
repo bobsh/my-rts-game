@@ -1,5 +1,7 @@
-use bevy::prelude::*;
+use bevy::app::App;
+use bevy::prelude::{PluginGroup, Window};
 use bevy::window::WindowPlugin;
+use bevy::DefaultPlugins;
 
 mod components;
 mod plugin;
