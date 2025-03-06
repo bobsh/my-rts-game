@@ -38,10 +38,10 @@ impl Default for ResourceRegistry {
 
         registry.register(ResourceDefinition {
             id: ResourceId("wood".to_string()),
-            name: "Wood".to_string(),
+            name: "Tree".to_string(),
             color: Color::srgb(0.6, 0.4, 0.2), // Corrected color
             gathering_time: 1.5,
-            icon_path: "resources/wood.png".to_string(), // Remove the "assets/" prefix
+            icon_path: "resources/tree2/tree2.png".to_string(), // Remove the "assets/" prefix
         });
 
         registry.register(ResourceDefinition {
