@@ -59,6 +59,20 @@ jobs:
       - name: Check code formatting
         run: cargo fmt -- --check
 
+      - name: Setup Rust Nightly
+        uses: dtolnay/rust-toolchain@master  # Use the action version
+        with:
+          toolchain: nightly  # Specify nightly as the toolchain
+
+      - name: Install cargo-audit
+        uses: actions-rs/install@v0.1
+        with:
+          crate: cargo-audit
+          version: latest
+
+      - name: Check for vulnerabilities
+        run: cargo audit
+
   build-windows:
     name: Build Windows
     needs: test  # This ensures tests must pass before build starts

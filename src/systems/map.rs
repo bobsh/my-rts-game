@@ -80,7 +80,6 @@ pub fn spawn_resource_node(
                 ResourceNode {
                     resource_id: resource_id.clone(),
                     amount_remaining: amount,
-                    max_amount: amount,
                 },
             ))
             .id();

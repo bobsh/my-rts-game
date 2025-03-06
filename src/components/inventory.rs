@@ -75,7 +75,6 @@ impl Inventory {
         self.used_capacity
     }
 
-    #[allow(dead_code)]
     pub const fn capacity(&self) -> u32 {
         self.capacity
     }

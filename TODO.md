@@ -20,6 +20,8 @@
 - [x] Fix nightly builds
 - [x] Think about map system
 - [x] Move some more things out of main.rs
+- [x] Modularize some more, restructure ready for a grid system
+- [ ] Add a grid system
 - [ ] Add trees, mines and quarries and mine resources from them
 - [ ] Add complete unit tests for each .rs file
 - [ ] Add a splash screen

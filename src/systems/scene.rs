@@ -1,7 +1,10 @@
-use crate::{
-    ResourceId, ResourceRegistry, Selectable, Unit, UnitAttributes, Velocity, WorkerAnimation,
-    WorkerAnimationState,
-};
+use crate::components::unit::Selectable;
+use crate::components::unit::Unit;
+use crate::components::unit::UnitAttributes;
+use crate::components::unit::Velocity;
+use crate::components::unit::WorkerAnimation;
+use crate::components::unit::WorkerAnimationState;
+use crate::resources::{ResourceId, ResourceRegistry};
 use bevy::prelude::*;
 
 use crate::components::inventory::Inventory;
