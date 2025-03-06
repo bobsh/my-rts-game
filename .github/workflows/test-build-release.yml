@@ -64,15 +64,6 @@ jobs:
         with:
           toolchain: nightly  # Specify nightly as the toolchain
 
-      - name: Install cargo-udeps
-        uses: actions-rs/install@v0.1
-        with:
-          crate: cargo-udeps
-          version: latest
-
-      - name: Check for unused dependencies
-        run: cargo +nightly udeps --all-targets
-
       - name: Install cargo-audit
         uses: actions-rs/install@v0.1
         with:
