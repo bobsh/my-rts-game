@@ -59,6 +59,15 @@ jobs:
       - name: Check code formatting
         run: cargo fmt -- --check
 
+      - name: Install cargo-udeps
+        uses: actions-rs/install@v0.1
+        with:
+          crate: cargo-udeps
+          version: latest
+
+      - name: Check for unused dependencies
+        run: cargo +nightly udeps --all-targets
+
   build-windows:
     name: Build Windows
     needs: test  # This ensures tests must pass before build starts
