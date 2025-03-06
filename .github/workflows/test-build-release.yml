@@ -63,7 +63,6 @@ jobs:
         uses: dtolnay/rust-toolchain@master  # Use the action version
         with:
           toolchain: nightly  # Specify nightly as the toolchain
-          profile: minimal
 
       - name: Install cargo-udeps
         uses: actions-rs/install@v0.1
