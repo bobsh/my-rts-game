@@ -18,7 +18,7 @@ codegen-units = 1
 lto = "fat"  # Full optimization for actual releases
 
 [dependencies]
-bevy = "0.14.2"
+bevy = "0.15.3"
 winit = "0.30"
 image = "0.25"
 
