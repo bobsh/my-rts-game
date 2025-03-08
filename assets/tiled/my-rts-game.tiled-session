@@ -1,0 +1,31 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "",
+    "expandedProjectPaths": [
+    ],
+    "fileStates": {
+        "terrains.tsx": {
+            "dynamicWrapping": true
+        }
+    },
+    "last.imagePath": "C:/Users/Ken/Development/my-rts-game/assets/terrain/grass2",
+    "last.worldFilePath": "C:/Users/Ken/Development/my-rts-game/assets/tiled",
+    "loadedWorlds": [
+        "C:/Users/Ken/Development/my-rts-game/assets/tiled/my-rts-game.world",
+        "C:/Users/Ken/Development/my-rts-game/assets/tiled/my-rts-game.world"
+    ],
+    "map.fixedSize": true,
+    "map.lastUsedFormat": "tmx",
+    "map.tileHeight": 64,
+    "map.tileWidth": 64,
+    "openFiles": [
+    ],
+    "project": "my-rts-game.tiled-project",
+    "recentFiles": [
+    ],
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.type": 1
+}

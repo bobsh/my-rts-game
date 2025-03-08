@@ -44,3 +44,14 @@ Example 2:
   * ResourceNode: False
   * Building: False
   * Unit: Worker
+
+## Tiled
+
+So what if we just used tiled to create the maps?
+
+* tilesets to gather all the tile images
+
+Supports aesprite files directly, which might reduce some of the work needed to create the maps.
+
+* <https://github.com/lommix/bevy_aseprite_ultra> <- looks like it's maintained>
+* <https://github.com/mdenchev/bevy_aseprite>

@@ -22,6 +22,7 @@
 - [x] Move some more things out of main.rs
 - [x] Modularize some more, restructure ready for a grid system
 - [x] Support pxo files for git-lfs
+- [x] Research and test out tiled, and how to integrate it with bevy and rust
 - [ ] Add a grid system
 - [ ] Add trees, mines and quarries and mine resources from them
 - [ ] Add complete unit tests for each .rs file
