@@ -5,7 +5,7 @@
   <image source="../terrain/grass2/grass2.png" width="64" height="64"/>
  </tile>
  <wangsets>
-  <wangset name="Unnamed Set" type="mixed" tile="-1">
+  <wangset name="My rts" type="mixed" tile="-1">
    <wangcolor name="Grass" color="#00aa00" tile="-1" probability="1"/>
    <wangtile tileid="0" wangid="1,1,1,1,1,1,1,1"/>
   </wangset>
