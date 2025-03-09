@@ -24,7 +24,7 @@
 - [x] Support pxo files for git-lfs
 - [x] Research and test out tiled, and how to integrate it with bevy and rust
 - [x] Research and test ltdk, and how to integrate it with bevy
-- [x] Try out aesprite, and using files directly in bevy
+- [ ] Try out aesprite, and using files directly in bevy
 - [ ] Add a grid system
 - [ ] Add trees, mines and quarries and mine resources from them
 - [ ] Add complete unit tests for each .rs file
