@@ -26,24 +26,21 @@ pub fn move_command_system(
     // Get the cursor position
     if let Some(cursor_position) = window.cursor_position() {
         // Convert cursor position to world coordinates
-        if let Some(world_position) = camera.viewport_to_world(camera_transform, cursor_position) {
+        if let Ok(world_position) = camera.viewport_to_world(camera_transform, cursor_position) {
             let target_pos = world_position.origin.truncate();
 
             // Create a move marker at the target location
             commands.spawn((
-                SpriteBundle {
-                    sprite: Sprite {
-                        color: Color::srgba(0.2, 0.8, 0.2, 0.7),
-                        custom_size: Some(Vec2::new(15.0, 15.0)),
-                        ..default()
-                    },
-                    transform: Transform::from_translation(Vec3::new(
-                        target_pos.x,
-                        target_pos.y,
-                        0.0,
-                    )),
+                Sprite {
+                    color: Color::srgba(0.2, 0.8, 0.2, 0.7),
+                    custom_size: Some(Vec2::new(15.0, 15.0)),
                     ..default()
                 },
+                Transform::from_translation(Vec3::new(
+                    target_pos.x,
+                    target_pos.y,
+                    0.0,
+                )),
                 MoveMarker {
                     timer: Timer::from_seconds(1.0, TimerMode::Once),
                 },
@@ -80,7 +77,7 @@ pub fn movement_system(
             // Calculate direction and movement this frame
             let direction = to_target.normalize();
             velocity.value = direction * velocity.speed;
-            let delta_movement = velocity.value * time.delta_seconds();
+            let delta_movement = velocity.value * time.delta_secs();
 
             // Update position
             transform.translation.x += delta_movement.x;

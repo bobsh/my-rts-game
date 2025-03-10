@@ -15,7 +15,7 @@ pub fn setup_scene(
     asset_server: Res<AssetServer>,
     resource_registry: Res<ResourceRegistry>,
 ) {
-    commands.spawn(Camera2dBundle::default());
+    commands.spawn(Camera2d::default());
 
     // Spawn worker units
     spawn_worker(
@@ -110,10 +110,10 @@ fn spawn_worker(
 
     let _worker_entity = commands
         .spawn((
-            SpriteBundle {
-                texture,
-                transform: Transform::from_translation(Vec3::new(position.x, position.y, 0.0))
+            Transform::from_translation(Vec3::new(position.x, position.y, 0.0))
                     .with_scale(Vec3::new(0.8, 0.8, 1.0)),
+            Sprite {
+                image: texture,
                 ..Default::default()
             },
             Name::new(format!("Worker {i}")),

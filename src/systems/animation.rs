@@ -127,23 +127,23 @@ pub fn animate_gather_effects(
 pub fn animate_floating_text(
     time: Res<Time>,
     mut commands: Commands,
-    mut query: Query<(Entity, &mut FloatingText, &mut Transform, &mut Text)>,
+    mut query: Query<(Entity, &mut FloatingText, &mut Transform, &mut TextColor)>,
     resource_registry: Res<ResourceRegistry>,
 ) {
-    for (entity, mut floating_text, mut transform, mut text) in &mut query {
+    for (entity, mut floating_text, mut transform, mut text_color) in &mut query {
         floating_text.timer.tick(time.delta());
 
         // Move the text upward
-        let delta = floating_text.velocity * time.delta_seconds();
+        let delta = floating_text.velocity * time.delta_secs();
         transform.translation.x += delta.x;
         transform.translation.y += delta.y;
 
         // Fade out as timer progresses
         let progress = floating_text.timer.fraction();
         if let Some(resource_def) = resource_registry.get(&floating_text.resource_id) {
-            text.sections[0].style.color = resource_def.color.with_alpha(1.0 - progress);
+            *text_color = TextColor(resource_def.color.with_alpha(1.0 - progress));
         } else {
-            text.sections[0].style.color = text.sections[0].style.color.with_alpha(1.0 - progress);
+            *text_color = TextColor(text_color.with_alpha(1.0 - progress));
         }
 
         // Remove when timer is finished

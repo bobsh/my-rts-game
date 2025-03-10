@@ -21,7 +21,7 @@ pub fn setup_background(mut commands: Commands, asset_server: Res<AssetServer>) 
 
     // Create parent entity to hold all background tiles
     let background = commands
-        .spawn((SpatialBundle::default(), Name::new("Background Container")))
+        .spawn((Transform::default(), Visibility::default(), Name::new("Background Container")))
         .id();
 
     // Create a grid of background tiles
@@ -29,19 +29,16 @@ pub fn setup_background(mut commands: Commands, asset_server: Res<AssetServer>) 
         for x in -tiles_x..=tiles_x {
             commands
                 .spawn((
-                    SpriteBundle {
-                        texture: grass_texture.clone(),
-                        sprite: Sprite {
-                            custom_size: Some(Vec2::new(tile_size, tile_size)),
-                            ..Default::default()
-                        },
-                        transform: Transform::from_translation(Vec3::new(
-                            x as f32 * tile_size,
-                            y as f32 * tile_size,
-                            -100.0, // Behind other elements
-                        )),
+                    Sprite {
+                        image: grass_texture.clone(),
+                        custom_size: Some(Vec2::new(tile_size, tile_size)),
                         ..Default::default()
                     },
+                    Transform::from_translation(Vec3::new(
+                        x as f32 * tile_size,
+                        y as f32 * tile_size,
+                        -100.0, // Behind other elements
+                    )),
                     Name::new(format!("Grass Tile {x},{y}")),
                 ))
                 .set_parent(background);
@@ -66,17 +63,14 @@ pub fn spawn_resource_node(
         // Spawn the resource node entity
         let _resource_entity = commands
             .spawn((
-                SpriteBundle {
-                    texture,
-                    sprite: Sprite {
-                        color: resource_def.color,
-                        custom_size: Some(Vec2::new(30.0, 30.0)),
-                        ..default()
-                    },
-                    transform: Transform::from_translation(Vec3::new(position.x, position.y, -0.1))
-                        .with_scale(Vec3::new(0.5, 0.5, 1.0)),
+                Sprite {
+                    image: texture,
+                    color: resource_def.color,
+                    custom_size: Some(Vec2::new(30.0, 30.0)),
                     ..default()
                 },
+                Transform::from_translation(Vec3::new(position.x, position.y, -0.1))
+                    .with_scale(Vec3::new(0.5, 0.5, 1.0)),
                 ResourceNode {
                     resource_id: resource_id.clone(),
                     amount_remaining: amount,
@@ -85,21 +79,15 @@ pub fn spawn_resource_node(
             .id();
 
         // Add a small label above the resource
-        commands.spawn(Text2dBundle {
-            text: Text {
-                sections: vec![TextSection::new(
-                    resource_def.name.clone(),
-                    TextStyle {
-                        font,
-                        font_size: 16.0,
-                        color: Color::WHITE,
-                    },
-                )],
-                justify: JustifyText::Center,
+        commands.spawn((
+            Text2d::new(resource_def.name.clone()),
+            TextFont {
+                font,
+                font_size: 16.0,
                 ..default()
             },
-            transform: Transform::from_translation(Vec3::new(position.x, position.y + 20.0, 0.0)),
-            ..default()
-        });
+            TextColor(Color::WHITE),
+            Transform::from_translation(Vec3::new(position.x, position.y + 20.0, 0.0)),
+        ));
     }
 }
