@@ -39,17 +39,17 @@ impl Default for ResourceRegistry {
         registry.register(ResourceDefinition {
             id: ResourceId("wood".to_string()),
             name: "Tree".to_string(),
-            color: Color::srgb(0.6, 0.4, 0.2), // Corrected color
+            color: Color::srgb(0.6, 0.4, 0.2),
             gathering_time: 1.5,
-            icon_path: "resources/tree2/tree2.png".to_string(), // Remove the "assets/" prefix
+            icon_path: "resources/tree2/tree2.png".to_string(),
         });
 
         registry.register(ResourceDefinition {
             id: ResourceId("stone".to_string()),
             name: "Stone".to_string(),
             color: Color::srgb(0.7, 0.7, 0.7),
-            gathering_time: 2.0, // Corrected gathering time
-            icon_path: "resources/stone/stone.png".to_string(), // Remove the "assets/" prefix
+            gathering_time: 2.0,
+            icon_path: "resources/stone/stone.png".to_string(),
         });
 
         registry
