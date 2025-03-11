@@ -270,7 +270,7 @@ pub fn update_inventory_ui(
                     },
                     Button {},
                     ImageNode {
-                        image: asset_server.load("resources/empty_slot.png"),
+                        image: asset_server.load("empty_slot.png"),
                         ..default()
                     },
                     InventorySlot {
@@ -312,7 +312,7 @@ pub fn update_inventory_ui(
         if slot.entity_owner != selected_entity {
             slot.entity_owner = selected_entity;
             slot.resource_id = None;
-            ui_image.image = asset_server.load("resources/empty_slot.png");
+            ui_image.image = asset_server.load("empty_slot.png");
 
             // Update quantity text
             if let Some(&child) = children.first() {
@@ -341,7 +341,7 @@ pub fn update_inventory_ui(
                 if let Some(resource_def) = resource_registry.get(resource_id) {
                     ui_image.image = asset_server.load(&resource_def.icon_path);
                 } else {
-                    ui_image.image = asset_server.load("resources/unknown.png");
+                    ui_image.image = asset_server.load("unknown.png");
                 }
             }
 
@@ -361,7 +361,7 @@ pub fn update_inventory_ui(
         if let Some((mut ui_image, mut slot, children)) = inventory_slots.iter_mut().nth(i) {
             if slot.resource_id.is_some() {
                 slot.resource_id = None;
-                ui_image.image = asset_server.load("resources/empty_slot.png");
+                ui_image.image = asset_server.load("empty_slot.png");
 
                 // Clear quantity text
                 if let Some(&child) = children.first() {

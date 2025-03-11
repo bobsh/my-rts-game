@@ -22,21 +22,21 @@ pub fn setup_scene(
         &mut commands,
         &asset_server,
         Vec2::new(-200.0, 0.0),
-        "units/jungleman/jungleman.png".to_string(),
+        "jungleman.png".to_string(),
         1,
     );
     spawn_worker(
         &mut commands,
         &asset_server,
         Vec2::new(0.0, 0.0),
-        "units/jungleman/jungleman.png".to_string(),
+        "jungleman.png".to_string(),
         2,
     );
     spawn_worker(
         &mut commands,
         &asset_server,
         Vec2::new(200.0, 0.0),
-        "units/jungleman/jungleman.png".to_string(),
+        "jungleman.png".to_string(),
         3,
     );
 

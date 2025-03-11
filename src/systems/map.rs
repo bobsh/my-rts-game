@@ -7,7 +7,7 @@ use bevy::prelude::*;
 /// Sets up the tiled grass background for the game world
 pub fn setup_background(mut commands: Commands, asset_server: Res<AssetServer>) {
     // Load the grass texture
-    let grass_texture = asset_server.load("terrain/grass1/grass1.png");
+    let grass_texture = asset_server.load("grass.png");
 
     // Texture size is 1024x1024
     let tile_size = 256.0_f32; // Use smaller tiles for more repetition

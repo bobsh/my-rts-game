@@ -33,7 +33,7 @@ impl Default for ResourceRegistry {
             name: "Gold".to_string(),
             color: Color::srgb(1.0, 0.84, 0.0),
             gathering_time: 3.0,
-            icon_path: "resources/gold.png".to_string(),
+            icon_path: "mine.png".to_string(),
         });
 
         registry.register(ResourceDefinition {
@@ -41,7 +41,7 @@ impl Default for ResourceRegistry {
             name: "Tree".to_string(),
             color: Color::srgb(0.6, 0.4, 0.2),
             gathering_time: 1.5,
-            icon_path: "resources/tree2/tree2.png".to_string(),
+            icon_path: "tree.gif".to_string(),
         });
 
         registry.register(ResourceDefinition {
@@ -49,7 +49,7 @@ impl Default for ResourceRegistry {
             name: "Stone".to_string(),
             color: Color::srgb(0.7, 0.7, 0.7),
             gathering_time: 2.0,
-            icon_path: "resources/stone/stone.png".to_string(),
+            icon_path: "mine.png".to_string(),
         });
 
         registry

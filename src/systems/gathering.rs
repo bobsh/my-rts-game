@@ -292,7 +292,7 @@ pub fn gathering_system(
 // Helper function to spawn a visual effect when gathering
 fn spawn_gather_effect(commands: &mut Commands, asset_server: &Res<AssetServer>, position: Vec3) {
     // You could load different effect textures based on resource type
-    let effect_texture = asset_server.load("effects/gather_effect.png");
+    let effect_texture = asset_server.load("gather_effect.png");
 
     commands.spawn((
         Sprite {
