@@ -27,7 +27,7 @@ pub fn selection_system(
     // Get the cursor position
     if let Some(cursor_position) = window.cursor_position() {
         // Convert cursor position to world coordinates
-        if let Some(world_position) = camera.viewport_to_world(camera_transform, cursor_position) {
+        if let Ok(world_position) = camera.viewport_to_world(camera_transform, cursor_position) {
             let world_position = world_position.origin.truncate();
 
             // Remove selection rings
@@ -146,7 +146,6 @@ pub fn draw_selection_boxes(
         // Draw just the outline in green (no fill)
         gizmos.rect_2d(
             position,
-            0.0, // No rotation
             size,
             Color::srgb(0.0, 1.0, 0.0), // Green
         );

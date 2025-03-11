@@ -44,3 +44,22 @@ Example 2:
   * ResourceNode: False
   * Building: False
   * Unit: Worker
+
+## Tiled
+
+So what if we just used tiled to create the maps?
+
+* tilesets to gather all the tile images
+
+There is direct support for tiled maps in rust and or bevy.
+
+* <https://github.com/adrien-bon/bevy_ecs_tiled>
+
+Wait wait wait, there is also LDtk.
+
+* <https://github.com/Trouv/bevy_ecs_ldtk/>
+
+Supports aesprite files directly, which might reduce some of the work needed to create the maps.
+
+* <https://github.com/lommix/bevy_aseprite_ultra> <- looks like it's maintained>
+* <https://github.com/mdenchev/bevy_aseprite>

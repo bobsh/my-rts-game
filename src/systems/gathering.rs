@@ -32,7 +32,7 @@ pub fn resource_gathering_command(
     let (camera, camera_transform) = camera_query.single();
 
     if let Some(cursor_position) = window.cursor_position() {
-        if let Some(world_position) = camera.viewport_to_world(camera_transform, cursor_position) {
+        if let Ok(world_position) = camera.viewport_to_world(camera_transform, cursor_position) {
             let cursor_pos = world_position.origin.truncate();
 
             // Check if we clicked on a resource node
@@ -295,16 +295,13 @@ fn spawn_gather_effect(commands: &mut Commands, asset_server: &Res<AssetServer>,
     let effect_texture = asset_server.load("effects/gather_effect.png");
 
     commands.spawn((
-        SpriteBundle {
-            texture: effect_texture,
-            sprite: Sprite {
-                color: Color::srgba(1.0, 1.0, 1.0, 0.7),
-                custom_size: Some(Vec2::new(20.0, 20.0)),
-                ..default()
-            },
-            transform: Transform::from_translation(position + Vec3::new(0.0, 10.0, 0.1)),
+        Sprite {
+            image: effect_texture,
+            color: Color::srgba(1.0, 1.0, 1.0, 0.7),
+            custom_size: Some(Vec2::new(20.0, 20.0)),
             ..default()
         },
+        Transform::from_translation(position + Vec3::new(0.0, 10.0, 0.1)),
         GatherEffect {
             timer: Timer::from_seconds(0.5, TimerMode::Once),
         },
@@ -322,22 +319,14 @@ fn spawn_resource_collected_text(
     let font = asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf");
 
     commands.spawn((
-        Text2dBundle {
-            text: Text {
-                sections: vec![TextSection::new(
-                    format!("+{amount}"),
-                    TextStyle {
-                        font,
-                        font_size: 16.0,
-                        color: Color::WHITE,
-                    },
-                )],
-                justify: JustifyText::Center,
-                ..default()
-            },
-            transform: Transform::from_translation(position + Vec3::new(0.0, 20.0, 0.1)),
+        Text2d(format!("+{amount}")),
+        TextFont {
+            font,
+            font_size: 16.0,
             ..default()
         },
+        TextColor(Color::WHITE),
+        Transform::from_translation(position + Vec3::new(0.0, 20.0, 0.1)),
         FloatingText {
             timer: Timer::from_seconds(1.0, TimerMode::Once),
             velocity: Vec2::new(0.0, 20.0),

@@ -17,90 +17,80 @@ pub fn setup_ui(
     // Create a container for our unit info panel in the top right
     commands
         .spawn((
-            NodeBundle {
-                style: Style {
-                    position_type: PositionType::Absolute,
-                    right: Val::Px(10.0),
-                    top: Val::Px(10.0),
-                    width: Val::Px(200.0),
-                    height: Val::Px(120.0),
-                    padding: UiRect::all(Val::Px(10.0)),
-                    flex_direction: FlexDirection::Column,
-                    ..default()
-                },
-                background_color: BackgroundColor(Color::srgba(0.1, 0.1, 0.1, 0.8)),
+            Node {
+                position_type: PositionType::Absolute,
+                right: Val::Px(10.0),
+                top: Val::Px(10.0),
+                width: Val::Px(200.0),
+                height: Val::Px(120.0),
+                padding: UiRect::all(Val::Px(10.0)),
+                flex_direction: FlexDirection::Column,
                 ..default()
             },
             UnitInfoPanel,
         ))
         .with_children(|parent| {
             // Title - Unit Info
-            parent.spawn(TextBundle::from_section(
-                "Unit Information",
-                TextStyle {
+            parent.spawn((
+                Text::new("Unit Information"),
+                TextFont {
                     font: font.clone(),
                     font_size: 18.0,
-                    color: Color::WHITE,
+                    ..default()
                 },
+                TextColor(Color::WHITE),
             ));
 
             // Name
             parent.spawn((
-                TextBundle::from_section(
-                    "No unit selected",
-                    TextStyle {
-                        font: font.clone(),
-                        font_size: 16.0,
-                        color: Color::WHITE,
-                    },
-                ),
+                Text::new("No unit selected"),
+                TextFont {
+                    font: font.clone(),
+                    font_size: 16.0,
+                    ..default()
+                },
+                TextColor(Color::WHITE),
                 UnitNameText,
             ));
 
             // Health
             parent.spawn((
-                TextBundle::from_section(
-                    "",
-                    TextStyle {
-                        font: font.clone(),
-                        font_size: 16.0,
-                        color: Color::WHITE,
-                    },
-                ),
+                Text::new(""),
+                TextFont {
+                    font: font.clone(),
+                    font_size: 16.0,
+                    ..default()
+                },
+                TextColor(Color::WHITE),
                 UnitHealthText,
             ));
 
             // Speed
             parent.spawn((
-                TextBundle::from_section(
-                    "",
-                    TextStyle {
-                        font: font.clone(),
-                        font_size: 16.0,
-                        color: Color::WHITE,
-                    },
-                ),
+                Text::new(""),
+                TextFont {
+                    font: font.clone(),
+                    font_size: 16.0,
+                    ..default()
+                },
+                TextColor(Color::WHITE),
                 UnitSpeedText,
             ));
         });
 
     // Add a resources display at the top of the screen
     let mut resources_entity = commands.spawn((
-        NodeBundle {
-            style: Style {
-                position_type: PositionType::Absolute,
-                top: Val::Px(10.0),
-                left: Val::Px(10.0),
-                width: Val::Px(400.0), // Make wider to accommodate more resources
-                height: Val::Auto,
-                padding: UiRect::all(Val::Px(8.0)),
-                column_gap: Val::Px(15.0),
-                flex_direction: FlexDirection::Row,
-                flex_wrap: FlexWrap::Wrap, // Allow wrapping to multiple rows
-                align_items: AlignItems::Center,
-                ..default()
-            },
-            background_color: BackgroundColor(Color::srgba(0.1, 0.1, 0.1, 0.8)),
+        Node {
+            position_type: PositionType::Absolute,
+            top: Val::Px(10.0),
+            left: Val::Px(10.0),
+            width: Val::Px(400.0), // Make wider to accommodate more resources
+            height: Val::Auto,
+            padding: UiRect::all(Val::Px(8.0)),
+            column_gap: Val::Px(15.0),
+            flex_direction: FlexDirection::Row,
+            flex_wrap: FlexWrap::Wrap, // Allow wrapping to multiple rows
+            align_items: AlignItems::Center,
             ..default()
         },
         ResourcesDisplay,
@@ -110,14 +100,13 @@ pub fn setup_ui(
     resources_entity.with_children(|parent| {
         for resource_def in resource_registry.all() {
             parent.spawn((
-                TextBundle::from_section(
-                    format!("{}: 0", resource_def.name),
-                    TextStyle {
-                        font: font.clone(),
-                        font_size: 16.0,
-                        color: resource_def.color,
-                    },
-                ),
+                Text::new(format!("{}: 0", resource_def.name)),
+                TextFont {
+                    font: font.clone(),
+                    font_size: 16.0,
+                    ..default()
+                },
+                TextColor(resource_def.color),
                 ResourceText(resource_def.id.0.clone()),
             ));
         }
@@ -140,9 +129,9 @@ pub fn update_unit_info(
     let mut name_query = text_query.p0();
     if let Ok(mut name_text) = name_query.get_single_mut() {
         if let Some((attributes, _)) = selected_info {
-            name_text.sections[0].value = format!("Name: {}", attributes.name);
+            *name_text = Text::new(format!("Name: {}", attributes.name));
         } else {
-            name_text.sections[0].value = "No unit selected".to_string();
+            *name_text = Text::new("No unit selected".to_string());
         }
     }
 
@@ -152,12 +141,12 @@ pub fn update_unit_info(
         if let Some((attributes, _)) = selected_info {
             // Calculate health percentage
             let health_percent = (attributes.health / attributes.max_health) * 100.0;
-            health_text.sections[0].value = format!(
+            *health_text = Text::new(format!(
                 "Health: {:.0}/{:.0} ({:.0}%)",
                 attributes.health, attributes.max_health, health_percent
-            );
+            ));
         } else {
-            health_text.sections[0].value = String::new();
+            *health_text = Text::new(String::new());
         }
     }
 
@@ -165,9 +154,9 @@ pub fn update_unit_info(
     let mut speed_query = text_query.p2();
     if let Ok(mut speed_text) = speed_query.get_single_mut() {
         if let Some((_, velocity)) = selected_info {
-            speed_text.sections[0].value = format!("Speed: {:.0}", velocity.speed);
+            *speed_text = Text::new(format!("Speed: {:.0}", velocity.speed));
         } else {
-            speed_text.sections[0].value = String::new();
+            *speed_text = Text::new(String::new());
         }
     }
 }
@@ -183,7 +172,7 @@ pub fn update_resources_display(
 
         // Find the resource definition to get its name
         if let Some(resource_def) = resource_registry.get(&resource_id) {
-            text.sections[0].value = format!("{}: {}", resource_def.name, amount);
+            *text = Text::new(format!("{}: {}", resource_def.name, amount));
         }
     }
 }
@@ -193,7 +182,7 @@ pub fn update_inventory_ui(
     mut commands: Commands,
     selected_units: Query<(Entity, &Inventory), With<Selected>>,
     inventory_ui_query: Query<Entity, With<InventoryUI>>,
-    mut inventory_slots: Query<(&mut UiImage, &mut InventorySlot, &Children), With<Button>>,
+    mut inventory_slots: Query<(&mut ImageNode, &mut InventorySlot, &Children), With<Button>>,
     mut text_query: Query<&mut Text>,
     resource_registry: Res<ResourceRegistry>,
     asset_server: Res<AssetServer>,
@@ -220,18 +209,14 @@ pub fn update_inventory_ui(
         // Create the main UI container
         let ui_entity = commands
             .spawn((
-                NodeBundle {
-                    style: Style {
-                        position_type: PositionType::Absolute,
-                        bottom: Val::Px(10.0),
-                        right: Val::Px(10.0),
-                        width: Val::Px(120.0),
-                        height: Val::Px(80.0),
-                        padding: UiRect::all(Val::Px(8.0)),
-                        flex_direction: FlexDirection::Column,
-                        ..default()
-                    },
-                    background_color: Color::srgba(0.1, 0.1, 0.1, 0.8).into(),
+                Node {
+                    position_type: PositionType::Absolute,
+                    bottom: Val::Px(10.0),
+                    right: Val::Px(10.0),
+                    width: Val::Px(120.0),
+                    height: Val::Px(80.0),
+                    padding: UiRect::all(Val::Px(8.0)),
+                    flex_direction: FlexDirection::Column,
                     ..default()
                 },
                 InventoryUI,
@@ -240,34 +225,32 @@ pub fn update_inventory_ui(
 
         // Add a title
         let title = commands
-            .spawn(TextBundle::from_section(
-                "Inventory",
-                TextStyle {
+            .spawn((
+                Text::new("Inventory"),
+                TextFont {
                     font: asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf"),
                     font_size: 16.0,
-                    color: Color::WHITE,
+                    ..default()
                 },
+                TextColor(Color::WHITE),
             ))
             .id();
-        commands.entity(ui_entity).push_children(&[title]);
+        commands.entity(ui_entity).add_children(&[title]);
 
         // Create a grid container for the slots
         let grid_entity = commands
-            .spawn(NodeBundle {
-                style: Style {
-                    margin: UiRect::all(Val::Px(5.0)),
-                    width: Val::Percent(100.0),
-                    height: Val::Px(70.0),
-                    display: Display::Flex,
-                    flex_direction: FlexDirection::Row,
-                    flex_wrap: FlexWrap::Wrap,
-                    ..default()
-                },
+            .spawn(Node {
+                margin: UiRect::all(Val::Px(5.0)),
+                width: Val::Percent(100.0),
+                height: Val::Px(70.0),
+                display: Display::Flex,
+                flex_direction: FlexDirection::Row,
+                flex_wrap: FlexWrap::Wrap,
                 ..default()
             })
             .id();
 
-        commands.entity(ui_entity).push_children(&[grid_entity]);
+        commands.entity(ui_entity).add_children(&[grid_entity]);
 
         // Create slot placeholders - avoid nested with_children calls
         let mut slot_entities = Vec::new();
@@ -277,20 +260,17 @@ pub fn update_inventory_ui(
         for _ in 0..8 {
             let slot = commands
                 .spawn((
-                    ButtonBundle {
-                        style: Style {
-                            width: Val::Px(24.0),
-                            height: Val::Px(24.0),
-                            margin: UiRect::all(Val::Px(2.0)),
-                            justify_content: JustifyContent::Center,
-                            align_items: AlignItems::Center,
-                            ..default()
-                        },
-                        background_color: Color::srgba(0.2, 0.2, 0.2, 0.6).into(),
-                        image: UiImage {
-                            texture: asset_server.load("resources/empty_slot.png"),
-                            ..default()
-                        },
+                    Node {
+                        width: Val::Px(24.0),
+                        height: Val::Px(24.0),
+                        margin: UiRect::all(Val::Px(2.0)),
+                        justify_content: JustifyContent::Center,
+                        align_items: AlignItems::Center,
+                        ..default()
+                    },
+                    Button {},
+                    ImageNode {
+                        image: asset_server.load("resources/empty_slot.png"),
                         ..default()
                     },
                     InventorySlot {
@@ -302,22 +282,15 @@ pub fn update_inventory_ui(
 
             // Create text for the quantity
             let text = commands
-                .spawn(
-                    TextBundle::from_section(
-                        "",
-                        TextStyle {
-                            font: asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf"),
-                            font_size: 10.0,
-                            color: Color::WHITE,
-                        },
-                    )
-                    .with_style(Style {
-                        position_type: PositionType::Absolute,
-                        bottom: Val::Px(1.0),
-                        right: Val::Px(1.0),
+                .spawn((
+                    Text::new(""),
+                    TextFont {
+                        font: asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf"),
+                        font_size: 10.0,
                         ..default()
-                    }),
-                )
+                    },
+                    TextColor(Color::WHITE),
+                ))
                 .id();
 
             slot_entities.push(slot);
@@ -325,11 +298,11 @@ pub fn update_inventory_ui(
         }
 
         // Now add all slots to the grid
-        commands.entity(grid_entity).push_children(&slot_entities);
+        commands.entity(grid_entity).add_children(&slot_entities);
 
         // Then add text to each slot
         for (slot, text) in slot_entities.iter().zip(text_entities.iter()) {
-            commands.entity(*slot).push_children(&[*text]);
+            commands.entity(*slot).add_children(&[*text]);
         }
     }
 
@@ -339,12 +312,12 @@ pub fn update_inventory_ui(
         if slot.entity_owner != selected_entity {
             slot.entity_owner = selected_entity;
             slot.resource_id = None;
-            ui_image.texture = asset_server.load("resources/empty_slot.png");
+            ui_image.image = asset_server.load("resources/empty_slot.png");
 
             // Update quantity text
             if let Some(&child) = children.first() {
                 if let Ok(mut text) = text_query.get_mut(child) {
-                    text.sections[0].value = String::new();
+                    *text = Text::new(String::new());
                 }
             }
         }
@@ -366,16 +339,16 @@ pub fn update_inventory_ui(
 
                 // Get resource icon
                 if let Some(resource_def) = resource_registry.get(resource_id) {
-                    ui_image.texture = asset_server.load(&resource_def.icon_path);
+                    ui_image.image = asset_server.load(&resource_def.icon_path);
                 } else {
-                    ui_image.texture = asset_server.load("resources/unknown.png");
+                    ui_image.image = asset_server.load("resources/unknown.png");
                 }
             }
 
             // Update quantity text
             if let Some(&child) = children.first() {
                 if let Ok(mut text) = text_query.get_mut(child) {
-                    text.sections[0].value = amount.to_string();
+                    *text = Text::new(amount.to_string());
                 }
             }
 
@@ -388,12 +361,12 @@ pub fn update_inventory_ui(
         if let Some((mut ui_image, mut slot, children)) = inventory_slots.iter_mut().nth(i) {
             if slot.resource_id.is_some() {
                 slot.resource_id = None;
-                ui_image.texture = asset_server.load("resources/empty_slot.png");
+                ui_image.image = asset_server.load("resources/empty_slot.png");
 
                 // Clear quantity text
                 if let Some(&child) = children.first() {
                     if let Ok(mut text) = text_query.get_mut(child) {
-                        text.sections[0].value = String::new();
+                        *text = Text::new(String::new());
                     }
                 }
             }
