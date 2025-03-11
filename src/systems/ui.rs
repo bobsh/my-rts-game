@@ -240,14 +240,14 @@ pub fn update_inventory_ui(
         // Create a grid container for the slots
         let grid_entity = commands
             .spawn(Node {
-                    margin: UiRect::all(Val::Px(5.0)),
-                    width: Val::Percent(100.0),
-                    height: Val::Px(70.0),
-                    display: Display::Flex,
-                    flex_direction: FlexDirection::Row,
-                    flex_wrap: FlexWrap::Wrap,
-                    ..default()
-                })
+                margin: UiRect::all(Val::Px(5.0)),
+                width: Val::Percent(100.0),
+                height: Val::Px(70.0),
+                display: Display::Flex,
+                flex_direction: FlexDirection::Row,
+                flex_wrap: FlexWrap::Wrap,
+                ..default()
+            })
             .id();
 
         commands.entity(ui_entity).add_children(&[grid_entity]);

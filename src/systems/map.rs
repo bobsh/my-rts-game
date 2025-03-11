@@ -21,7 +21,11 @@ pub fn setup_background(mut commands: Commands, asset_server: Res<AssetServer>) 
 
     // Create parent entity to hold all background tiles
     let background = commands
-        .spawn((Transform::default(), Visibility::default(), Name::new("Background Container")))
+        .spawn((
+            Transform::default(),
+            Visibility::default(),
+            Name::new("Background Container"),
+        ))
         .id();
 
     // Create a grid of background tiles

@@ -111,7 +111,7 @@ fn spawn_worker(
     let _worker_entity = commands
         .spawn((
             Transform::from_translation(Vec3::new(position.x, position.y, 0.0))
-                    .with_scale(Vec3::new(0.8, 0.8, 1.0)),
+                .with_scale(Vec3::new(0.8, 0.8, 1.0)),
             Sprite {
                 image: texture,
                 ..Default::default()

@@ -36,11 +36,7 @@ pub fn move_command_system(
                     custom_size: Some(Vec2::new(15.0, 15.0)),
                     ..default()
                 },
-                Transform::from_translation(Vec3::new(
-                    target_pos.x,
-                    target_pos.y,
-                    0.0,
-                )),
+                Transform::from_translation(Vec3::new(target_pos.x, target_pos.y, 0.0)),
                 MoveMarker {
                     timer: Timer::from_seconds(1.0, TimerMode::Once),
                 },
