@@ -25,6 +25,7 @@
 - [x] Research and test out tiled, and how to integrate it with bevy and rust
 - [x] Research and test ltdk, and how to integrate it with bevy
 - [x] Upgrade to bevy 0.15
+- [x] Make repository public
 - [ ] Try out aesprite, and using files directly in bevy
 - [ ] Add a grid system
 - [ ] Add trees, mines and quarries and mine resources from them
