@@ -26,6 +26,7 @@
 - [x] Research and test ltdk, and how to integrate it with bevy
 - [x] Upgrade to bevy 0.15
 - [x] Make repository public
+- [x] Remove some old assets, make some space
 - [ ] Try out aesprite, and using files directly in bevy
 - [ ] Add a grid system
 - [ ] Add trees, mines and quarries and mine resources from them
