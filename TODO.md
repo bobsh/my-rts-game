@@ -27,6 +27,9 @@
 - [x] Upgrade to bevy 0.15
 - [x] Make repository public
 - [x] Remove some old assets, make some space
+- [x] Migrate assets to aseprite
+- [x] Add gif support so we can switch to our silly tree (no animation working yet though)
+- [x] Delete old assets and and cleanup
 - [ ] Try out aesprite, and using files directly in bevy
 - [ ] Add a grid system
 - [ ] Add trees, mines and quarries and mine resources from them
