@@ -6,7 +6,7 @@ fn main() {
     #[cfg(target_os = "windows")]
     {
         println!("Windows target detected");
-        let icon_path = "assets/icons/quillbrainstars/quillbrainstars-64x64.ico";
+        let icon_path = "assets/brainquill_small.ico";
 
         // Verify file exists
         if std::path::Path::new(icon_path).exists() {
