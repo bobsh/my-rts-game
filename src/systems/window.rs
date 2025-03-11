@@ -14,7 +14,7 @@ pub fn setup_window_icon(
     };
 
     // Load the icon
-    let icon_path = "assets/icons/quillbrainstars/quillbrainstars-64x64.png"; // Use PNG for runtime
+    let icon_path = "assets/brainquill_small.png"; // Use PNG for runtime
     let icon_bytes = std::fs::read(icon_path).unwrap_or_else(|_| {
         println!("Failed to load icon");
         Vec::new()
