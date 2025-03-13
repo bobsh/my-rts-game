@@ -1,11 +1,12 @@
 use bevy::app::{App, Plugin, Startup, Update};
+use bevy_ecs_ldtk::prelude::*;
 
 use crate::resources::{PlayerResources, ResourceRegistry};
 use crate::systems::animation::{
     animate_floating_text, animate_gather_effects, animate_workers, update_worker_animations,
 };
 use crate::systems::gathering::{gathering_system, resource_gathering_command};
-use crate::systems::map::setup_background;
+use crate::systems::map::setup_ldtk_map;
 use crate::systems::movement::{move_command_system, movement_system, show_destination_markers};
 use crate::systems::scene::setup_scene;
 use crate::systems::selection::{
@@ -21,11 +22,13 @@ pub struct RtsPlugin;
 
 impl Plugin for RtsPlugin {
     fn build(&self, app: &mut App) {
-        app.init_resource::<PlayerResources>()
+        app.add_plugins(LdtkPlugin)
+            .init_resource::<PlayerResources>()
             .init_resource::<ResourceRegistry>()
+            .insert_resource(LevelSelection::index(0))
             .add_systems(
                 Startup,
-                (setup_scene, setup_ui, setup_window_icon, setup_background),
+                (setup_scene, setup_ui, setup_window_icon, setup_ldtk_map),
             )
             .add_systems(
                 Update,

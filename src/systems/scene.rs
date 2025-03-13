@@ -15,7 +15,10 @@ pub fn setup_scene(
     asset_server: Res<AssetServer>,
     resource_registry: Res<ResourceRegistry>,
 ) {
-    commands.spawn(Camera2d);
+    commands.spawn((
+        Camera2d,
+        Transform::from_xyz(1280.0 / 4.0, 720.0 / 4.0, 0.0),
+    ));
 
     // Spawn worker units
     spawn_worker(

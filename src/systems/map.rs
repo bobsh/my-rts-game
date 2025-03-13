@@ -3,6 +3,17 @@
 use crate::components::resource::ResourceNode;
 use crate::resources::{ResourceId, ResourceRegistry};
 use bevy::prelude::*;
+use bevy_ecs_ldtk::prelude::*;
+
+pub fn setup_ldtk_map(mut commands: Commands, asset_server: Res<AssetServer>) {
+    // Load the ldtk map file
+    let map_handle = asset_server.load("test-map.ldtk");
+
+    commands.spawn(LdtkWorldBundle {
+        ldtk_handle: map_handle.into(),
+        ..Default::default()
+    });
+}
 
 /// Sets up the tiled grass background for the game world
 pub fn setup_background(mut commands: Commands, asset_server: Res<AssetServer>) {
@@ -70,7 +81,6 @@ pub fn spawn_resource_node(
                 Sprite {
                     image: texture,
                     color: resource_def.color,
-                    custom_size: Some(Vec2::new(30.0, 30.0)),
                     ..default()
                 },
                 Transform::from_translation(Vec3::new(position.x, position.y, -0.1))
