@@ -30,7 +30,9 @@
 - [x] Migrate assets to aseprite
 - [x] Add gif support so we can switch to our silly tree (no animation working yet though)
 - [x] Delete old assets and and cleanup
-- [ ] Try out aesprite, and using files directly in bevy
+- [x] Create our first LDTK map and do the import using it
+- [x] Consolidate map into scenes
+- [ ] Can we use aseprite directly in LDTK?
 - [ ] Add a grid system
 - [ ] Add trees, mines and quarries and mine resources from them
 - [ ] Add complete unit tests for each .rs file
