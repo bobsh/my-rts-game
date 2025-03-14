@@ -6,7 +6,6 @@ use crate::systems::animation::{
     animate_floating_text, animate_gather_effects, animate_workers, update_worker_animations,
 };
 use crate::systems::gathering::{gathering_system, resource_gathering_command};
-use crate::systems::map::setup_ldtk_map;
 use crate::systems::movement::{move_command_system, movement_system, show_destination_markers};
 use crate::systems::scene::setup_scene;
 use crate::systems::selection::{
@@ -28,7 +27,7 @@ impl Plugin for RtsPlugin {
             .insert_resource(LevelSelection::index(0))
             .add_systems(
                 Startup,
-                (setup_scene, setup_ui, setup_window_icon, setup_ldtk_map),
+                (setup_ui, setup_window_icon, setup_scene),
             )
             .add_systems(
                 Update,
