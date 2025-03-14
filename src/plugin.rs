@@ -25,10 +25,7 @@ impl Plugin for RtsPlugin {
             .init_resource::<PlayerResources>()
             .init_resource::<ResourceRegistry>()
             .insert_resource(LevelSelection::index(0))
-            .add_systems(
-                Startup,
-                (setup_ui, setup_window_icon, setup_scene),
-            )
+            .add_systems(Startup, (setup_ui, setup_window_icon, setup_scene))
             .add_systems(
                 Update,
                 (
