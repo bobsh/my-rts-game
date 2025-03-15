@@ -9,10 +9,7 @@ use bevy_ecs_ldtk::prelude::*;
 
 use crate::components::inventory::Inventory;
 
-pub fn setup_scene(
-    mut commands: Commands,
-    asset_server: Res<AssetServer>,
-) {
+pub fn setup_scene(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn((
         Camera2d,
         Transform::from_xyz(1280.0 / 4.0, 720.0 / 4.0, 0.0),
