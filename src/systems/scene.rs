@@ -18,7 +18,7 @@ pub fn setup_scene(
 ) {
     commands.spawn((
         Camera2d,
-        Transform::from_xyz(1280.0 / 2.0, 720.0 / 2.0, 0.0),
+        Transform::from_xyz(1280.0 / 4.0, 720.0 / 4.0, 0.0),
     ));
 
     // Load the ldtk map file
@@ -58,56 +58,56 @@ pub fn setup_scene(
     let stone_id = ResourceId("stone".to_string());
 
     // Increased spacing between resource nodes
-    spawn_resource_node(
-        &mut commands,
-        &asset_server,
-        &resource_registry,
-        Vec2::new(-300.0, 200.0),
-        &gold_id,
-        100,
-    );
-    spawn_resource_node(
-        &mut commands,
-        &asset_server,
-        &resource_registry,
-        Vec2::new(0.0, 200.0),
-        &wood_id,
-        150,
-    );
-    spawn_resource_node(
-        &mut commands,
-        &asset_server,
-        &resource_registry,
-        Vec2::new(300.0, 200.0),
-        &stone_id,
-        125,
-    );
+    // spawn_resource_node(
+    //     &mut commands,
+    //     &asset_server,
+    //     &resource_registry,
+    //     Vec2::new(-300.0, 200.0),
+    //     &gold_id,
+    //     100,
+    // );
+    // spawn_resource_node(
+    //     &mut commands,
+    //     &asset_server,
+    //     &resource_registry,
+    //     Vec2::new(0.0, 200.0),
+    //     &wood_id,
+    //     150,
+    // );
+    // spawn_resource_node(
+    //     &mut commands,
+    //     &asset_server,
+    //     &resource_registry,
+    //     Vec2::new(300.0, 200.0),
+    //     &stone_id,
+    //     125,
+    // );
 
-    // Additional resource nodes in different locations
-    spawn_resource_node(
-        &mut commands,
-        &asset_server,
-        &resource_registry,
-        Vec2::new(-200.0, -150.0),
-        &gold_id,
-        75,
-    );
-    spawn_resource_node(
-        &mut commands,
-        &asset_server,
-        &resource_registry,
-        Vec2::new(150.0, -200.0),
-        &wood_id,
-        100,
-    );
-    spawn_resource_node(
-        &mut commands,
-        &asset_server,
-        &resource_registry,
-        Vec2::new(-100.0, -250.0),
-        &stone_id,
-        80,
-    );
+    // // Additional resource nodes in different locations
+    // spawn_resource_node(
+    //     &mut commands,
+    //     &asset_server,
+    //     &resource_registry,
+    //     Vec2::new(-200.0, -150.0),
+    //     &gold_id,
+    //     75,
+    // );
+    // spawn_resource_node(
+    //     &mut commands,
+    //     &asset_server,
+    //     &resource_registry,
+    //     Vec2::new(150.0, -200.0),
+    //     &wood_id,
+    //     100,
+    // );
+    // spawn_resource_node(
+    //     &mut commands,
+    //     &asset_server,
+    //     &resource_registry,
+    //     Vec2::new(-100.0, -250.0),
+    //     &stone_id,
+    //     80,
+    // );
 }
 
 // Update worker spawning with the new animation component

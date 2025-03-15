@@ -32,6 +32,9 @@
 - [x] Delete old assets and and cleanup
 - [x] Create our first LDTK map and do the import using it
 - [x] Consolidate map into scenes
+- [x] Make the map bigger
+- [x] Add a quarry to the map, for stone resources
+- [ ] Spawn a character using the ldtk way
 - [ ] Can we use aseprite directly in LDTK?
 - [ ] Add a grid system
 - [ ] Add trees, mines and quarries and mine resources from them
