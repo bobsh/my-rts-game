@@ -1,5 +1,6 @@
 use bevy::app::{App, Plugin, Startup, Update};
 use bevy_ecs_ldtk::prelude::*;
+use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
 use crate::resources::{PlayerResources, ResourceRegistry};
 use crate::systems::animation::{
@@ -22,6 +23,7 @@ pub struct RtsPlugin;
 impl Plugin for RtsPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins(LdtkPlugin)
+            .add_plugins(WorldInspectorPlugin::new())
             .init_resource::<PlayerResources>()
             .init_resource::<ResourceRegistry>()
             .insert_resource(LevelSelection::index(0))

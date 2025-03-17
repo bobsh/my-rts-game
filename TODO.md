@@ -34,6 +34,7 @@
 - [x] Consolidate map into scenes
 - [x] Make the map bigger
 - [x] Add a quarry to the map, for stone resources
+- [x] Run egui inspector in the game
 - [ ] Spawn a character using the ldtk way
 - [ ] Can we use aseprite directly in LDTK?
 - [ ] Add a grid system
