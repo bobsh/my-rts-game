@@ -19,10 +19,11 @@ lto = "fat"  # Full optimization for actual releases
 
 [dependencies]
 bevy = { version = "0.15", features = ["png", "gif"] }
-wgpu = "=0.17.1"
+wgpu = ">0.19.0"
 image = "0.25"
 winit = "0.30"
 bevy_ecs_ldtk = "0.11"
+bevy-inspector-egui = "0.30"
 
 [build-dependencies]
 winres = "0.1"
