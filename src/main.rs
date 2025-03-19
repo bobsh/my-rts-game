@@ -4,6 +4,7 @@ use bevy::window::WindowPlugin;
 use bevy::DefaultPlugins;
 
 mod components;
+mod entities;
 mod plugin;
 mod resources;
 mod systems;

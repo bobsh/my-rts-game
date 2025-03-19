@@ -2,6 +2,7 @@ use bevy::app::{App, Plugin, Startup, Update};
 use bevy_ecs_ldtk::prelude::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
+use crate::entities::EntitiesPlugin;
 use crate::resources::{PlayerResources, ResourceRegistry};
 use crate::systems::animation::{
     animate_floating_text, animate_gather_effects, animate_workers, update_worker_animations,
@@ -27,6 +28,7 @@ impl Plugin for RtsPlugin {
             .init_resource::<PlayerResources>()
             .init_resource::<ResourceRegistry>()
             .insert_resource(LevelSelection::index(0))
+            .add_plugins(EntitiesPlugin)
             .add_systems(Startup, (setup_ui, setup_window_icon, setup_scene))
             .add_systems(
                 Update,
