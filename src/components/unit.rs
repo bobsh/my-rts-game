@@ -3,7 +3,7 @@ use bevy::prelude::*;
 #[derive(Component, Default)]
 pub struct Unit;
 
-#[derive(Component)]
+#[derive(Component, Default)]
 pub struct Selectable;
 
 #[derive(Component)]

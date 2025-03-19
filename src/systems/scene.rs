@@ -22,29 +22,6 @@ pub fn setup_scene(mut commands: Commands, asset_server: Res<AssetServer>) {
         ldtk_handle: map_handle.into(),
         ..Default::default()
     });
-
-    // Spawn worker units
-    spawn_worker(
-        &mut commands,
-        &asset_server,
-        Vec2::new(-200.0, 0.0),
-        "jungleman.png".to_string(),
-        1,
-    );
-    spawn_worker(
-        &mut commands,
-        &asset_server,
-        Vec2::new(0.0, 0.0),
-        "jungleman.png".to_string(),
-        2,
-    );
-    spawn_worker(
-        &mut commands,
-        &asset_server,
-        Vec2::new(200.0, 0.0),
-        "jungleman.png".to_string(),
-        3,
-    );
 }
 
 // Update worker spawning with the new animation component
