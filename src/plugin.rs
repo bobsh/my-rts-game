@@ -3,7 +3,6 @@ use bevy_ecs_ldtk::prelude::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
 use crate::entities::EntitiesPlugin;
-use crate::systems::movement::{move_command_system, movement_system, show_destination_markers};
 use crate::systems::scene::setup_scene;
 use crate::systems::selection::{
     draw_selection_boxes, highlight_selected, selection_system, update_selection_ring,
@@ -27,9 +26,6 @@ impl Plugin for RtsPlugin {
                     highlight_selected,
                     draw_selection_boxes,
                     update_selection_ring,
-                    move_command_system,
-                    movement_system,
-                    show_destination_markers,
                 ),
             );
     }
