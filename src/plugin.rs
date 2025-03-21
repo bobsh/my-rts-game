@@ -6,12 +6,9 @@ use crate::entities::EntitiesPlugin;
 use crate::systems::movement::{move_command_system, movement_system, show_destination_markers};
 use crate::systems::scene::setup_scene;
 use crate::systems::selection::{
-    draw_selection_boxes, highlight_selected, selection_system,
-    update_selection_ring,
+    draw_selection_boxes, highlight_selected, selection_system, update_selection_ring,
 };
-use crate::systems::ui::{
-    setup_ui,
-};
+use crate::systems::ui::setup_ui;
 use crate::systems::window::setup_window_icon;
 
 pub struct RtsPlugin;

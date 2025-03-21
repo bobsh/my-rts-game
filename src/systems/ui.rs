@@ -1,13 +1,7 @@
-use crate::components::ui::{
-    UnitHealthText, UnitInfoPanel,
-    UnitNameText, UnitSpeedText,
-};
+use crate::components::ui::{UnitHealthText, UnitInfoPanel, UnitNameText, UnitSpeedText};
 use bevy::prelude::*;
 
-pub fn setup_ui(
-    mut commands: Commands,
-    asset_server: Res<AssetServer>,
-) {
+pub fn setup_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
     let font = asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf");
 
     // Create a container for our unit info panel in the top right
