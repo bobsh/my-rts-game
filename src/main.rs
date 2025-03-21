@@ -6,7 +6,6 @@ use bevy::DefaultPlugins;
 mod components;
 mod entities;
 mod plugin;
-mod resources;
 mod systems;
 
 use plugin::RtsPlugin;

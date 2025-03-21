@@ -64,31 +64,6 @@ pub fn selection_system(
     }
 }
 
-// Add a new system for animating the selection ring
-pub fn animate_selection_rings(
-    time: Res<Time>,
-    mut query: Query<(&mut SelectionRing, &mut Sprite)>,
-) {
-    for (mut ring, mut sprite) in &mut query {
-        ring.timer.tick(time.delta());
-
-        // Calculate a pulsing effect
-        let pulse_factor = (ring.timer.fraction() * std::f32::consts::PI * 2.0)
-            .sin()
-            .mul_add(0.1, 1.0);
-        let current_size = ring.base_size * pulse_factor;
-
-        // Update sprite size
-        sprite.custom_size = Some(Vec2::new(current_size, current_size));
-
-        // Also pulse the opacity
-        let alpha = (ring.timer.fraction() * std::f32::consts::PI * 2.0)
-            .cos()
-            .mul_add(0.2, 0.4);
-        sprite.color = sprite.color.with_alpha(alpha);
-    }
-}
-
 // Fix the update_selection_ring_positions system using ParamSet
 #[allow(clippy::type_complexity)]
 pub fn update_selection_ring(

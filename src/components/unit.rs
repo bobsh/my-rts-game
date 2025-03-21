@@ -9,26 +9,9 @@ pub struct Selectable;
 #[derive(Component)]
 pub struct Selected;
 
-// Enhanced worker animation that supports different states
-#[derive(Component)]
-pub struct WorkerAnimation {
-    pub timer: Timer,
-    pub state: WorkerAnimationState,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum WorkerAnimationState {
-    Idle,
-    Walking,
-    Mining,
-    Woodcutting,
-}
-
 // Update SelectionRing to include animation timer
 #[derive(Component)]
 pub struct SelectionRing {
-    pub timer: Timer,
-    pub base_size: f32,
     pub owner: Entity, // Add this to track which entity this ring belongs to
 }
 
@@ -42,11 +25,4 @@ pub struct Velocity {
 #[derive(Component)]
 pub struct MoveMarker {
     pub timer: Timer,
-}
-
-#[derive(Component)]
-pub struct UnitAttributes {
-    pub name: String,
-    pub health: f32,
-    pub max_health: f32,
 }
