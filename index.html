@@ -1,0 +1,40 @@
+-game\index.html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My RTS Game</title>
+  <style>
+    body,
+    html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #333;
+    }
+
+    canvas {
+      display: block;
+      margin: 0 auto;
+      background-color: black;
+    }
+  </style>
+</head>
+
+<body>
+  <script type="module">
+    import init from './my_rts_game.js';
+
+    async function run() {
+      await init();
+    }
+
+    run();
+  </script>
+</body>
+
+</html>
