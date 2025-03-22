@@ -35,7 +35,11 @@
 - [x] Make the map bigger
 - [x] Add a quarry to the map, for stone resources
 - [x] Run egui inspector in the game
-- [ ] Spawn a character using the ldtk way
+- [x] Align the map so it isn't off the screen
+- [x] Spawn the entities using the ldtk way
+- [x] Strip out a whole bunch of unused code now that we have changed to a tiled map, yay
+- [ ] Publish to wasm somewhere
+- [ ] Add the ability to move the map somehow?
 - [ ] Can we use aseprite directly in LDTK?
 - [ ] Add a grid system
 - [ ] Add trees, mines and quarries and mine resources from them
