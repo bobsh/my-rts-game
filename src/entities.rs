@@ -76,6 +76,19 @@ struct TreeBundle {
     grid_coords: GridCoords,
 }
 
+#[derive(Default, Component)]
+struct House;
+
+#[derive(Default, Bundle, LdtkEntity)]
+struct HouseBundle {
+    house: House,
+    selectable: Selectable,
+    #[sprite_sheet]
+    sprite_sheet: Sprite,
+    #[grid_coords]
+    grid_coords: GridCoords,
+}
+
 impl Default for Movable {
     fn default() -> Self {
         Self { speed: 3.0 } // Units move at 3 grid cells per second
@@ -88,6 +101,7 @@ impl Plugin for EntitiesPlugin {
             .register_ldtk_entity::<WorkerBundle>("Worker")
             .register_ldtk_entity::<MineBundle>("Mine")
             .register_ldtk_entity::<QuarryBundle>("Quarry")
-            .register_ldtk_entity::<TreeBundle>("Tree");
+            .register_ldtk_entity::<TreeBundle>("Tree")
+            .register_ldtk_entity::<HouseBundle>("House");
     }
 }
