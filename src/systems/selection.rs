@@ -1,20 +1,17 @@
-use bevy::prelude::*;
-use bevy::sprite::Sprite;
+use crate::components::unit::{Selectable, Selected, SelectionRing, Unit};
 use bevy::input::mouse::MouseButton;
 use bevy::input::ButtonInput;
+use bevy::prelude::*;
+use bevy::sprite::Sprite;
 use bevy::window::PrimaryWindow;
-use crate::components::unit::{Selectable, Selected, SelectionRing, Unit};
 
+#[allow(clippy::too_many_arguments)]
 pub fn selection_system(
     mut commands: Commands,
     window_query: Query<&Window, With<PrimaryWindow>>,
     camera_query: Query<(&Camera, &GlobalTransform)>,
     mouse_button_input: Res<ButtonInput<MouseButton>>,
-    selectable_query: Query<(
-        Entity,
-        &Transform,
-        &Sprite,
-    ), With<Selectable>>,
+    selectable_query: Query<(Entity, &Transform, &Sprite), With<Selectable>>,
     selected_query: Query<Entity, With<Selected>>,
     selection_ring_query: Query<Entity, With<SelectionRing>>,
     _asset_server: Res<AssetServer>,
@@ -72,10 +69,7 @@ pub fn selection_system(
     }
 }
 
-fn get_entity_size(
-    sprite: &Sprite,
-    images: &Res<Assets<Image>>,
-) -> Vec2 {
+fn get_entity_size(sprite: &Sprite, images: &Res<Assets<Image>>) -> Vec2 {
     // First priority: Use custom_size if available (explicitly set size)
     if let Some(custom_size) = sprite.custom_size {
         return custom_size;
@@ -85,7 +79,7 @@ fn get_entity_size(
     if let Some(image) = images.get(&sprite.image) {
         return Vec2::new(
             image.texture_descriptor.size.width as f32,
-            image.texture_descriptor.size.height as f32
+            image.texture_descriptor.size.height as f32,
         );
     }
 
@@ -137,10 +131,7 @@ pub fn highlight_selected(query: Query<(&Transform, Option<&Selected>), With<Sel
 
 pub fn draw_selection_boxes(
     mut gizmos: Gizmos,
-    selection_query: Query<(
-        &Transform,
-        &Sprite,
-    ), With<Selected>>,
+    selection_query: Query<(&Transform, &Sprite), With<Selected>>,
     images: Res<Assets<Image>>,
 ) {
     for (transform, sprite) in selection_query.iter() {
@@ -157,7 +148,7 @@ pub fn draw_selection_boxes(
         gizmos.rect_2d(
             position,
             box_size,
-            Color::srgb(0.0, 1.0, 0.0)  // Green color
+            Color::srgb(0.0, 1.0, 0.0), // Green color
         );
     }
 }
