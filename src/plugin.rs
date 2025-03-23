@@ -3,14 +3,14 @@ use bevy_ecs_ldtk::prelude::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
 use crate::entities::EntitiesPlugin;
+use crate::systems::camera::CameraPlugin;
 use crate::systems::movement::MovementPlugin;
 use crate::systems::scene::setup_scene;
 use crate::systems::selection::{
     draw_selection_boxes, highlight_selected, selection_system, update_selection_ring,
 };
 use crate::systems::ui::setup_ui;
-use crate::systems::window::setup_window_icon;
-use crate::systems::camera::CameraPlugin; // Add this import
+use crate::systems::window::setup_window_icon; // Add this import
 
 pub struct RtsPlugin;
 
