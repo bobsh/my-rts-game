@@ -86,8 +86,8 @@ fn camera_zoom(
         let mut zoom_amount = event.y * zoom_factor;
 
         // Further smooth the zoom on WASM by clamping large deltas
-        if is_wasm && zoom_amount.abs() > 0.005 {
-            zoom_amount = zoom_amount.signum() * 0.005;
+        if is_wasm && zoom_amount.abs() > 0.05 {
+            zoom_amount = zoom_amount.signum() * 0.05;
         }
 
         // Apply zoom
