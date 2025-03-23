@@ -9,11 +9,12 @@ on:
     - cron: '0 0 * * *'  # Run every day at midnight UTC for nightly builds
   workflow_dispatch:  # Allow manual trigger
 
-# Add permissions needed for GitHub Pages
+# Add permissions needed for GitHub Pages and PR comments
 permissions:
   contents: write
   pages: write
   id-token: write
+  pull-requests: write
 
 jobs:
   test:
@@ -353,6 +354,57 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: './web_dist'
+
+  build-wasm-preview:
+    name: Build WASM Preview
+    needs: test
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Install Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libasound2-dev libudev-dev pkg-config libx11-dev libxcb-shape0-dev libxcb-xfixes0-dev libwayland-dev libxkbcommon-dev
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: Install wasm-bindgen-cli
+        run: cargo install wasm-bindgen-cli
+
+      - name: Build WASM
+        run: |
+          cargo build --release --target wasm32-unknown-unknown
+          wasm-bindgen --out-dir ./preview --target web target/wasm32-unknown-unknown/release/my-rts-game.wasm
+          cp index.html ./preview/
+
+      - name: Deploy to GitHub Pages PR Preview
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: preview
+          target-folder: pr-${{ github.event.pull_request.number }}
+          branch: gh-pages
+
+      - name: Comment on PR
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const prNumber = context.issue.number;
+            const commentBody = `📦 WASM Preview deployed!\n\nPreview: https://bob.sh/my-rts-game/pr-${prNumber}/\n\nPlease test the WASM build to ensure it works correctly before merging.`;
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              body: commentBody
+            });
 
   create-release:
     name: Create Release
