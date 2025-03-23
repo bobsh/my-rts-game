@@ -11,7 +11,7 @@
 	"iid": "3708b6b0-e920-11ef-87ba-09f2666d0e64",
 	"jsonVersion": "1.5.3",
 	"appBuildId": 473703,
-	"nextUid": 30,
+	"nextUid": 32,
 	"identifierStyle": "Capitalize",
 	"toc": [],
 	"worldLayout": "Free",
@@ -324,6 +324,41 @@
 			"pivotX": 0,
 			"pivotY": 0,
 			"fieldDefs": []
+		},
+		{
+			"identifier": "House",
+			"uid": 31,
+			"tags": [],
+			"exportToToc": false,
+			"allowOutOfBounds": false,
+			"doc": null,
+			"width": 128,
+			"height": 128,
+			"resizableX": false,
+			"resizableY": false,
+			"minWidth": null,
+			"maxWidth": null,
+			"minHeight": null,
+			"maxHeight": null,
+			"keepAspectRatio": false,
+			"tileOpacity": 1,
+			"fillOpacity": 0.08,
+			"lineOpacity": 0,
+			"hollow": false,
+			"color": "#BE4A2F",
+			"renderMode": "Tile",
+			"showName": true,
+			"tilesetId": 30,
+			"tileRenderMode": "FitInside",
+			"tileRect": { "tilesetUid": 30, "x": 0, "y": 0, "w": 128, "h": 128 },
+			"uiTileRect": null,
+			"nineSliceBorders": [],
+			"maxCount": 0,
+			"limitScope": "PerLevel",
+			"limitBehavior": "MoveLastOne",
+			"pivotX": 0,
+			"pivotY": 0,
+			"fieldDefs": []
 		}
 	], "tilesets": [
 		{
@@ -553,6 +588,25 @@
 			"customData": [],
 			"savedSelections": [],
 			"cachedPixelData": { "opaqueTiles": "0", "averageColors": "3bb2" }
+		},
+		{
+			"__cWid": 1,
+			"__cHei": 1,
+			"identifier": "House",
+			"uid": 30,
+			"relPath": "house.png",
+			"embedAtlas": null,
+			"pxWid": 128,
+			"pxHei": 128,
+			"tileGridSize": 128,
+			"spacing": 0,
+			"padding": 0,
+			"tags": [],
+			"tagsSourceEnumUid": null,
+			"enumTags": [],
+			"customData": [],
+			"savedSelections": [],
+			"cachedPixelData": { "opaqueTiles": "0", "averageColors": "6766" }
 		}
 	], "enums": [], "externalEnums": [], "levelFields": [] },
 	"levels": [
@@ -9096,6 +9150,22 @@
 							"fieldInstances": [],
 							"__worldX": -128,
 							"__worldY": 896
+						},
+						{
+							"__identifier": "House",
+							"__grid": [18,44],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": { "tilesetUid": 30, "x": 0, "y": 0, "w": 128, "h": 128 },
+							"__smartColor": "#BE4A2F",
+							"iid": "76a8f100-e920-11ef-ad67-6da79147a6de",
+							"width": 128,
+							"height": 128,
+							"defUid": 31,
+							"px": [1152,2816],
+							"fieldInstances": [],
+							"__worldX": -768,
+							"__worldY": 1216
 						}
 					]
 				},
