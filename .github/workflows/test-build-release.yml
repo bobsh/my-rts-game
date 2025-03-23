@@ -455,17 +455,3 @@ jobs:
             wasm-zip/*.zip
           prerelease: true
           generate_release_notes: true
-
-  deploy-pages:
-    name: Deploy GitHub Pages
-    needs: [build-wasm]
-    # Changed condition to include pushes to main branch
-    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch')
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
