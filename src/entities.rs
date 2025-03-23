@@ -10,7 +10,6 @@ pub struct EntitiesPlugin;
 #[derive(Default, Component)]
 struct Warrior;
 
-// Only update the units that should move (Warrior and Jungleman)
 #[derive(Default, Bundle, LdtkEntity)]
 struct WarriorBundle {
     warrior: Warrior,
@@ -24,11 +23,11 @@ struct WarriorBundle {
 }
 
 #[derive(Default, Component)]
-struct Jungleman;
+struct Worker;
 
 #[derive(Default, Bundle, LdtkEntity)]
-struct JunglemanBundle {
-    jungleman: Jungleman,
+struct WorkerBundle {
+    worker: Worker,
     selectable: Selectable,
     #[sprite_sheet]
     sprite_sheet: Sprite,
@@ -65,11 +64,11 @@ struct QuarryBundle {
 }
 
 #[derive(Default, Component)]
-struct Tree2;
+struct Tree;
 
 #[derive(Default, Bundle, LdtkEntity)]
-struct Tree2Bundle {
-    tree2: Tree2,
+struct TreeBundle {
+    tree: Tree,
     selectable: Selectable,
     #[sprite_sheet]
     sprite_sheet: Sprite,
@@ -86,9 +85,9 @@ impl Default for Movable {
 impl Plugin for EntitiesPlugin {
     fn build(&self, app: &mut App) {
         app.register_ldtk_entity::<WarriorBundle>("Warrior")
-            .register_ldtk_entity::<JunglemanBundle>("Jungleman")
+            .register_ldtk_entity::<WorkerBundle>("Worker")
             .register_ldtk_entity::<MineBundle>("Mine")
             .register_ldtk_entity::<QuarryBundle>("Quarry")
-            .register_ldtk_entity::<Tree2Bundle>("Tree2");
+            .register_ldtk_entity::<TreeBundle>("Tree");
     }
 }
