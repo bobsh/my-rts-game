@@ -32,3 +32,11 @@ pub fn setup_window_icon(
         }
     }
 }
+
+pub fn setup_window(mut window_query: Query<&mut Window>) {
+    if let Ok(mut window) = window_query.get_single_mut() {
+        // Make sure these are set for WASM display
+        window.fit_canvas_to_parent = true;
+        window.canvas = Some("#bevy".to_string());
+    }
+}

@@ -41,8 +41,9 @@
 - [x] Publish to wasm somewhere
 - [x] Get movement working with LDTK
 - [x] Add the ability to move the map somehow?
+- [x] Add a grid system
+- [x] Make the WASM window in the browser as large as the viewable window
 - [ ] Can we use aseprite directly in LDTK?
-- [ ] Add a grid system
 - [ ] Add trees, mines and quarries and mine resources from them
 - [ ] Add complete unit tests for each .rs file
 - [ ] Add a splash screen
