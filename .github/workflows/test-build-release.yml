@@ -371,10 +371,32 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libasound2-dev libudev-dev pkg-config libx11-dev libxcb-shape0-dev libxcb-xfixes0-dev libwayland-dev libxkbcommon-dev
 
+      # Add sparse index configuration
+      - name: Configure sparse index
+        run: |
+          mkdir -p .cargo
+          echo '[registries.crates-io]' > .cargo/config.toml
+          echo 'protocol = "sparse"' >> .cargo/config.toml
+
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: wasm32-unknown-unknown
+
+      # Add caching
+      - name: Cache Rust dependencies
+        id: rust-cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true
+          shared-key: "ubuntu-wasm-preview-rust-${{ hashFiles('**/Cargo.lock') }}"
+
+      # Add cargo optimization settings
+      - name: Configure Cargo settings
+        run: |
+          echo "CARGO_INCREMENTAL=0" >> $GITHUB_ENV
+          echo "CARGO_NET_RETRY=10" >> $GITHUB_ENV
+          echo "CARGO_BUILD_JOBS=8" >> $GITHUB_ENV
 
       - name: Install wasm-bindgen-cli
         run: cargo install wasm-bindgen-cli
@@ -384,6 +406,8 @@ jobs:
           cargo build --release --target wasm32-unknown-unknown
           wasm-bindgen --out-dir ./preview --target web target/wasm32-unknown-unknown/release/my-rts-game.wasm
           cp index.html ./preview/
+          mkdir -p preview/assets
+          cp -r assets/* preview/assets/
 
       - name: Deploy to GitHub Pages PR Preview
         uses: JamesIves/github-pages-deploy-action@v4
