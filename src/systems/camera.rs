@@ -64,20 +64,37 @@ fn camera_zoom(
     mut camera_query: Query<&mut Transform, With<Camera>>,
     mut mouse_wheel_events: EventReader<MouseWheel>,
 ) {
-    let zoom_factor = 0.1; // How fast to zoom
-    let min_zoom = 0.25; // Maximum zoom out (25% of original size)
-    let max_zoom = 2.0; // Maximum zoom in (200% of original size)
+    // Base zoom factor (for native builds)
+    let base_zoom_factor = 0.1;
+
+    // Get the current platform
+    let is_wasm = cfg!(target_arch = "wasm32");
+
+    // Much more aggressive reduction for WASM
+    let zoom_factor = if is_wasm {
+        // Try an extremely small value for WASM
+        0.01 // 1/100th of the original sensitivity
+    } else {
+        base_zoom_factor
+    };
+
+    let min_zoom = 0.25;
+    let max_zoom = 2.0;
 
     for event in mouse_wheel_events.read() {
-        // Only use the y value for zooming (scrolling up/down)
-        let zoom_amount = event.y * zoom_factor;
+        // Apply even more smoothing for WASM
+        let mut zoom_amount = event.y * zoom_factor;
 
-        // Update the zoom level, clamping between min and max values
+        // Further smooth the zoom on WASM by clamping large deltas
+        if is_wasm && zoom_amount.abs() > 0.05 {
+            zoom_amount = zoom_amount.signum() * 0.05;
+        }
+
+        // Apply zoom
         camera_state.zoom_level = (camera_state.zoom_level + zoom_amount).clamp(min_zoom, max_zoom);
 
         // Apply the zoom to the camera
         for mut transform in camera_query.iter_mut() {
-            // Set scale based on zoom level (inverse for camera - smaller number = zoom in)
             transform.scale = Vec3::splat(1.0 / camera_state.zoom_level);
         }
     }
