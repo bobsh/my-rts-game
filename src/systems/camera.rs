@@ -40,10 +40,10 @@ fn camera_pan(
 
         if total_delta != Vec2::ZERO {
             for mut transform in camera_query.iter_mut() {
-                // Reverse the direction so that the camera moves in the direction the mouse is dragging
-                // Adjust the sensitivity as needed
-                transform.translation.x -= total_delta.x * 0.5;
-                transform.translation.y += total_delta.y * 0.5;
+                // Increased the speed multiplier from 0.5 to 1.5 for more responsive dragging
+                // Adjust this value to your preference - higher means faster camera movement
+                transform.translation.x -= total_delta.x * 1.5;
+                transform.translation.y += total_delta.y * 1.5;
             }
         }
     }
