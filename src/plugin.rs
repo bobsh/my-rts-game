@@ -10,7 +10,7 @@ use crate::systems::selection::{
     draw_selection_boxes, highlight_selected, selection_system, update_selection_ring,
 };
 use crate::systems::ui::setup_ui;
-use crate::systems::window::{setup_window_icon, setup_window};
+use crate::systems::window::{setup_window, setup_window_icon};
 
 pub struct RtsPlugin;
 
@@ -22,7 +22,10 @@ impl Plugin for RtsPlugin {
             .add_plugins(EntitiesPlugin)
             .add_plugins(MovementPlugin)
             .add_plugins(CameraPlugin)
-            .add_systems(Startup, (setup_ui, setup_window_icon, setup_window, setup_scene))
+            .add_systems(
+                Startup,
+                (setup_ui, setup_window_icon, setup_window, setup_scene),
+            )
             .add_systems(
                 Update,
                 (
