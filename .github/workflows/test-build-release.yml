@@ -259,23 +259,19 @@ jobs:
 
   build-wasm:
     name: Build WASM
-    needs: test  # This ensures tests must pass before build starts
     runs-on: ubuntu-latest
-    # Changed condition to include pushes to main branch
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'pull_request' || github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           lfs: true
 
-      # Install Linux dependencies for Bevy
       - name: Install Linux dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y libasound2-dev libudev-dev pkg-config libx11-dev libxcb-shape0-dev libxcb-xfixes0-dev libwayland-dev libxkbcommon-dev
 
-      # Configure sparse index for faster builds
       - name: Configure sparse index
         run: |
           mkdir -p .cargo
@@ -339,85 +335,36 @@ jobs:
         run: echo "value=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_OUTPUT
 
       - name: Create WASM ZIP Archive
+        if: github.ref == 'refs/heads/main'
         run: |
           cd web_dist
           zip -r ../my-rts-game-wasm-${{ steps.timestamp.outputs.value }}.zip ./*
 
       - name: Upload WASM ZIP
+        if: github.ref == 'refs/heads/main'
         uses: actions/upload-artifact@v4
         with:
           name: wasm-zip
           path: my-rts-game-wasm-${{ steps.timestamp.outputs.value }}.zip
 
       - name: Deploy to GitHub Pages (Main Version)
-        if: github.ref == 'refs/heads/main'  # Only on main branch
+        if: github.ref == 'refs/heads/main'
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: web_dist
-          target-folder: main  # Deploy main game to /game subdirectory
+          target-folder: main
           branch: gh-pages
 
-  build-wasm-preview:
-    name: Build WASM Preview
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          lfs: true
-
-      - name: Install Linux dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libasound2-dev libudev-dev pkg-config libx11-dev libxcb-shape0-dev libxcb-xfixes0-dev libwayland-dev libxkbcommon-dev
-
-      # Add sparse index configuration
-      - name: Configure sparse index
-        run: |
-          mkdir -p .cargo
-          echo '[registries.crates-io]' > .cargo/config.toml
-          echo 'protocol = "sparse"' >> .cargo/config.toml
-
-      - name: Setup Rust
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: wasm32-unknown-unknown
-
-      # Add caching
-      - name: Cache Rust dependencies
-        id: rust-cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          cache-on-failure: true
-          shared-key: "ubuntu-wasm-preview-rust-${{ hashFiles('**/Cargo.lock') }}"
-
-      # Add cargo optimization settings
-      - name: Configure Cargo settings
-        run: |
-          echo "CARGO_INCREMENTAL=0" >> $GITHUB_ENV
-          echo "CARGO_NET_RETRY=10" >> $GITHUB_ENV
-          echo "CARGO_BUILD_JOBS=8" >> $GITHUB_ENV
-
-      - name: Install wasm-bindgen-cli
-        run: cargo install wasm-bindgen-cli
-
-      - name: Build WASM
-        run: |
-          cargo build --release --target wasm32-unknown-unknown
-          wasm-bindgen --out-dir ./preview --target web target/wasm32-unknown-unknown/release/my-rts-game.wasm
-          cp index.html ./preview/
-          mkdir -p preview/assets
-          cp -r assets/* preview/assets/
-
-      - name: Deploy to GitHub Pages PR Preview
+      - name: Deploy to GitHub Pages (PR Preview)
+        if: github.event_name == 'pull_request'
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: preview
+          folder: web_dist
           target-folder: pr-${{ github.event.pull_request.number }}
           branch: gh-pages
 
       - name: Comment on PR
+        if: github.event_name == 'pull_request'
         uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
