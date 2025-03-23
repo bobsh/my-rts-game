@@ -40,7 +40,7 @@
 - [x] Strip out a whole bunch of unused code now that we have changed to a tiled map, yay
 - [x] Publish to wasm somewhere
 - [x] Get movement working with LDTK
-- [ ] Add the ability to move the map somehow?
+- [x] Add the ability to move the map somehow?
 - [ ] Can we use aseprite directly in LDTK?
 - [ ] Add a grid system
 - [ ] Add trees, mines and quarries and mine resources from them
