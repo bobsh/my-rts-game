@@ -9,6 +9,12 @@ on:
     - cron: '0 0 * * *'  # Run every day at midnight UTC for nightly builds
   workflow_dispatch:  # Allow manual trigger
 
+# Add permissions needed for GitHub Pages
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
 jobs:
   test:
     name: Run Tests (${{ matrix.os }})
@@ -250,9 +256,98 @@ jobs:
           name: windows-installer
           path: installer/*.exe
 
+  build-wasm:
+    name: Build WASM
+    needs: test  # This ensures tests must pass before build starts
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      # Install Linux dependencies for Bevy
+      - name: Install Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libasound2-dev libudev-dev pkg-config libx11-dev libxcb-shape0-dev libxcb-xfixes0-dev libwayland-dev libxkbcommon-dev
+
+      # Configure sparse index for faster builds
+      - name: Configure sparse index
+        run: |
+          mkdir -p .cargo
+          echo '[registries.crates-io]' > .cargo/config.toml
+          echo 'protocol = "sparse"' >> .cargo/config.toml
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: Cache Rust dependencies
+        id: rust-cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true
+          shared-key: "ubuntu-wasm-rust-${{ hashFiles('**/Cargo.lock') }}"
+
+      - name: Install wasm-bindgen-cli
+        run: cargo install wasm-bindgen-cli
+
+      - name: Debug cache info
+        run: |
+          echo "Runner OS: ${{ runner.os }}"
+          echo "Rust version: $(rustc --version)"
+          echo "Cargo.lock hash: ${{ hashFiles('**/Cargo.lock') }}"
+          echo "Cache saved: ${{ steps.rust-cache.outputs.cache-hit != 'true' }}"
+
+      - name: Configure Cargo settings
+        run: |
+          echo "CARGO_INCREMENTAL=0" >> $GITHUB_ENV
+          echo "CARGO_NET_RETRY=10" >> $GITHUB_ENV
+          echo "CARGO_BUILD_JOBS=8" >> $GITHUB_ENV
+
+      - name: Build for WASM
+        run: cargo build --release --target wasm32-unknown-unknown
+
+      - name: Create web directory structure
+        run: |
+          # Create web dist directory
+          mkdir -p web_dist
+
+          # Process the WASM output with wasm-bindgen
+          wasm-bindgen --out-dir ./web_dist/ --target web target/wasm32-unknown-unknown/release/my-rts-game.wasm
+
+          # Copy assets and HTML
+          mkdir -p web_dist/assets
+          cp -r assets/* web_dist/assets/
+          cp index.html web_dist/
+
+      - name: Generate timestamp
+        id: timestamp
+        run: echo "value=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_OUTPUT
+
+      - name: Create WASM ZIP Archive
+        run: |
+          cd web_dist
+          zip -r ../my-rts-game-wasm-${{ steps.timestamp.outputs.value }}.zip ./*
+
+      - name: Upload WASM ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: wasm-zip
+          path: my-rts-game-wasm-${{ steps.timestamp.outputs.value }}.zip
+
+      - name: Upload GitHub Pages artifact
+        if: github.ref == 'refs/heads/main'  # Only on main branch
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './web_dist'
+
   create-release:
     name: Create Release
-    needs: build-windows
+    needs: [build-windows, build-wasm]
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
@@ -271,5 +366,27 @@ jobs:
           files: |
             windows-installer/*.exe
             windows-zip/*.zip
+            wasm-zip/*.zip
           prerelease: true
           generate_release_notes: true
+
+  deploy-pages:
+    name: Deploy GitHub Pages
+    needs: [build-wasm]
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download WASM build
+        uses: actions/download-artifact@v4
+        with:
+          name: github-pages
+          path: ./web_dist
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: ./web_dist
+          branch: gh-pages
