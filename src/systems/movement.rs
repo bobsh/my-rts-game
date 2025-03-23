@@ -19,6 +19,34 @@ impl Plugin for MovementPlugin {
     }
 }
 
+// Add this function for simple grid-based pathfinding (Manhattan style)
+fn calculate_path(start: &GridCoords, end: &GridCoords) -> Vec<GridCoords> {
+    let mut path = Vec::new();
+    let mut current = *start;
+
+    // First move horizontally
+    while current.x != end.x {
+        if current.x < end.x {
+            current.x += 1;
+        } else {
+            current.x -= 1;
+        }
+        path.push(current);
+    }
+
+    // Then move vertically
+    while current.y != end.y {
+        if current.y < end.y {
+            current.y += 1;
+        } else {
+            current.y -= 1;
+        }
+        path.push(current);
+    }
+
+    path
+}
+
 // Handle right-click to set movement destinations for selected units
 fn handle_movement_input(
     mouse_button: Res<ButtonInput<MouseButton>>,
@@ -26,7 +54,7 @@ fn handle_movement_input(
     camera_q: Query<(&Camera, &GlobalTransform)>,
     // Use LdtkProjectHandle instead of LdtkAsset
     level_transform: Query<&GlobalTransform, With<LdtkProjectHandle>>,
-    selected_units: Query<Entity, (With<Selected>, With<Movable>)>,
+    selected_units: Query<(Entity, &GridCoords), (With<Selected>, With<Movable>)>,
     mut unit_targets: Query<&mut MoveTarget>,
 ) {
     // Only process right-clicks
@@ -62,10 +90,16 @@ fn handle_movement_input(
         y: (relative_pos.y / TILE_SIZE).floor() as i32,
     };
 
-    // Set movement target for all selected units
-    for selected_entity in selected_units.iter() {
-        if let Ok(mut move_target) = unit_targets.get_mut(selected_entity) {
+    // Calculate path and set target for each selected unit
+    for (entity, grid_coords) in selected_units.iter() {
+        if let Ok(mut move_target) = unit_targets.get_mut(entity) {
+            // Don't create a path if clicking on the same cell
+            if grid_coords.x == grid_pos.x && grid_coords.y == grid_pos.y {
+                continue;
+            }
+
             move_target.destination = Some(grid_pos);
+            move_target.path = calculate_path(grid_coords, &grid_pos);
         }
     }
 }
@@ -73,32 +107,35 @@ fn handle_movement_input(
 // Start movement for units with targets
 fn start_unit_movement(
     mut commands: Commands,
-    // Use LdtkProjectHandle here too
     level_transform: Query<&GlobalTransform, With<LdtkProjectHandle>>,
     mut movable_units: Query<
         (Entity, &Transform, &GridCoords, &mut MoveTarget, &Movable),
         Without<Moving>,
     >,
 ) {
-    // Get level transform
     let level_transform = match level_transform.get_single() {
         Ok(transform) => transform,
         Err(_) => return,
     };
 
-    // Process each unit with a move target
     for (entity, transform, grid_coords, mut move_target, _) in movable_units.iter_mut() {
-        if let Some(target) = move_target.destination {
-            if target == *grid_coords {
-                // Already at destination
-                move_target.destination = None;
-                continue;
-            }
+        // If there's no path or the path is empty but there's a destination,
+        // calculate a new path
+        if move_target.path.is_empty() && move_target.destination.is_some() {
+            let destination = move_target.destination.unwrap();
+            move_target.path = calculate_path(grid_coords, &destination);
+        }
+
+        // If there's a path, start moving to the next cell
+        if !move_target.path.is_empty() {
+            let next_pos = move_target.path.remove(0);
 
             // Calculate world positions
             let current_pos = transform.translation;
-            let target_world_x = level_transform.translation().x + target.x as f32 * TILE_SIZE;
-            let target_world_y = level_transform.translation().y + target.y as f32 * TILE_SIZE;
+
+            // Add half a tile size to position units at the center of grid cells
+            let target_world_x = level_transform.translation().x + (next_pos.x as f32 + 0.5) * TILE_SIZE;
+            let target_world_y = level_transform.translation().y + (next_pos.y as f32 + 0.5) * TILE_SIZE;
             let target_pos = Vec3::new(target_world_x, target_world_y, current_pos.z);
 
             // Start movement animation
@@ -109,10 +146,15 @@ fn start_unit_movement(
             });
 
             // Update grid coordinates (logical position change)
-            commands.entity(entity).insert(target);
+            commands.entity(entity).insert(next_pos);
 
-            // Clear target
-            move_target.destination = None;
+            // If the path is now empty and we've reached the destination,
+            // clear the destination too
+            if move_target.path.is_empty() && move_target.destination.is_some() {
+                if next_pos == move_target.destination.unwrap() {
+                    move_target.destination = None;
+                }
+            }
         }
     }
 }

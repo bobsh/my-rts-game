@@ -6,12 +6,21 @@ pub struct Movable {
     pub speed: f32,
 }
 
-#[derive(Component, Default)]
+#[derive(Component)]
 pub struct MoveTarget {
     pub destination: Option<GridCoords>,
+    pub path: Vec<GridCoords>, // Add this to store the path
 }
 
-// For smooth animations between grid positions
+impl Default for MoveTarget {
+    fn default() -> Self {
+        Self {
+            destination: None,
+            path: Vec::new(),
+        }
+    }
+}
+
 #[derive(Component)]
 pub struct Moving {
     pub from: Vec3,
