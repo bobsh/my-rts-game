@@ -1,17 +1,24 @@
-use crate::components::unit::{Selectable, Selected, SelectionRing, Unit};
+use bevy::prelude::*;
+use bevy::sprite::Sprite;
 use bevy::input::mouse::MouseButton;
 use bevy::input::ButtonInput;
-use bevy::prelude::*;
-use bevy::window::PrimaryWindow; // Added Unit here
+use bevy::window::PrimaryWindow;
+use crate::components::unit::{Selectable, Selected, SelectionRing, Unit};
 
 pub fn selection_system(
     mut commands: Commands,
     window_query: Query<&Window, With<PrimaryWindow>>,
     camera_query: Query<(&Camera, &GlobalTransform)>,
     mouse_button_input: Res<ButtonInput<MouseButton>>,
-    selectable_query: Query<(Entity, &Transform), With<Selectable>>,
+    selectable_query: Query<(
+        Entity,
+        &Transform,
+        &Sprite,
+    ), With<Selectable>>,
     selected_query: Query<Entity, With<Selected>>,
     selection_ring_query: Query<Entity, With<SelectionRing>>,
+    _asset_server: Res<AssetServer>,
+    images: Res<Assets<Image>>,
 ) {
     // Only process clicks
     if !mouse_button_input.just_pressed(MouseButton::Left) {
@@ -41,13 +48,15 @@ pub fn selection_system(
             }
 
             // Check if we clicked on a selectable entity
-            for (entity, transform) in selectable_query.iter() {
-                // Simple AABB collision detection - assuming 64x64 size for sprites
-                let sprite_size = Vec2::new(64.0, 64.0); // Adjust as needed for your sprite
-                let min_x = transform.translation.x - sprite_size.x / 2.0;
-                let max_x = transform.translation.x + sprite_size.x / 2.0;
-                let min_y = transform.translation.y - sprite_size.y / 2.0;
-                let max_y = transform.translation.y + sprite_size.y / 2.0;
+            for (entity, transform, sprite) in selectable_query.iter() {
+                // Get entity size from LDTK or sprite
+                let entity_size = get_entity_size(sprite, &images);
+
+                // Simple AABB collision detection with dynamic size
+                let min_x = transform.translation.x - entity_size.x / 2.0;
+                let max_x = transform.translation.x + entity_size.x / 2.0;
+                let min_y = transform.translation.y - entity_size.y / 2.0;
+                let max_y = transform.translation.y + entity_size.y / 2.0;
 
                 if world_position.x >= min_x
                     && world_position.x <= max_x
@@ -56,7 +65,6 @@ pub fn selection_system(
                 {
                     // Add Selected component
                     commands.entity(entity).insert(Selected);
-
                     break;
                 }
             }
@@ -64,15 +72,35 @@ pub fn selection_system(
     }
 }
 
-// Fix the update_selection_ring_positions system using ParamSet
+fn get_entity_size(
+    sprite: &Sprite,
+    images: &Res<Assets<Image>>,
+) -> Vec2 {
+    // First priority: Use custom_size if available (explicitly set size)
+    if let Some(custom_size) = sprite.custom_size {
+        return custom_size;
+    }
+
+    // Second priority: Get size from the actual image asset
+    if let Some(image) = images.get(&sprite.image) {
+        return Vec2::new(
+            image.texture_descriptor.size.width as f32,
+            image.texture_descriptor.size.height as f32
+        );
+    }
+
+    // Default fallback
+    Vec2::new(64.0, 64.0)
+}
+
+// Fix the update_selection_ring function
+// Complexity:
 #[allow(clippy::type_complexity)]
 pub fn update_selection_ring(
-    // Function parameters including your ParamSet
     mut params: ParamSet<(
         Query<(&SelectionRing, &mut Transform)>,
         Query<(Entity, &Transform), With<Unit>>,
     )>,
-    // ... rest of function parameters
 ) {
     // First, collect the positions we need
     let mut unit_positions: Vec<(Entity, Vec3)> = Vec::new();
@@ -109,20 +137,27 @@ pub fn highlight_selected(query: Query<(&Transform, Option<&Selected>), With<Sel
 
 pub fn draw_selection_boxes(
     mut gizmos: Gizmos,
-    selection_query: Query<&Transform, With<Selected>>,
+    selection_query: Query<(
+        &Transform,
+        &Sprite,
+    ), With<Selected>>,
+    images: Res<Assets<Image>>,
 ) {
-    for transform in selection_query.iter() {
+    for (transform, sprite) in selection_query.iter() {
         // Get position from transform
         let position = transform.translation.truncate();
 
-        // Use a consistent size for selection boxes (adjust as needed)
-        let size = Vec2::new(70.0, 70.0);
+        // Get entity size
+        let entity_size = get_entity_size(sprite, &images);
 
-        // Draw just the outline in green (no fill)
+        // Make selection box slightly larger than the entity
+        let box_size = entity_size + Vec2::new(6.0, 6.0);
+
+        // In Bevy 0.15, rect_2d takes position, size, color
         gizmos.rect_2d(
             position,
-            size,
-            Color::srgb(0.0, 1.0, 0.0), // Green
+            box_size,
+            Color::srgb(0.0, 1.0, 0.0)  // Green color
         );
     }
 }
