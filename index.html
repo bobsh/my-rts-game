@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My RTS Game</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 2rem;
+      color: #333;
+      background-color: #f5f5f5;
+      line-height: 1.6;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    h1 {
+      color: #2c3e50;
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .tagline {
+      font-size: 1.2rem;
+      color: #7f8c8d;
+      margin-bottom: 2rem;
+    }
+
+    .play-button {
+      display: inline-block;
+      background-color: #27ae60;
+      color: white;
+      padding: 15px 30px;
+      text-decoration: none;
+      border-radius: 4px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      transition: background-color 0.3s;
+    }
+
+    .play-button:hover {
+      background-color: #2ecc71;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .game-info {
+      margin-top: 3rem;
+      background-color: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    footer {
+      margin-top: 3rem;
+      text-align: center;
+      color: #7f8c8d;
+      font-size: 0.9rem;
+    }
+
+    .preview-note {
+      margin-top: 2rem;
+      padding: 1rem;
+      background-color: #f9f9f9;
+      border-left: 4px solid #3498db;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>My RTS Game</h1>
+    <p class="tagline">A real-time strategy adventure built with Rust and Bevy</p>
+  </header>
+
+  <div class="container">
+    <a href="./main/" class="play-button">Play Now</a>
+
+    <div class="game-info">
+      <h2>About The Game</h2>
+      <p>
+        Welcome to My RTS Game, a modern real-time strategy game where you'll command units,
+        gather resources, and build your empire. Featuring grid-based movement,
+        strategic gameplay, and beautiful pixel art graphics.
+      </p>
+
+      <h2>Features</h2>
+      <ul>
+        <li>Simple and intuitive controls</li>
+        <li>Engaging strategic gameplay</li>
+        <li>Smooth grid-based movement</li>
+        <li>Unit selection and command system</li>
+        <li>Multi-directional camera controls</li>
+      </ul>
+
+      <div class="preview-note">
+        <h3>Development Versions</h3>
+        <p>
+          This game is under active development. Pull request previews are available
+          in the <code>/pr-X</code> directories, where X is the PR number.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; 2025 My RTS Game | Made with Rust and Bevy</p>
+  </footer>
+</body>
+
+</html>
