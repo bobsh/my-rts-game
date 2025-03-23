@@ -19,40 +19,12 @@ impl Plugin for MovementPlugin {
     }
 }
 
-// Add this function for simple grid-based pathfinding (Manhattan style)
-fn calculate_path(start: &GridCoords, end: &GridCoords) -> Vec<GridCoords> {
-    let mut path = Vec::new();
-    let mut current = *start;
-
-    // First move horizontally
-    while current.x != end.x {
-        if current.x < end.x {
-            current.x += 1;
-        } else {
-            current.x -= 1;
-        }
-        path.push(current);
-    }
-
-    // Then move vertically
-    while current.y != end.y {
-        if current.y < end.y {
-            current.y += 1;
-        } else {
-            current.y -= 1;
-        }
-        path.push(current);
-    }
-
-    path
-}
-
-// Handle right-click to set movement destinations for selected units
+// Same systems but without explicit lifetime annotations in function signatures
+#[allow(clippy::type_complexity)]
 fn handle_movement_input(
     mouse_button: Res<ButtonInput<MouseButton>>,
     windows: Query<&Window>,
     camera_q: Query<(&Camera, &GlobalTransform)>,
-    // Use LdtkProjectHandle instead of LdtkAsset
     level_transform: Query<&GlobalTransform, With<LdtkProjectHandle>>,
     selected_units: Query<(Entity, &GridCoords), (With<Selected>, With<Movable>)>,
     mut unit_targets: Query<&mut MoveTarget>,
@@ -104,7 +76,7 @@ fn handle_movement_input(
     }
 }
 
-// Start movement for units with targets
+#[allow(clippy::type_complexity)]
 fn start_unit_movement(
     mut commands: Commands,
     level_transform: Query<&GlobalTransform, With<LdtkProjectHandle>>,
@@ -115,7 +87,7 @@ fn start_unit_movement(
 ) {
     let level_transform = match level_transform.get_single() {
         Ok(transform) => transform,
-        Err(_) => return,
+        Err(_) => return, // Changed semicolon to comma
     };
 
     for (entity, transform, grid_coords, mut move_target, _) in movable_units.iter_mut() {
@@ -134,8 +106,10 @@ fn start_unit_movement(
             let current_pos = transform.translation;
 
             // Add half a tile size to position units at the center of grid cells
-            let target_world_x = level_transform.translation().x + (next_pos.x as f32 + 0.5) * TILE_SIZE;
-            let target_world_y = level_transform.translation().y + (next_pos.y as f32 + 0.5) * TILE_SIZE;
+            let target_world_x =
+                level_transform.translation().x + (next_pos.x as f32 + 0.5) * TILE_SIZE;
+            let target_world_y =
+                level_transform.translation().y + (next_pos.y as f32 + 0.5) * TILE_SIZE;
             let target_pos = Vec3::new(target_world_x, target_world_y, current_pos.z);
 
             // Start movement animation
@@ -150,16 +124,16 @@ fn start_unit_movement(
 
             // If the path is now empty and we've reached the destination,
             // clear the destination too
-            if move_target.path.is_empty() && move_target.destination.is_some() {
-                if next_pos == move_target.destination.unwrap() {
-                    move_target.destination = None;
-                }
+            if move_target.path.is_empty()
+                && move_target.destination.is_some()
+                && next_pos == move_target.destination.unwrap()
+            {
+                move_target.destination = None;
             }
         }
     }
 }
 
-// Animate moving units
 fn move_units(
     mut commands: Commands,
     time: Res<Time>,
@@ -178,4 +152,32 @@ fn move_units(
             transform.translation = moving.from.lerp(moving.to, moving.progress);
         }
     }
+}
+
+// Add this function for simple grid-based pathfinding (Manhattan style)
+fn calculate_path(start: &GridCoords, end: &GridCoords) -> Vec<GridCoords> {
+    let mut path = Vec::new();
+    let mut current = *start;
+
+    // First move horizontally
+    while current.x != end.x {
+        if current.x < end.x {
+            current.x += 1;
+        } else {
+            current.x -= 1;
+        }
+        path.push(current);
+    }
+
+    // Then move vertically
+    while current.y != end.y {
+        if current.y < end.y {
+            current.y += 1;
+        } else {
+            current.y -= 1;
+        }
+        path.push(current);
+    }
+
+    path
 }

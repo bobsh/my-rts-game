@@ -6,19 +6,10 @@ pub struct Movable {
     pub speed: f32,
 }
 
-#[derive(Component)]
+#[derive(Component, Default)]
 pub struct MoveTarget {
     pub destination: Option<GridCoords>,
     pub path: Vec<GridCoords>, // Add this to store the path
-}
-
-impl Default for MoveTarget {
-    fn default() -> Self {
-        Self {
-            destination: None,
-            path: Vec::new(),
-        }
-    }
 }
 
 #[derive(Component)]
