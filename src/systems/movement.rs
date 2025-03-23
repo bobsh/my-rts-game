@@ -154,28 +154,31 @@ fn move_units(
     }
 }
 
-// Add this function for simple grid-based pathfinding (Manhattan style)
+// Modify the pathfinding function to include diagonal movement
 fn calculate_path(start: &GridCoords, end: &GridCoords) -> Vec<GridCoords> {
     let mut path = Vec::new();
     let mut current = *start;
 
-    // First move horizontally
-    while current.x != end.x {
-        if current.x < end.x {
-            current.x += 1;
-        } else {
-            current.x -= 1;
-        }
-        path.push(current);
-    }
+    // Continue until we reach the destination
+    while current != *end {
+        // Determine direction for x and y
+        let dx = (end.x - current.x).signum();
+        let dy = (end.y - current.y).signum();
 
-    // Then move vertically
-    while current.y != end.y {
-        if current.y < end.y {
-            current.y += 1;
-        } else {
-            current.y -= 1;
+        // If both x and y need to change, move diagonally
+        if dx != 0 && dy != 0 {
+            // Diagonal move (change both x and y)
+            current.x += dx;
+            current.y += dy;
+        } else if dx != 0 {
+            // Horizontal move
+            current.x += dx;
+        } else if dy != 0 {
+            // Vertical move
+            current.y += dy;
         }
+
+        // Add the new position to the path
         path.push(current);
     }
 
