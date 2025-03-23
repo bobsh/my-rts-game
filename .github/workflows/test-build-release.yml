@@ -357,7 +357,6 @@ jobs:
 
   build-wasm-preview:
     name: Build WASM Preview
-    needs: test
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
