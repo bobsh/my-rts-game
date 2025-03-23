@@ -349,11 +349,13 @@ jobs:
           name: wasm-zip
           path: my-rts-game-wasm-${{ steps.timestamp.outputs.value }}.zip
 
-      - name: Upload GitHub Pages artifact
+      - name: Deploy to GitHub Pages (Main Version)
         if: github.ref == 'refs/heads/main'  # Only on main branch
-        uses: actions/upload-pages-artifact@v3
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
-          path: './web_dist'
+          folder: web_dist
+          target-folder: main  # Deploy main game to /game subdirectory
+          branch: gh-pages
 
   build-wasm-preview:
     name: Build WASM Preview
