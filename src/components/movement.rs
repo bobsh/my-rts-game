@@ -9,9 +9,9 @@ pub struct Movable {
 #[derive(Component, Default)]
 pub struct MoveTarget {
     pub destination: Option<GridCoords>,
+    pub path: Vec<GridCoords>, // Add this to store the path
 }
 
-// For smooth animations between grid positions
 #[derive(Component)]
 pub struct Moving {
     pub from: Vec3,
