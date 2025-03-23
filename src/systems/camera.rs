@@ -73,7 +73,7 @@ fn camera_zoom(
     // Much more aggressive reduction for WASM
     let zoom_factor = if is_wasm {
         // Try an extremely small value for WASM
-        0.001 // 1/1000th of the original sensitivity
+        0.01 // 1/100th of the original sensitivity
     } else {
         base_zoom_factor
     };
