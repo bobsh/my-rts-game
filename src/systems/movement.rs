@@ -318,7 +318,7 @@ fn get_neighbors(pos: &GridCoords) -> Vec<GridCoords> {
         GridCoords {
             x: pos.x - 1,
             y: pos.y - 1,
-        }
+        },
     ];
 
     neighbors
