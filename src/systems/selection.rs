@@ -5,8 +5,24 @@ use bevy::prelude::*;
 use bevy::sprite::Sprite;
 use bevy::window::PrimaryWindow;
 
+pub struct SelectionPlugin;
+
+impl Plugin for SelectionPlugin {
+    fn build(&self, app: &mut App) {
+        app.add_systems(
+            Update,
+            (
+                selection_system,
+                update_selection_ring,
+                highlight_selected,
+                draw_selection_boxes,
+            ),
+        );
+    }
+}
+
 #[allow(clippy::too_many_arguments)]
-pub fn selection_system(
+fn selection_system(
     mut commands: Commands,
     window_query: Query<&Window, With<PrimaryWindow>>,
     camera_query: Query<(&Camera, &GlobalTransform)>,
@@ -90,7 +106,7 @@ fn get_entity_size(sprite: &Sprite, images: &Res<Assets<Image>>) -> Vec2 {
 // Fix the update_selection_ring function
 // Complexity:
 #[allow(clippy::type_complexity)]
-pub fn update_selection_ring(
+fn update_selection_ring(
     mut params: ParamSet<(
         Query<(&SelectionRing, &mut Transform)>,
         Query<(Entity, &Transform), With<Unit>>,
@@ -120,7 +136,7 @@ pub fn update_selection_ring(
     }
 }
 
-pub fn highlight_selected(query: Query<(&Transform, Option<&Selected>), With<Selectable>>) {
+fn highlight_selected(query: Query<(&Transform, Option<&Selected>), With<Selectable>>) {
     for (_transform, selected) in query.iter() {
         if selected.is_some() {
             // Selected units are highlighted by the selection ring
@@ -129,7 +145,7 @@ pub fn highlight_selected(query: Query<(&Transform, Option<&Selected>), With<Sel
     }
 }
 
-pub fn draw_selection_boxes(
+fn draw_selection_boxes(
     mut gizmos: Gizmos,
     selection_query: Query<(&Transform, &Sprite), With<Selected>>,
     images: Res<Assets<Image>>,
