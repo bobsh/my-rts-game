@@ -1,6 +1,14 @@
 use crate::components::ui::{UnitHealthText, UnitInfoPanel, UnitNameText, UnitSpeedText};
 use bevy::prelude::*;
 
+pub struct UiPlugin;
+
+impl Plugin for UiPlugin {
+    fn build(&self, app: &mut App) {
+        app.add_systems(Startup, setup_ui);
+    }
+}
+
 pub fn setup_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
     let font = asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf");
 

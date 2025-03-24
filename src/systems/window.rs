@@ -1,8 +1,16 @@
 use bevy::prelude::*;
 use bevy::winit::WinitWindows;
 
+pub struct WindowPlugin;
+
+impl Plugin for WindowPlugin {
+    fn build(&self, app: &mut App) {
+        app.add_systems(Startup, (setup_window, setup_window_icon));
+    }
+}
+
 // Add this system to your startup systems
-pub fn setup_window_icon(
+fn setup_window_icon(
     windows: Query<Entity, With<bevy::window::PrimaryWindow>>,
     winit_windows: NonSend<WinitWindows>,
 ) {
@@ -33,7 +41,7 @@ pub fn setup_window_icon(
     }
 }
 
-pub fn setup_window(mut window_query: Query<&mut Window>) {
+fn setup_window(mut window_query: Query<&mut Window>) {
     if let Ok(mut window) = window_query.get_single_mut() {
         // Make sure these are set for WASM display
         window.fit_canvas_to_parent = true;
