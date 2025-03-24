@@ -4,8 +4,8 @@ use bevy::input::mouse::MouseButton;
 use bevy::prelude::*;
 use bevy::window::Window;
 use bevy_ecs_ldtk::prelude::*;
-use std::collections::{BinaryHeap, HashMap, HashSet};
 use std::cmp::Ordering;
+use std::collections::{BinaryHeap, HashMap, HashSet};
 
 // Define a constant for tile size - adjust this to match your game
 const TILE_SIZE: f32 = 64.0;
@@ -234,7 +234,11 @@ fn a_star_pathfinding(
             }
 
             // Calculate tentative g score
-            let movement_cost = if is_diagonal(&current_pos, &neighbor_pos) { 14 } else { 10 };
+            let movement_cost = if is_diagonal(&current_pos, &neighbor_pos) {
+                14
+            } else {
+                10
+            };
             let tentative_g = current.g_score + movement_cost;
 
             // If this path is better than any previous one
@@ -282,25 +286,49 @@ fn is_diagonal(a: &GridCoords, b: &GridCoords) -> bool {
 
 // Get all valid adjacent positions
 fn get_neighbors(pos: &GridCoords) -> Vec<GridCoords> {
-    let mut neighbors = Vec::with_capacity(8);
-
-    // Orthogonal neighbors
-    neighbors.push(GridCoords { x: pos.x + 1, y: pos.y });
-    neighbors.push(GridCoords { x: pos.x - 1, y: pos.y });
-    neighbors.push(GridCoords { x: pos.x, y: pos.y + 1 });
-    neighbors.push(GridCoords { x: pos.x, y: pos.y - 1 });
-
-    // Diagonal neighbors
-    neighbors.push(GridCoords { x: pos.x + 1, y: pos.y + 1 });
-    neighbors.push(GridCoords { x: pos.x + 1, y: pos.y - 1 });
-    neighbors.push(GridCoords { x: pos.x - 1, y: pos.y + 1 });
-    neighbors.push(GridCoords { x: pos.x - 1, y: pos.y - 1 });
+    let neighbors = vec![
+        GridCoords {
+            x: pos.x + 1,
+            y: pos.y,
+        },
+        GridCoords {
+            x: pos.x - 1,
+            y: pos.y,
+        },
+        GridCoords {
+            x: pos.x,
+            y: pos.y + 1,
+        },
+        GridCoords {
+            x: pos.x,
+            y: pos.y - 1,
+        },
+        GridCoords {
+            x: pos.x + 1,
+            y: pos.y + 1,
+        },
+        GridCoords {
+            x: pos.x + 1,
+            y: pos.y - 1,
+        },
+        GridCoords {
+            x: pos.x - 1,
+            y: pos.y + 1,
+        },
+        GridCoords {
+            x: pos.x - 1,
+            y: pos.y - 1,
+        }
+    ];
 
     neighbors
 }
 
 // Reconstruct path from came_from map
-fn reconstruct_path(came_from: &HashMap<GridCoords, GridCoords>, end: GridCoords) -> Vec<GridCoords> {
+fn reconstruct_path(
+    came_from: &HashMap<GridCoords, GridCoords>,
+    end: GridCoords,
+) -> Vec<GridCoords> {
     let mut path = Vec::new();
     let mut current = end;
 
