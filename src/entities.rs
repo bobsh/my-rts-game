@@ -2,7 +2,7 @@ use bevy::app::{App, Plugin};
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 
-use crate::components::movement::{Movable, MoveTarget};
+use crate::components::movement::{Collider, Movable, MoveTarget};
 use crate::components::unit::Selectable;
 
 pub struct EntitiesPlugin;
@@ -14,6 +14,7 @@ struct Warrior;
 struct WarriorBundle {
     warrior: Warrior,
     selectable: Selectable,
+    collider: Collider,
     #[sprite_sheet]
     sprite_sheet: Sprite,
     #[grid_coords]
@@ -29,6 +30,7 @@ struct Worker;
 struct WorkerBundle {
     worker: Worker,
     selectable: Selectable,
+    collider: Collider,
     #[sprite_sheet]
     sprite_sheet: Sprite,
     #[grid_coords]
@@ -44,6 +46,7 @@ struct Mine;
 struct MineBundle {
     mine: Mine,
     selectable: Selectable,
+    collider: Collider,
     #[sprite_sheet]
     sprite_sheet: Sprite,
     #[grid_coords]
@@ -57,6 +60,7 @@ struct Quarry;
 struct QuarryBundle {
     quarry: Quarry,
     selectable: Selectable,
+    collider: Collider,
     #[sprite_sheet]
     sprite_sheet: Sprite,
     #[grid_coords]
@@ -70,6 +74,7 @@ struct Tree;
 struct TreeBundle {
     tree: Tree,
     selectable: Selectable,
+    collider: Collider,
     #[sprite_sheet]
     sprite_sheet: Sprite,
     #[grid_coords]
@@ -83,16 +88,11 @@ struct House;
 struct HouseBundle {
     house: House,
     selectable: Selectable,
+    collider: Collider,
     #[sprite_sheet]
     sprite_sheet: Sprite,
     #[grid_coords]
     grid_coords: GridCoords,
-}
-
-impl Default for Movable {
-    fn default() -> Self {
-        Self { speed: 3.0 } // Units move at 3 grid cells per second
-    }
 }
 
 impl Plugin for EntitiesPlugin {
