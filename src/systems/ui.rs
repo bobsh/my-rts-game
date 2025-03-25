@@ -25,50 +25,44 @@ fn setup_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
                 height: Val::Px(120.0),
                 padding: UiRect::all(Val::Px(10.0)),
                 flex_direction: FlexDirection::Column,
+                // Start with the panel hidden
+                display: Display::None,
                 ..default()
             },
-            BackgroundColor(Color::srgba(0.1, 0.1, 0.1, 0.8)),
+            BackgroundColor(Color::rgba(0.1, 0.1, 0.1, 0.8)),
             EntityInfoPanel,
         ))
         .with_children(|parent| {
-            // Title - Entity Info
+            // Entity name as the title/header
             parent.spawn((
-                Text::new("Entity Information"),
+                Text::new(""),  // Initially empty
                 TextFont {
                     font: font.clone(),
-                    font_size: 18.0,
-                    ..default()
-                },
-                TextColor(Color::WHITE),
-            ));
-
-            // Name of the selected entity
-            parent.spawn((
-                Text::new("No entity selected"),
-                TextFont {
-                    font: font.clone(),
-                    font_size: 16.0,
+                    font_size: 22.0,  // Larger font for the title
                     ..default()
                 },
                 TextColor(Color::WHITE),
                 EntityNameText,
             ));
 
-            // We can add more info elements here in the future
+            // Additional info can be added here in the future
         });
 }
 
 fn update_entity_info_panel(
     selected_entities: Query<Entity, With<Selected>>,
-    // Try to get entity type components
     house_query: Query<Entity, With<Name>>,
     unit_query: Query<&Name>,
     mut entity_name_text: Query<&mut Text, With<EntityNameText>>,
+    mut panel_query: Query<&mut Node, With<EntityInfoPanel>>,
 ) {
-    // Get the entity name text component
-    if let Ok(mut name_text) = entity_name_text.get_single_mut() {
+    // Get a mutable reference to the panel to control visibility
+    if let Ok(mut panel_node) = panel_query.get_single_mut() {
         // Check if there's a selected entity
         if let Some(entity) = selected_entities.iter().next() {
+            // Show the panel when something is selected
+            panel_node.display = Display::Flex;
+
             // Try to get the entity's name
             let entity_name = match unit_query.get(entity) {
                 Ok(name) => name.as_str().to_string(),
@@ -78,11 +72,13 @@ fn update_entity_info_panel(
                 }
             };
 
-            // In Bevy 0.15, we update Text directly
-            *name_text = Text::new(format!("Selected: {}", entity_name));
+            // Update the title text to show the entity name
+            if let Ok(mut name_text) = entity_name_text.get_single_mut() {
+                *name_text = Text::new(entity_name);
+            }
         } else {
-            // No entity selected
-            *name_text = Text::new("No entity selected");
+            // Hide the panel when nothing is selected
+            panel_node.display = Display::None;
         }
     }
 }
