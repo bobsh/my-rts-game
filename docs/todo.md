@@ -45,17 +45,6 @@
 - [x] Make the WASM window in the browser as large as the viewable window
 - [x] Deploy to wasm when a PR is merged
 - [x] Collisions and a star path finding
-- [ ] Can we use aseprite directly in LDTK?
-- [ ] Add trees, mines and quarries and mine resources from them
-- [ ] Add complete unit tests for each .rs file
-- [ ] Add a splash screen
-- [ ] Add a main menu
-- [ ] Add a pause menu
-- [ ] Implement resource drop-off system - allow workers to return resources to a central building
-- [ ] Add simple building placement system - start with a basic town center that accepts resource drop-offs
-- [ ] Create a tech/research tree
-- [ ] Add combat units and basic combat system
-- [ ] Implement enemy AI
-- [ ] Add sound effects and music
-- [ ] Improve visual effects for gathering and construction
-- [ ] Create more unit types with different abilities
+- [x] When you select something, it should show the name of it in the top left
+- [ ] Every unit needs an inventory system
+- [ ] Fog of war
