@@ -46,5 +46,6 @@
 - [x] Deploy to wasm when a PR is merged
 - [x] Collisions and a star path finding
 - [x] When you select something, it should show the name of it in the top left
+- [x] Make a better house
 - [ ] Every unit needs an inventory system
 - [ ] Fog of war
