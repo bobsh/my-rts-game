@@ -7,7 +7,7 @@ pub struct UiPlugin;
 impl Plugin for UiPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, setup_ui)
-           .add_systems(Update, update_entity_info_panel);
+            .add_systems(Update, update_entity_info_panel);
     }
 }
 
@@ -29,16 +29,16 @@ fn setup_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
                 display: Display::None,
                 ..default()
             },
-            BackgroundColor(Color::rgba(0.1, 0.1, 0.1, 0.8)),
+            BackgroundColor(Color::srgba(0.1, 0.1, 0.1, 0.8)),
             EntityInfoPanel,
         ))
         .with_children(|parent| {
             // Entity name as the title/header
             parent.spawn((
-                Text::new(""),  // Initially empty
+                Text::new(""), // Initially empty
                 TextFont {
                     font: font.clone(),
-                    font_size: 22.0,  // Larger font for the title
+                    font_size: 22.0, // Larger font for the title
                     ..default()
                 },
                 TextColor(Color::WHITE),
