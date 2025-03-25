@@ -11,7 +11,7 @@ impl Plugin for ScenePlugin {
 }
 
 pub fn setup_scene(mut commands: Commands, asset_server: Res<AssetServer>) {
-    commands.spawn((Camera2d, Transform::from_xyz(1280.0, 720.0, 0.0)));
+    commands.spawn((Camera2d, Transform::from_xyz(-550.0, -1050.0, 0.0)));
 
     // Load the ldtk map file
     let map_handle = asset_server.load("test-map.ldtk");
