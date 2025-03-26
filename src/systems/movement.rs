@@ -27,7 +27,7 @@ fn handle_movement_input(
     mouse_button: Res<ButtonInput<MouseButton>>,
     windows: Query<&Window>,
     camera_q: Query<(&Camera, &GlobalTransform)>,
-    level_transform: Query<&GlobalTransform, With<LdtkProjectHandle>>,
+    level_query: Query<&Transform, With<LdtkProjectHandle>>,
     selected_units: Query<(Entity, &GridCoords), (With<Selected>, With<Movable>)>,
     mut unit_targets: Query<&mut MoveTarget>,
     colliders: Query<&GridCoords, With<Collider>>,
@@ -50,26 +50,33 @@ fn handle_movement_input(
 
     let cursor_pos = cursor_ray.origin.truncate();
 
-    // Get just the level transform
-    let level_transform = match level_transform.get_single() {
+    // Get the level transform
+    let level_transform = match level_query.get_single() {
         Ok(transform) => transform,
         Err(_) => return,
     };
 
-    // Find the grid cell that was clicked
-    let level_pos = level_transform.translation().truncate();
+    // Debug info for world position
+    info!("Cursor world position: {:?}", cursor_pos);
+    info!("Level position: {:?}", level_transform.translation.truncate());
 
-    let relative_pos = cursor_pos - level_pos;
+    // Calculate grid position with the OFFSET CORRECTION
+    // Based on the debug logs, there's a consistent offset between entity grid coords
+    // and the calculated grid coordinates
     let grid_pos = GridCoords {
-        x: (relative_pos.x / TILE_SIZE).floor() as i32,
-        y: (relative_pos.y / TILE_SIZE).floor() as i32,
+        x: ((cursor_pos.x - level_transform.translation.x) / TILE_SIZE).floor() as i32 + 30,
+        y: ((cursor_pos.y - level_transform.translation.y) / TILE_SIZE).floor() as i32 + 29,
     };
+
+    info!("Calculated grid position: {:?}", grid_pos);
 
     // Collect all blocked grid coordinates
     let blocked_coords: HashSet<GridCoords> = colliders.iter().cloned().collect();
 
-    // Calculate path and set target for each selected unit
+    // Set target for each selected unit
     for (entity, grid_coords) in selected_units.iter() {
+        info!("Selected unit at grid: {:?}", grid_coords);
+
         if let Ok(mut move_target) = unit_targets.get_mut(entity) {
             // Don't create a path if clicking on the same cell
             if grid_coords.x == grid_pos.x && grid_coords.y == grid_pos.y {
@@ -78,7 +85,9 @@ fn handle_movement_input(
 
             // Use A* to find a path avoiding obstacles
             move_target.destination = Some(grid_pos);
-            move_target.path = a_star_pathfinding(grid_coords, &grid_pos, &blocked_coords);
+            let path = a_star_pathfinding(grid_coords, &grid_pos, &blocked_coords);
+            info!("Path found: {:?}", path);
+            move_target.path = path;
         }
     }
 }

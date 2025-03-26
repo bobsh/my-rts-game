@@ -14,6 +14,7 @@ impl Plugin for ScenePlugin {
                 },
                 ..Default::default()
             })
+            .add_systems(Update, level_selection_follow_player)
             .add_systems(Startup, setup_scene);
     }
 }
