@@ -4,20 +4,16 @@ use bevy::input::ButtonInput;
 use bevy::prelude::*;
 use bevy::sprite::Sprite;
 use bevy::window::PrimaryWindow;
+use bevy_ecs_ldtk::prelude::*;
 
 pub struct SelectionPlugin;
 
 impl Plugin for SelectionPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(
-            Update,
-            (
-                selection_system,
-                update_selection_ring,
-                highlight_selected,
-                draw_selection_boxes,
-            ),
-        );
+        app.add_systems(Update, selection_system)
+           .add_systems(Update, update_selection_ring)
+           .add_systems(Update, highlight_selected)
+           .add_systems(Update, draw_selection_boxes);
     }
 }
 
@@ -27,9 +23,11 @@ fn selection_system(
     window_query: Query<&Window, With<PrimaryWindow>>,
     camera_query: Query<(&Camera, &GlobalTransform)>,
     mouse_button_input: Res<ButtonInput<MouseButton>>,
-    selectable_query: Query<(Entity, &Transform, &Sprite), With<Selectable>>,
+    selectable_query: Query<(Entity, &GlobalTransform, &Sprite), With<Selectable>>,
     selected_query: Query<Entity, With<Selected>>,
     selection_ring_query: Query<Entity, With<SelectionRing>>,
+    // Use the LdtkProject component instead of the Bundle
+    _ldtk_worlds: Query<&GlobalTransform, With<LdtkProjectHandle>>,
     _asset_server: Res<AssetServer>,
     images: Res<Assets<Image>>,
 ) {
@@ -50,6 +48,8 @@ fn selection_system(
         if let Ok(world_position) = camera.viewport_to_world(camera_transform, cursor_position) {
             let world_position = world_position.origin.truncate();
 
+            info!("Click at world position: {:?}", world_position);
+
             // Remove selection rings
             for entity in selection_ring_query.iter() {
                 commands.entity(entity).despawn();
@@ -62,20 +62,24 @@ fn selection_system(
 
             // Check if we clicked on a selectable entity
             for (entity, transform, sprite) in selectable_query.iter() {
-                // Get entity size from LDTK or sprite
+                // Get entity size from sprite
                 let entity_size = get_entity_size(sprite, &images);
 
+                // Debug info
+                info!("Entity at position: {:?} with size: {:?}", transform.translation().truncate(), entity_size);
+
                 // Simple AABB collision detection with dynamic size
-                let min_x = transform.translation.x - entity_size.x / 2.0;
-                let max_x = transform.translation.x + entity_size.x / 2.0;
-                let min_y = transform.translation.y - entity_size.y / 2.0;
-                let max_y = transform.translation.y + entity_size.y / 2.0;
+                let min_x = transform.translation().x - entity_size.x / 2.0;
+                let max_x = transform.translation().x + entity_size.x / 2.0;
+                let min_y = transform.translation().y - entity_size.y / 2.0;
+                let max_y = transform.translation().y + entity_size.y / 2.0;
 
                 if world_position.x >= min_x
                     && world_position.x <= max_x
                     && world_position.y >= min_y
                     && world_position.y <= max_y
                 {
+                    info!("Selected entity: {:?}", entity);
                     // Add Selected component
                     commands.entity(entity).insert(Selected);
                     break;
@@ -99,17 +103,16 @@ fn get_entity_size(sprite: &Sprite, images: &Res<Assets<Image>>) -> Vec2 {
         );
     }
 
-    // Default fallback
+    // Default fallback (64x64 is typical for tiles)
     Vec2::new(64.0, 64.0)
 }
 
-// Fix the update_selection_ring function
-// Complexity:
+// Update selection ring function
 #[allow(clippy::type_complexity)]
 fn update_selection_ring(
     mut params: ParamSet<(
         Query<(&SelectionRing, &mut Transform)>,
-        Query<(Entity, &Transform), With<Unit>>,
+        Query<(Entity, &GlobalTransform), With<Unit>>,
     )>,
 ) {
     // First, collect the positions we need
@@ -117,7 +120,7 @@ fn update_selection_ring(
 
     // Get all unit positions
     for (entity, transform) in params.p1().iter() {
-        unit_positions.push((entity, transform.translation));
+        unit_positions.push((entity, transform.translation()));
     }
 
     // Update ring positions based on collected data
@@ -147,12 +150,12 @@ fn highlight_selected(query: Query<(&Transform, Option<&Selected>), With<Selecta
 
 fn draw_selection_boxes(
     mut gizmos: Gizmos,
-    selection_query: Query<(&Transform, &Sprite), With<Selected>>,
+    selection_query: Query<(&GlobalTransform, &Sprite), With<Selected>>,
     images: Res<Assets<Image>>,
 ) {
     for (transform, sprite) in selection_query.iter() {
         // Get position from transform
-        let position = transform.translation.truncate();
+        let position = transform.translation();
 
         // Get entity size
         let entity_size = get_entity_size(sprite, &images);
@@ -160,10 +163,13 @@ fn draw_selection_boxes(
         // Make selection box slightly larger than the entity
         let box_size = entity_size + Vec2::new(6.0, 6.0);
 
-        // In Bevy 0.15, rect_2d takes position, size, color
-        gizmos.rect_2d(
-            position,
-            box_size,
+        // In Bevy 0.15, rect takes:
+        // 1. Position+Rotation (as Vec3 or Transform)
+        // 2. Size (Vec2)
+        // 3. Color
+        gizmos.rect(
+            position, // Vec3 for position
+            box_size, // Vec2 for size
             Color::srgb(0.0, 1.0, 0.0), // Green color
         );
     }

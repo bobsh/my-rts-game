@@ -16,13 +16,7 @@ pub struct RtsPlugin;
 
 impl Plugin for RtsPlugin {
     fn build(&self, app: &mut App) {
-        app.insert_resource(LdtkSettings {
-                level_spawn_behavior: LevelSpawnBehavior::UseWorldTranslation {
-                    load_level_neighbors: true,
-                },
-                ..Default::default()
-            })
-            .add_plugins(LdtkPlugin)
+        app.add_plugins(LdtkPlugin)
             .add_plugins(WorldInspectorPlugin::new().run_if(input_toggle_active(false, KeyCode::F10)))
             .add_plugins(EntitiesPlugin)
             .add_plugins(MovementPlugin)
