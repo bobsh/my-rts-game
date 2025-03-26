@@ -1,5 +1,5 @@
-use bevy::input::common_conditions::input_toggle_active;
 use bevy::app::{App, Plugin};
+use bevy::input::common_conditions::input_toggle_active;
 use bevy::prelude::KeyCode;
 use bevy_ecs_ldtk::prelude::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
@@ -17,7 +17,9 @@ pub struct RtsPlugin;
 impl Plugin for RtsPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins(LdtkPlugin)
-            .add_plugins(WorldInspectorPlugin::new().run_if(input_toggle_active(false, KeyCode::F10)))
+            .add_plugins(
+                WorldInspectorPlugin::new().run_if(input_toggle_active(false, KeyCode::F10)),
+            )
             .add_plugins(EntitiesPlugin)
             .add_plugins(MovementPlugin)
             .add_plugins(CameraPlugin)

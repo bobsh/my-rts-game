@@ -58,7 +58,10 @@ fn handle_movement_input(
 
     // Debug info for world position
     info!("Cursor world position: {:?}", cursor_pos);
-    info!("Level position: {:?}", level_transform.translation.truncate());
+    info!(
+        "Level position: {:?}",
+        level_transform.translation.truncate()
+    );
 
     // Calculate grid position with the OFFSET CORRECTION
     // Based on the debug logs, there's a consistent offset between entity grid coords

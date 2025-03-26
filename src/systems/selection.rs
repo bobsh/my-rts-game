@@ -11,9 +11,9 @@ pub struct SelectionPlugin;
 impl Plugin for SelectionPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Update, selection_system)
-           .add_systems(Update, update_selection_ring)
-           .add_systems(Update, highlight_selected)
-           .add_systems(Update, draw_selection_boxes);
+            .add_systems(Update, update_selection_ring)
+            .add_systems(Update, highlight_selected)
+            .add_systems(Update, draw_selection_boxes);
     }
 }
 
@@ -66,7 +66,11 @@ fn selection_system(
                 let entity_size = get_entity_size(sprite, &images);
 
                 // Debug info
-                info!("Entity at position: {:?} with size: {:?}", transform.translation().truncate(), entity_size);
+                info!(
+                    "Entity at position: {:?} with size: {:?}",
+                    transform.translation().truncate(),
+                    entity_size
+                );
 
                 // Simple AABB collision detection with dynamic size
                 let min_x = transform.translation().x - entity_size.x / 2.0;
@@ -168,8 +172,8 @@ fn draw_selection_boxes(
         // 2. Size (Vec2)
         // 3. Color
         gizmos.rect(
-            position, // Vec3 for position
-            box_size, // Vec2 for size
+            position,                   // Vec3 for position
+            box_size,                   // Vec2 for size
             Color::srgb(0.0, 1.0, 0.0), // Green color
         );
     }
