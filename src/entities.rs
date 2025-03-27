@@ -8,7 +8,7 @@ use crate::components::unit::Selectable;
 pub struct EntitiesPlugin;
 
 #[derive(Default, Component)]
-struct Warrior;
+pub struct Warrior;
 
 #[derive(Default, Bundle, LdtkEntity)]
 struct WarriorBundle {
@@ -24,7 +24,7 @@ struct WarriorBundle {
 }
 
 #[derive(Default, Component)]
-struct Worker;
+pub struct Worker;
 
 #[derive(Default, Bundle, LdtkEntity)]
 struct WorkerBundle {
@@ -40,7 +40,7 @@ struct WorkerBundle {
 }
 
 #[derive(Default, Component)]
-struct Mine;
+pub struct Mine;
 
 #[derive(Default, Bundle, LdtkEntity)]
 struct MineBundle {
@@ -54,7 +54,7 @@ struct MineBundle {
 }
 
 #[derive(Default, Component)]
-struct Quarry;
+pub struct Quarry;
 
 #[derive(Default, Bundle, LdtkEntity)]
 struct QuarryBundle {
@@ -68,7 +68,7 @@ struct QuarryBundle {
 }
 
 #[derive(Default, Component)]
-struct Tree;
+pub struct Tree;
 
 #[derive(Default, Bundle, LdtkEntity)]
 struct TreeBundle {
@@ -82,7 +82,7 @@ struct TreeBundle {
 }
 
 #[derive(Default, Component)]
-struct House;
+pub struct House;
 
 #[derive(Default, Bundle, LdtkEntity)]
 struct HouseBundle {
