@@ -54,15 +54,15 @@ fn setup_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
 
 fn update_entity_info_panel(
     selected_entities: Query<(Entity, Option<&Name>, Option<&Inventory>), With<Selected>>,
-    house_query: Query<Entity, With<Name>>,
+    _house_query: Query<Entity, With<Name>>,
     mut panel_query: Query<&mut Node, With<EntityInfoPanel>>,
     mut entity_name_text: Query<&mut Text, With<EntityNameText>>,
-    inventory_settings: Query<&InventorySettings>,
+    _inventory_settings: Query<&InventorySettings>,
 ) {
     // Get a mutable reference to the panel to control visibility
     if let Ok(mut panel_node) = panel_query.get_single_mut() {
         // Check if there's a selected entity
-        if let Ok((entity, name, inventory)) = selected_entities.get_single() {
+        if let Ok((_entity, name, _inventory)) = selected_entities.get_single() {
             // Show the panel when something is selected
             panel_node.display = Display::Flex;
 

@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 use crate::components::inventory::*;
-use crate::components::unit::{Selected, Unit, Worker, Warrior, House};
+use crate::components::unit::Selected;
+use crate::entities::{Worker, Warrior, House};
 use crate::components::ui::EntityInfoPanel;
 
 pub struct InventoryPlugin;
@@ -52,7 +53,9 @@ fn update_inventory_ui(
     if let Ok(panel_entity) = panel_query.get_single() {
         // If there's a selected entity with inventory
         if let Ok((entity, inventory)) = selected_entities.get_single() {
-            let settings = inventory_settings.get(entity).unwrap_or(&InventorySettings::default());
+            // Create a longer-lived value to avoid temporary value issue
+            let default_settings = InventorySettings::default();
+            let settings = inventory_settings.get(entity).unwrap_or(&default_settings);
 
             // Create inventory UI within the panel
             commands.entity(panel_entity).with_children(|parent| {
@@ -98,7 +101,7 @@ fn update_inventory_ui(
                                 font_size: 14.0,
                                 ..default()
                             },
-                            TextColor(Color::rgba(0.7, 0.7, 0.7, 1.0)),
+                            TextColor(Color::srgba(0.7, 0.7, 0.7, 1.0)),
                         ));
                     }
                 }

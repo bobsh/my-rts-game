@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 use crate::components::inventory::*;
-use crate::entities::{Tree, Mine, Quarry};
+use crate::components::unit::Selected;
+use crate::entities::{Tree, Mine, Quarry, Worker};
 
 pub struct ResourceGatheringPlugin;
 
@@ -70,6 +71,8 @@ fn start_gathering(
     camera_q: Query<(&Camera, &GlobalTransform)>,
     selected_workers: Query<Entity, (With<Selected>, With<Worker>)>,
     resource_nodes: Query<(Entity, &GlobalTransform, &Sprite), Or<(With<Tree>, With<Mine>, With<Quarry>)>>,
+    trees: Query<Entity, With<Tree>>,
+    mines: Query<Entity, With<Mine>>,
 ) {
     // Only process right-clicks
     if !mouse_button.just_pressed(MouseButton::Right) {
@@ -110,9 +113,9 @@ fn start_gathering(
         if cursor_pos.x >= min_x && cursor_pos.x <= max_x &&
            cursor_pos.y >= min_y && cursor_pos.y <= max_y {
             // Determine resource type
-            let resource_type = if resource_nodes.get_component::<Tree>(node_entity).is_ok() {
+            let resource_type = if trees.contains(node_entity) {
                 ResourceType::Wood
-            } else if resource_nodes.get_component::<Mine>(node_entity).is_ok() {
+            } else if mines.contains(node_entity) {
                 ResourceType::Gold
             } else {
                 ResourceType::Stone
