@@ -79,9 +79,17 @@ fn update_inventory_ui(
                             ResourceType::Stone => "Stone",
                         };
 
+                        // Example of adding an icon to resource names
+                        let resource_icon = match inv_slot.resource_type {
+                            ResourceType::Gold => "🪙",
+                            ResourceType::Wood => "🪵",
+                            ResourceType::Stone => "🪨",
+                        };
+
                         parent.spawn((
-                            Text::new(format!("Slot {}: {} x{}/{}",
+                            Text::new(format!("Slot {}: {} {} x{}/{}",
                                 i + 1,
+                                resource_icon,
                                 resource_name,
                                 inv_slot.quantity,
                                 settings.max_stack_size
