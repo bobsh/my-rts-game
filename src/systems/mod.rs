@@ -1,5 +1,7 @@
 pub mod camera;
+pub mod inventory;
 pub mod movement;
+pub mod resource_gathering;
 pub mod scene;
 pub mod selection;
 pub mod ui;

@@ -6,7 +6,9 @@ use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
 use crate::entities::EntitiesPlugin;
 use crate::systems::camera::CameraPlugin;
+use crate::systems::inventory::InventoryPlugin;
 use crate::systems::movement::MovementPlugin;
+use crate::systems::resource_gathering::ResourceGatheringPlugin;
 use crate::systems::scene::ScenePlugin;
 use crate::systems::selection::SelectionPlugin;
 use crate::systems::ui::UiPlugin;
@@ -22,6 +24,8 @@ impl Plugin for RtsPlugin {
             )
             .add_plugins(EntitiesPlugin)
             .add_plugins(MovementPlugin)
+            .add_plugins(ResourceGatheringPlugin)
+            .add_plugins(InventoryPlugin)
             .add_plugins(CameraPlugin)
             .add_plugins(WindowPlugin)
             .add_plugins(SelectionPlugin)
