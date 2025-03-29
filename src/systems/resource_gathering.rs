@@ -139,9 +139,15 @@ fn start_gathering(
 
     let cursor_pos = cursor_ray.origin.truncate();
 
+    // Log cursor position for debugging
+    info!("Resource gathering cursor position: {:?}", cursor_pos);
+
     let Some((character_entity, skills, character_coords)) = selected_characters.iter().next() else {
         return;
     };
+
+    // Track if we found a resource to gather
+    let mut found_resource = false;
 
     for (node_entity, transform, sprite, is_tree, is_mine, is_quarry) in &resource_nodes {
         let size = sprite.custom_size.unwrap_or(Vec2::new(64.0, 64.0));
@@ -154,6 +160,8 @@ fn start_gathering(
 
         if cursor_pos.x >= min_x && cursor_pos.x <= max_x &&
            cursor_pos.y >= min_y && cursor_pos.y <= max_y {
+
+            found_resource = true;
 
             let (resource_type, resource_name) = if is_tree.is_some() {
                 (ResourceType::Wood, "wood from tree")
@@ -224,6 +232,11 @@ fn start_gathering(
             info!("Moving to gather {}", resource_name);
             break;
         }
+    }
+
+    // If we didn't find a resource, let the movement system handle it
+    if !found_resource {
+        info!("No resource found at click position, deferring to movement system");
     }
 }
 

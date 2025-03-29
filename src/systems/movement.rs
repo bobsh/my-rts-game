@@ -8,7 +8,7 @@ pub struct MovementPlugin;
 impl Plugin for MovementPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Update, (
-            handle_movement_input,  // New system for handling input
+            handle_movement_input,
             update_movement,
             calculate_path,
             move_along_path
@@ -16,17 +16,18 @@ impl Plugin for MovementPlugin {
     }
 }
 
-// New system to handle right-click movement input
+// Fixed system to handle right-click movement input
 fn handle_movement_input(
     mouse_button: Res<ButtonInput<MouseButton>>,
     windows: Query<&Window>,
     camera_q: Query<(&Camera, &GlobalTransform)>,
     selected_units: Query<(Entity, &GridCoords), With<crate::components::unit::Selected>>,
     mut move_targets: Query<&mut MoveTarget>,
-    ldtk_tile_query: Query<&GridCoords>,
+    ldtk_tile_query: Query<&GridCoords, With<crate::components::movement::Collider>>,
+    resource_gathering_system: Option<Res<crate::systems::resource_gathering::Gathering>>,
 ) {
-    // Only process right-click inputs
-    if !mouse_button.just_pressed(MouseButton::Right) {
+    // Only process right-click inputs when not already gathering resources
+    if !mouse_button.just_pressed(MouseButton::Right) || resource_gathering_system.is_some() {
         return;
     }
 
@@ -40,21 +41,44 @@ fn handle_movement_input(
         return;
     };
 
-    // Convert cursor world position to grid coordinates
+    // Convert cursor world position to grid coordinates - FIXED CALCULATION
     let cursor_world_pos = cursor_ray.origin.truncate();
+
+    // Log raw position for debugging
+    info!("Raw cursor world position: {:?}", cursor_world_pos);
+
+    // Adjusted calculation that properly accounts for the grid size
     let target_grid = GridCoords {
-        x: (cursor_world_pos.x / 64.0).round() as i32,
-        y: (cursor_world_pos.y / 64.0).round() as i32,
+        x: (cursor_world_pos.x / 64.0).floor() as i32,
+        y: (cursor_world_pos.y / 64.0).floor() as i32,
     };
 
-    // Check if the target position is occupied
-    let is_occupied = ldtk_tile_query.iter().any(|tile_pos| {
-        tile_pos.x == target_grid.x && tile_pos.y == target_grid.y
-    });
+    info!("Target grid coordinates: {:?}", target_grid);
 
-    if !is_occupied {
-        // Set destination for all selected units
-        for (entity, _) in selected_units.iter() {
+    // Get the first selected unit's position for reference
+    if let Some((entity, current_pos)) = selected_units.iter().next() {
+        // Log the current position and calculated target for debugging
+        info!("Current position: {:?}, Target: {:?}", current_pos, target_grid);
+
+        // Calculate distance to verify it's reasonable
+        let dx = target_grid.x - current_pos.x;
+        let dy = target_grid.y - current_pos.y;
+        let distance = ((dx * dx + dy * dy) as f32).sqrt();
+
+        info!("Movement distance: {:.1} grid cells", distance);
+
+        // Safeguard against excessive movement
+        if distance > 50.0 {
+            info!("Movement distance too large ({}), ignoring click", distance);
+            return;
+        }
+
+        // Check if the target position is occupied by a collider
+        let is_occupied = ldtk_tile_query.iter().any(|tile_pos| {
+            tile_pos.x == target_grid.x && tile_pos.y == target_grid.y
+        });
+
+        if !is_occupied {
             if let Ok(mut move_target) = move_targets.get_mut(entity) {
                 // Clear any existing path
                 move_target.path.clear();
@@ -64,9 +88,9 @@ fn handle_movement_input(
             } else {
                 info!("Selected entity {:?} has no MoveTarget component", entity);
             }
+        } else {
+            info!("Target position {:?} is occupied by a collider", target_grid);
         }
-    } else {
-        info!("Target position {:?} is occupied", target_grid);
     }
 }
 
