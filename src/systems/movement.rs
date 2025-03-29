@@ -1,8 +1,6 @@
 use bevy::prelude::*;
 use crate::components::movement::{Movable, MoveTarget, Moving};
 use bevy_ecs_ldtk::prelude::*;
-use std::collections::VecDeque;
-use pathfinding::prelude::astar;
 
 pub struct MovementPlugin;
 
@@ -89,9 +87,9 @@ fn calculate_path(
 fn move_along_path(
     mut commands: Commands,
     mut query: Query<(Entity, &GridCoords, &mut MoveTarget, &Movable), Without<Moving>>,
-    time: Res<Time>,
+    _time: Res<Time>,
 ) {
-    for (entity, current_pos, mut move_target, movable) in &mut query {
+    for (entity, current_pos, mut move_target, _movable) in &mut query {
         if !move_target.path.is_empty() {
             let next_pos = move_target.path[0];
 
@@ -133,7 +131,7 @@ fn update_movement(
 ) {
     for (entity, mut transform, mut moving, movable) in &mut query {
         // Update progress
-        moving.progress += time.delta_seconds() * movable.speed;
+        moving.progress += time.delta_secs() * movable.speed;
 
         if moving.progress >= 1.0 {
             // Movement complete
