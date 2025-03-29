@@ -165,7 +165,7 @@ fn calculate_path(
                     );
 
                     // Try a simple direct path as fallback
-                    let direct_path = create_direct_path(current_pos, destination);
+                    let direct_path = create_direct_path(current_pos, &destination);
                     move_target.path = direct_path;
                     info!("Using simplified direct path with {} steps", move_target.path.len());
                 }
