@@ -1,5 +1,5 @@
 use crate::components::ui::{EntityInfoPanel, EntityNameText};
-use crate::components::unit::{Selected, Unit};
+use crate::components::unit::Selected;
 use crate::components::inventory::{Inventory, InventorySettings}; // Add this import
 use bevy::prelude::*;
 
