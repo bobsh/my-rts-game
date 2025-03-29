@@ -208,7 +208,8 @@ fn check_gathering_proximity(
     characters: Query<(Entity, &GlobalTransform, &GatheringIntent, &Skills), (Without<Gathering>, Without<Moving>)>,
     resources: Query<&GlobalTransform>,
 ) {
-    const GATHERING_RANGE: f32 = 100.0;
+    // Increase the gathering range to be more lenient
+    const GATHERING_RANGE: f32 = 150.0;
 
     for (entity, transform, intent, skills) in &characters {
         if let Ok(resource_transform) = resources.get(intent.target) {
@@ -238,6 +239,8 @@ fn check_gathering_proximity(
                 };
 
                 info!("Started gathering {}", resource_name);
+            } else {
+                info!("Too far from resource: {:.1} units away (need {:.1})", distance, GATHERING_RANGE);
             }
         }
     }

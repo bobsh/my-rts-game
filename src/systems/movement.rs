@@ -74,7 +74,7 @@ fn handle_movement_input(
 fn calculate_path(
     _commands: Commands,
     mut query: Query<(Entity, &GridCoords, &mut MoveTarget), (With<Movable>, Without<Moving>)>,
-    ldtk_entities: Query<&GridCoords>,
+    obstacles: Query<&GridCoords, With<crate::components::movement::Collider>>,
     _ldtk_level: Query<&LevelIid>,
 ) {
     for (entity, current_pos, mut move_target) in &mut query {
@@ -82,6 +82,14 @@ fn calculate_path(
             if move_target.path.is_empty() {
                 // Only recalculate if we don't already have a path
                 info!("Calculating path from {:?} to {:?}", current_pos, destination);
+
+                // Extract obstacle positions for debugging
+                let obstacle_positions: Vec<(i32, i32)> = obstacles
+                    .iter()
+                    .map(|pos| (pos.x, pos.y))
+                    .collect();
+
+                info!("Found {} obstacles", obstacle_positions.len());
 
                 // Define a function to find neighboring grid positions
                 let neighbors = |pos: &GridCoords| {
@@ -96,18 +104,33 @@ fn calculate_path(
                             y: pos.y + dy,
                         })
                         .filter(|next_pos| {
-                            // Check if the position is valid (not occupied by other entities)
-                            !ldtk_entities.iter().any(|entity_pos| {
-                                entity_pos.x == next_pos.x && entity_pos.y == next_pos.y
+                            // Don't allow positions outside reasonable bounds
+                            if next_pos.x < -100 || next_pos.x > 100 ||
+                               next_pos.y < -100 || next_pos.y > 100 {
+                                return false;
+                            }
+
+                            // Only filter out positions occupied by actual obstacles
+                            !obstacles.iter().any(|obstacle_pos| {
+                                obstacle_pos.x == next_pos.x && obstacle_pos.y == next_pos.y
                             })
                         })
-                        .map(|pos| (pos, 1)) // Cost is always 1 for now
+                        .map(|pos| {
+                            // Cost is 1 for cardinal, sqrt(2) for diagonal (scaled to int)
+                            let dx = (pos.x - current_pos.x).abs();
+                            let dy = (pos.y - current_pos.y).abs();
+                            if dx == 1 && dy == 1 {
+                                (pos, 14) // Approximate sqrt(2) * 10
+                            } else {
+                                (pos, 10) // 10 for scaling purposes
+                            }
+                        })
                         .collect::<Vec<_>>()
                 };
 
                 // Calculate heuristic (Manhattan distance)
                 let heuristic = |pos: &GridCoords| {
-                    ((pos.x - destination.x).abs() + (pos.y - destination.y).abs()) as u32
+                    ((pos.x - destination.x).abs() + (pos.y - destination.y).abs()) as u32 * 10
                 };
 
                 // Check if already at destination
@@ -133,13 +156,45 @@ fn calculate_path(
                         move_target.destination = None;
                     }
                 } else {
-                    // No path found
+                    // No path found - provide detailed debug info
                     info!("No path found to destination for entity {:?}", entity);
-                    move_target.destination = None;
+                    info!("Start: {:?}, End: {:?}, Distance: {}",
+                        current_pos,
+                        destination,
+                        ((current_pos.x - destination.x).pow(2) + (current_pos.y - destination.y).pow(2)) as f32
+                    );
+
+                    // Try a simple direct path as fallback
+                    let direct_path = create_direct_path(current_pos, destination);
+                    move_target.path = direct_path;
+                    info!("Using simplified direct path with {} steps", move_target.path.len());
                 }
             }
         }
     }
+}
+
+// Helper function to create a simplified direct path when A* fails
+fn create_direct_path(start: &GridCoords, end: &GridCoords) -> Vec<GridCoords> {
+    let mut path = Vec::new();
+    let dx = end.x - start.x;
+    let dy = end.y - start.y;
+    let steps = dx.abs().max(dy.abs());
+
+    if steps == 0 {
+        return path;
+    }
+
+    let step_x = dx as f32 / steps as f32;
+    let step_y = dy as f32 / steps as f32;
+
+    for i in 1..=steps {
+        let x = start.x + (step_x * i as f32).round() as i32;
+        let y = start.y + (step_y * i as f32).round() as i32;
+        path.push(GridCoords { x, y });
+    }
+
+    path
 }
 
 // System to move along the calculated path

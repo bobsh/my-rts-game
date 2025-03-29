@@ -61,7 +61,6 @@ pub struct Mine;
 struct MineBundle {
     mine: Mine,
     selectable: Selectable,
-    collider: Collider,
     #[sprite_sheet]
     sprite_sheet: Sprite,
     #[grid_coords]
@@ -75,7 +74,6 @@ pub struct Quarry;
 struct QuarryBundle {
     quarry: Quarry,
     selectable: Selectable,
-    collider: Collider,
     #[sprite_sheet]
     sprite_sheet: Sprite,
     #[grid_coords]
