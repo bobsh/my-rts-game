@@ -25,6 +25,7 @@ fn handle_movement_input(
     ldtk_tile_query: Query<&GridCoords, With<crate::components::movement::Collider>>,
     gatherers: Query<(), With<crate::systems::resource_gathering::Gathering>>,
     ldtk_calibration: Res<LdtkCalibration>,
+    ldtk_worlds: Query<&GlobalTransform, With<LdtkProjectHandle>>,
 ) {
     // Only process right-click inputs when not already gathering resources
     if !mouse_button.just_pressed(MouseButton::Right) || !gatherers.is_empty() {
@@ -41,21 +42,23 @@ fn handle_movement_input(
         return;
     };
 
-    // Convert cursor world position to grid coordinates
+    // Get the world position of the cursor
     let cursor_world_pos = cursor_ray.origin.truncate();
-
-    // Log raw position for debugging
     info!("Raw cursor world position: {:?}", cursor_world_pos);
 
-    // We need to convert the world position to grid coordinates in the LDtk space
-    let world_to_grid_pos = cursor_world_pos - ldtk_calibration.offset;
+    // Get the LDTK world transform
+    let ldtk_world_transform = ldtk_worlds.single();
 
-    info!("Adjusted cursor world position: {:?}", world_to_grid_pos);
+    // To get a position relative to LDTK world, we need to account for the world transform
+    // Subtract the world position (the offset is already applied to the transform)
+    let ldtk_relative_pos = cursor_world_pos - ldtk_world_transform.translation().truncate();
 
-    // Convert to grid coordinates - use floor instead of round for more predictable results
+    info!("LDTK-relative cursor position: {:?}", ldtk_relative_pos);
+
+    // Convert to grid coordinates with fixed grid offset as specified
     let target_grid = GridCoords {
-        x: (world_to_grid_pos.x / 64.0).floor() as i32,
-        y: (world_to_grid_pos.y / 64.0).floor() as i32,
+        x: (ldtk_relative_pos.x / 64.0).round() as i32 + 30, // Add 29 to x
+        y: (ldtk_relative_pos.y / 64.0).round() as i32 + 29, // Add 30 to y
     };
 
     info!("Target grid coordinates: {:?}", target_grid);
