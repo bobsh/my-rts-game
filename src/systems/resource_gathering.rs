@@ -121,118 +121,119 @@ fn start_gathering(
     selected_characters: Query<(Entity, &Skills, &GridCoords), With<Selected>>,
     mut move_targets: Query<&mut MoveTarget>,
     resource_nodes: Query<(Entity, &GlobalTransform, &Sprite, Option<&Tree>, Option<&Mine>, Option<&Quarry>)>,
+    gathering_intent_query: Query<&GatheringIntent>, // Add this query to check existing intents gathering_intent_query: Query<&GatheringIntent>,
 ) {
-    if !mouse_button.just_pressed(MouseButton::Right) {
-        return;
-    }
+    if !mouse_button.just_pressed(MouseButton::Right) {utton.just_pressed(MouseButton::Right) {
+        return;   return;
+    }    }
 
     let window = windows.single();
-    let Some(cursor_position) = window.cursor_position() else {
-        return;
-    };
+    let Some(cursor_position) = window.cursor_position() else {rsor_position) = window.cursor_position() else {
+        return;  return;
+    };    };
 
     let (camera, camera_transform) = camera_q.single();
-    let Ok(cursor_ray) = camera.viewport_to_world(camera_transform, cursor_position) else {
-        return;
-    };
+    let Ok(cursor_ray) = camera.viewport_to_world(camera_transform, cursor_position) else {or_ray) = camera.viewport_to_world(camera_transform, cursor_position) else {
+        return;  return;
+    };    };
 
-    let cursor_pos = cursor_ray.origin.truncate();
+    let cursor_pos = cursor_ray.origin.truncate();    let cursor_pos = cursor_ray.origin.truncate();
 
-    let Some((character_entity, skills, _)) = selected_characters.iter().next() else {
-        return;
-    };
+    let Some((character_entity, skills, _)) = selected_characters.iter().next() else {haracter_entity, skills, _)) = selected_characters.iter().next() else {
+        return;  return;
+    };    };
 
-    for (node_entity, transform, sprite, is_tree, is_mine, _is_quarry) in &resource_nodes {
-        let size = sprite.custom_size.unwrap_or(Vec2::new(64.0, 64.0));
-        let pos = transform.translation().truncate();
+    for (node_entity, transform, sprite, is_tree, is_mine, _is_quarry) in &resource_nodes {n &resource_nodes {
+        let size = sprite.custom_size.unwrap_or(Vec2::new(64.0, 64.0));:new(64.0, 64.0));
+        let pos = transform.translation().truncate();        let pos = transform.translation().truncate();
 
         let min_x = pos.x - size.x / 2.0;
         let max_x = pos.x + size.x / 2.0;
         let min_y = pos.y - size.y / 2.0;
-        let max_y = pos.y + size.y / 2.0;
+        let max_y = pos.y + size.y / 2.0;        let max_y = pos.y + size.y / 2.0;
 
-        if cursor_pos.x >= min_x && cursor_pos.x <= max_x &&
-           cursor_pos.y >= min_y && cursor_pos.y <= max_y {
+        if cursor_pos.x >= min_x && cursor_pos.x <= max_x &&&
+           cursor_pos.y >= min_y && cursor_pos.y <= max_y {           cursor_pos.y >= min_y && cursor_pos.y <= max_y {
 
-            let resource_type = if is_tree.is_some() {
-                ResourceType::Wood
+            let resource_type = if is_tree.is_some() {pe detection
+                ResourceType::Woode.is_some() {
             } else if is_mine.is_some() {
-                ResourceType::Gold
+                ResourceType::Goldf is_mine.is_some() {
             } else {
-                ResourceType::Stone
-            };
+                ResourceType::Stoneelse if is_quarry.is_some() {
+            };                ResourceType::Stone
 
             let _skill_value = match resource_type {
                 ResourceType::Wood => skills.woodcutting,
                 ResourceType::Gold => skills.mining,
-                ResourceType::Stone => skills.harvesting,
-            };
+                ResourceType::Stone => skills.harvesting,t _skill_value = match resource_type {
+            };                ResourceType::Wood => skills.woodcutting,
 
-            commands.entity(character_entity).insert(GatheringIntent {
+            commands.entity(character_entity).insert(GatheringIntent {=> skills.harvesting,
                 target: node_entity,
                 resource_type,
-            });
-
-            commands.entity(character_entity).remove::<Gathering>();
+            });            // Prevent duplicate resource gathering intents
+(character_entity) {
+            commands.entity(character_entity).remove::<Gathering>();                if gathering_intent.target == node_entity {
 
             if let Ok(mut move_target) = move_targets.get_mut(character_entity) {
                 move_target.destination = Some(GridCoords {
                     x: (pos.x / 64.0).round() as i32,
-                    y: (pos.y / 64.0).round() as i32,
-                });
+                    y: (pos.y / 64.0).round() as i32,s.entity(character_entity).insert(GatheringIntent {
+                });                target: node_entity,
 
-                move_target.path.clear();
+                move_target.path.clear(););
             }
-
+g>();
             info!("Moving to gather from {:?}", resource_type);
-            break;
-        }
-    }
-}
+            break;   if let Ok(mut move_target) = move_targets.get_mut(character_entity) {
+        }           move_target.destination = Some(GridCoords {
+    }                   x: (pos.x / 64.0).round() as i32,
+}                    y: (pos.y / 64.0).round() as i32,
 
 // This system checks if characters with GatheringIntent are close enough to start gathering
-fn check_gathering_proximity(
+fn check_gathering_proximity(.path.clear();
     mut commands: Commands,
     characters: Query<(Entity, &GlobalTransform, &GatheringIntent, &Skills), (Without<Gathering>, Without<Moving>)>,
-    resources: Query<&GlobalTransform>,
-) {
-    const GATHERING_RANGE: f32 = 100.0;
-
+    resources: Query<&GlobalTransform>,         match resource_type {
+) {nfo!("Moving to gather from Wood"),
+    const GATHERING_RANGE: f32 = 100.0;                ResourceType::Gold => info!("Moving to gather from Gold"),
+er from Stone"),
     for (entity, transform, intent, skills) in &characters {
         if let Ok(resource_transform) = resources.get(intent.target) {
-            let distance = transform.translation().distance(resource_transform.translation());
+            let distance = transform.translation().distance(resource_transform.translation());            break;
 
             if distance <= GATHERING_RANGE {
                 let skill_value = match intent.resource_type {
                     ResourceType::Wood => skills.woodcutting,
-                    ResourceType::Gold => skills.mining,
-                    ResourceType::Stone => skills.harvesting,
-                };
-
+                    ResourceType::Gold => skills.mining,close enough to start gathering
+                    ResourceType::Stone => skills.harvesting,_proximity(
+                };    mut commands: Commands,
+gIntent, &Skills), (Without<Gathering>, Without<Moving>)>,
                 commands.entity(entity).insert(Gathering {
                     resource_type: intent.resource_type,
                     progress: 0.0,
                     target: intent.target,
-                    base_time: 3.0,
-                    skill_modifier: skill_value,
-                });
+                    base_time: 3.0,characters {
+                    skill_modifier: skill_value,esource_transform) = resources.get(intent.target) {
+                });            let distance = transform.translation().distance(resource_transform.translation());
 
-                commands.entity(entity).remove::<GatheringIntent>();
+                commands.entity(entity).remove::<GatheringIntent>();            if distance <= GATHERING_RANGE {
 
-                info!("Started gathering {:?}", intent.resource_type);
-            }
-        }
-    }
+                info!("Started gathering {:?}", intent.resource_type);       ResourceType::Wood => skills.woodcutting,
+            }           ResourceType::Gold => skills.mining,
+        }               ResourceType::Stone => skills.harvesting,
+    }               };
 }
-
+ntity).insert(Gathering {
 fn update_skills_from_activities(
     mut characters: Query<(&mut Skills, &mut SkillProgression)>,
-    gatherers: Query<(Entity, &Gathering)>,
-    time: Res<Time>,
-) {
+    gatherers: Query<(Entity, &Gathering)>,target: intent.target,
+    time: Res<Time>,                 base_time: 3.0,
+) {alue,
     for (entity, gathering) in &gatherers {
         if let Ok((mut skills, mut progression)) = characters.get_mut(entity) {
-            match gathering.resource_type {
+            match gathering.resource_type {.remove::<GatheringIntent>();
                 ResourceType::Wood => {
                     progression.woodcutting_xp += time.delta_secs() * 0.2;
                     if progression.woodcutting_xp >= 100.0 * skills.woodcutting {
@@ -246,55 +247,55 @@ fn update_skills_from_activities(
                     if progression.mining_xp >= 100.0 * skills.mining {
                         progression.mining_xp = 0.0;
                         skills.mining += 0.1;
-                        info!("Character {:?} improved mining to {:.1}", entity, skills.mining);
-                    }
+                        info!("Character {:?} improved mining to {:.1}", entity, skills.mining);t skills, mut progression)) = characters.get_mut(entity) {
+                    }gathering.resource_type {
                 },
-                ResourceType::Stone => {
-                    progression.harvesting_xp += time.delta_secs() * 0.2;
-                    if progression.harvesting_xp >= 100.0 * skills.harvesting {
-                        progression.harvesting_xp = 0.0;
-                        skills.harvesting += 0.1;
+                ResourceType::Stone => {;
+                    progression.harvesting_xp += time.delta_secs() * 0.2; {
+                    if progression.harvesting_xp >= 100.0 * skills.harvesting {;
+                        progression.harvesting_xp = 0.0;;
+                        skills.harvesting += 0.1;);
                         info!("Character {:?} improved harvesting to {:.1}", entity, skills.harvesting);
                     }
-                },
-            }
-        }
-    }
-}
-
+                },   ResourceType::Gold => {
+            }           progression.mining_xp += time.delta_secs() * 0.2;
+        }               if progression.mining_xp >= 100.0 * skills.mining {
+    }                       progression.mining_xp = 0.0;
+}                        skills.mining += 0.1;
+!("Character {:?} improved mining to {:.1}", entity, skills.mining);
 fn update_character_info_ui(
     selected_entities: Query<(Entity, &Skills, Option<&Inventory>), With<Selected>>,
-    panel_query: Query<Entity, With<EntityInfoPanel>>,
-    mut commands: Commands,
-    asset_server: Res<AssetServer>,
-    gathering_query: Query<&Gathering>,
-    gathering_intent_query: Query<&GatheringIntent>,
-) {
+    panel_query: Query<Entity, With<EntityInfoPanel>>,e::Stone => {
+    mut commands: Commands,vesting_xp += time.delta_secs() * 0.2;
+    asset_server: Res<AssetServer>,esting_xp >= 100.0 * skills.harvesting {
+    gathering_query: Query<&Gathering>,0.0;
+    gathering_intent_query: Query<&GatheringIntent>,                     skills.harvesting += 0.1;
+) {arvesting to {:.1}", entity, skills.harvesting);
     if let Ok(panel_entity) = panel_query.get_single() {
-        commands.entity(panel_entity).despawn_descendants();
+        commands.entity(panel_entity).despawn_descendants();                },
 
         if let Ok((entity, skills, inventory)) = selected_entities.get_single() {
             commands.entity(panel_entity).with_children(|parent| {
                 parent.spawn((
                     Text::new("Character Info"),
                     TextFont {
-                        font: asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf"),
-                        font_size: 18.0,
-                        ..default()
+                        font: asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf"),kills, Option<&Inventory>), With<Selected>>,
+                        font_size: 18.0,<EntityInfoPanel>>,
+                        ..default()ands,
                     },
-                    TextColor(Color::WHITE),
-                ));
+                    TextColor(Color::WHITE),: Query<&Gathering>,
+                ));    gathering_intent_query: Query<&GatheringIntent>,
 
-                parent.spawn((
-                    Text::new("Skills:"),
+                parent.spawn((.get_single() {
+                    Text::new("Skills:"),entity).despawn_descendants();
                     TextFont {
-                        font: asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf"),
-                        font_size: 16.0,
-                        ..default()
-                    },
-                    TextColor(Color::WHITE),
-                ));
-
+                        font: asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf"),tory)) = selected_entities.get_single() {
+                        font_size: 16.0,ntity).with_children(|parent| {
+                        ..default().spawn((
+                    },o"),
+                    TextColor(Color::WHITE), TextFont {
+                ));                        font: asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf"),
+ize: 18.0,
                 parent.spawn((
                     Text::new(format!("Mining: {:.1}", skills.mining)),
                     TextFont { font: asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf"), font_size: 14.0, ..default() },
@@ -303,41 +304,41 @@ fn update_character_info_ui(
 
                 parent.spawn((
                     Text::new(format!("Woodcutting: {:.1}", skills.woodcutting)),
-                    TextFont { font: asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf"), font_size: 14.0, ..default() },
-                    TextColor(Color::WHITE),
-                ));
+                    TextFont { font: asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf"), font_size: 14.0, ..default() },oad("fonts/fira_sans/FiraSans-Bold.ttf"),
+                    TextColor(Color::WHITE),     font_size: 16.0,
+                ));                        ..default()
 
                 parent.spawn((
                     Text::new(format!("Harvesting: {:.1}", skills.harvesting)),
                     TextFont { font: asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf"), font_size: 14.0, ..default() },
-                    TextColor(Color::WHITE),
-                ));
-
+                    TextColor(Color::WHITE),ent.spawn((
+                ));                    Text::new(format!("Mining: {:.1}", skills.mining)),
+ans/FiraSans-Bold.ttf"), font_size: 14.0, ..default() },
                 if let Ok(gathering) = gathering_query.get(entity) {
                     let progress_percent = (gathering.progress / gathering.base_time) * 100.0;
                     let resource_name = match gathering.resource_type {
                         ResourceType::Gold => "Gold",
-                        ResourceType::Wood => "Wood",
-                        ResourceType::Stone => "Stone",
-                    };
+                        ResourceType::Wood => "Wood",1}", skills.woodcutting)),
+                        ResourceType::Stone => "Stone",xtFont { font: asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf"), font_size: 14.0, ..default() },
+                    };                    TextColor(Color::WHITE),
 
                     parent.spawn((
                         Text::new(format!("Gathering {}: {:.1}%", resource_name, progress_percent)),
                         TextFont {
-                            font: asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf"),
-                            font_size: 14.0,
+                            font: asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf"),erver.load("fonts/fira_sans/FiraSans-Bold.ttf"), font_size: 14.0, ..default() },
+                            font_size: 14.0,ITE),
                             ..default()
                         },
-                        TextColor(Color::srgb(0.0, 1.0, 0.0)), // GREEN color
-                    ));
-                } else if let Ok(intent) = gathering_intent_query.get(entity) {
+                        TextColor(Color::srgb(0.0, 1.0, 0.0)), // GREEN colorOk(gathering) = gathering_query.get(entity) {
+                    ));_time) * 100.0;
+                } else if let Ok(intent) = gathering_intent_query.get(entity) {e {
                     let resource_name = match intent.resource_type {
                         ResourceType::Gold => "Gold",
                         ResourceType::Wood => "Wood",
                         ResourceType::Stone => "Stone",
                     };
 
-                    parent.spawn((
+                    parent.spawn((progress_percent)),
                         Text::new(format!("Moving to gather {}", resource_name)),
                         TextFont {
                             font: asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf"),
@@ -345,108 +346,125 @@ fn update_character_info_ui(
                             ..default()
                         },
                         TextColor(Color::srgb(1.0, 1.0, 0.0)), // YELLOW color
-                    ));
-                }
-
+                    )); else if let Ok(intent) = gathering_intent_query.get(entity) {
+                }                    let resource_name = match intent.resource_type {
+"Gold",
                 if let Some(inv) = inventory {
-                    let used_slots = inv.slots.iter().filter(|slot| slot.is_some()).count();
-                    let total_slots = inv.max_slots;
+                    let used_slots = inv.slots.iter().filter(|slot| slot.is_some()).count();e",
+                    let total_slots = inv.max_slots;                    };
 
                     parent.spawn((
-                        Text::new(format!("Inventory ({}/{})", used_slots, total_slots)),
+                        Text::new(format!("Inventory ({}/{})", used_slots, total_slots)),format!("Moving to gather {}", resource_name)),
                         TextFont {
-                            font: asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf"),
-                            font_size: 16.0,
-                            ..default()
+                            font: asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf"),er.load("fonts/fira_sans/FiraSans-Bold.ttf"),
+                            font_size: 16.0,14.0,
+                            ..default()  ..default()
                         },
-                        TextColor(Color::WHITE),
-                    ));
+                        TextColor(Color::WHITE), TextColor(Color::srgb(1.0, 1.0, 0.0)), // YELLOW color
+                    ));                    ));
 
                     for (i, slot) in inv.slots.iter().enumerate() {
                         if let Some(inv_slot) = slot {
-                            let resource_name = match inv_slot.resource_type {
+                            let resource_name = match inv_slot.resource_type {|slot| slot.is_some()).count();
                                 ResourceType::Gold => "Gold",
                                 ResourceType::Wood => "Wood",
-                                ResourceType::Stone => "Stone",
-                            };
+                                ResourceType::Stone => "Stone",wn((
+                            };                        Text::new(format!("Inventory ({}/{})", used_slots, total_slots)),
 
-                            let resource_icon = match inv_slot.resource_type {
+                            let resource_icon = match inv_slot.resource_type {fira_sans/FiraSans-Bold.ttf"),
                                 ResourceType::Gold => "🪙",
                                 ResourceType::Wood => "🪵",
                                 ResourceType::Stone => "🪨",
-                            };
+                            };                        TextColor(Color::WHITE),
 
                             parent.spawn((
                                 Text::new(format!("{} {} x{}", resource_icon, resource_name, inv_slot.quantity)),
                                 TextFont { font: asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf"), font_size: 14.0, ..default() },
-                                TextColor(Color::WHITE),
-                            ));
-                        } else {
+                                TextColor(Color::WHITE), resource_name = match inv_slot.resource_type {
+                            ));ResourceType::Gold => "Gold",
+                        } else {pe::Wood => "Wood",
                             parent.spawn((
                                 Text::new(format!("Slot {}: Empty", i + 1)),
                                 TextFont { font: asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf"), font_size: 14.0, ..default() },
-                                TextColor(Color::srgba(0.7, 0.7, 0.7, 1.0)),
-                            ));
-                        }
-                    }
+                                TextColor(Color::srgba(0.7, 0.7, 0.7, 1.0)), resource_icon = match inv_slot.resource_type {
+                            ));       ResourceType::Gold => "🪙",
+                        }           ResourceType::Wood => "🪵",
+                    }        ResourceType::Stone => "🪨",
                 } else {
                     parent.spawn((
+                        Text::new("No inventory available"),.spawn((
+                        TextFont {me, inv_slot.quantity)),
+                                TextFont { font: asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf"), font_size: 14.0, ..default() },er.load("fonts/fira_sans/FiraSans-Bold.ttf"),
+                                TextColor(Color::WHITE),14.0,
+                            ));  ..default()
+                        } else {
+                            parent.spawn(( TextColor(Color::srgba(0.9, 0.3, 0.3, 1.0)),
+                                Text::new(format!("Slot {}: Empty", i + 1)),   ));
+                                TextFont { font: asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf"), font_size: 14.0, ..default() }, }
+                                TextColor(Color::srgba(0.7, 0.7, 0.7, 1.0)),   });
+                            ));   }
+                        }   }
+                    }}
+                } else {
+                    parent.spawn((fer(
                         Text::new("No inventory available"),
                         TextFont {
                             font: asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf"),
                             font_size: 14.0,
-                            ..default()
+                            ..default()ory: Query<(Entity, &mut Inventory, &InventorySettings, &GlobalTransform), Without<Selected>>,
                         },
-                        TextColor(Color::srgba(0.9, 0.3, 0.3, 1.0)),
+                        TextColor(Color::srgba(0.9, 0.3, 0.3, 1.0)), camera_q: Query<(&Camera, &GlobalTransform)>,
                     ));
                 }
-            });
-        }
+            }); _selected_settings)) = selected_entity.get_single_mut() {
+        }            // Add underscore to fix unused variable warning
     }
 }
-
+ {
 fn handle_resource_transfer(
-    _commands: Commands,
-    keyboard: Res<ButtonInput<KeyCode>>,
-    mouse_button: Res<ButtonInput<MouseButton>>,
-    mut selected_entity: Query<(Entity, &mut Inventory, &InventorySettings), With<Selected>>,
-    mut entities_with_inventory: Query<(Entity, &mut Inventory, &InventorySettings, &GlobalTransform), Without<Selected>>,
-    windows: Query<&Window>,
+    _commands: Commands,amera_transform, cursor_position) {
+    keyboard: Res<ButtonInput<KeyCode>>,                    let cursor_pos = cursor_ray.origin.truncate();
+
+    mut selected_entity: Query<(Entity, &mut Inventory, &InventorySettings), With<Selected>>, entities_with_inventory {
+    mut entities_with_inventory: Query<(Entity, &mut Inventory, &InventorySettings, &GlobalTransform), Without<Selected>>,te();
+    windows: Query<&Window>,                        let distance = cursor_pos.distance(entity_pos);
     camera_q: Query<(&Camera, &GlobalTransform)>,
 ) {
-    if keyboard.pressed(KeyCode::KeyT) && mouse_button.just_pressed(MouseButton::Right) {
-        if let Ok((_selected_entity, mut selected_inventory, _selected_settings)) = selected_entity.get_single_mut() {
+    if keyboard.pressed(KeyCode::KeyT) && mouse_button.just_pressed(MouseButton::Right) {e::Wood) > 0 {
+        if let Ok((_selected_entity, mut selected_inventory, _selected_settings)) = selected_entity.get_single_mut() {ed_inventory.transfer_to(
             // Add underscore to fix unused variable warning
-
+sourceType::Wood,
             let window = windows.single();
-            if let Some(cursor_position) = window.cursor_position() {
-                let (camera, camera_transform) = camera_q.single();
+            if let Some(cursor_position) = window.cursor_position() {  settings.max_stack_size
+                let (camera, camera_transform) = camera_q.single();                                );
                 if let Ok(cursor_ray) = camera.viewport_to_world(camera_transform, cursor_position) {
                     let cursor_pos = cursor_ray.origin.truncate();
-
-                    for (entity, mut inventory, settings, transform) in &mut entities_with_inventory {
-                        let entity_pos = transform.translation().truncate();
+   info!("Transferred {} Wood to entity {:?}", amount, entity);
+                    for (entity, mut inventory, settings, transform) in &mut entities_with_inventory {   }
+                        let entity_pos = transform.translation().truncate();                            }
                         let distance = cursor_pos.distance(entity_pos);
+   break;
+                        if distance < 100.0 {   }
+                            if selected_inventory.count_resource(ResourceType::Wood) > 0 {   }
+                                let amount = selected_inventory.transfer_to(   }
+                                    &mut inventory,   }
+                                    ResourceType::Wood,   }
+                                    1,   }
+                                    settings.max_stack_size}
 
-                        if distance < 100.0 {
-                            if selected_inventory.count_resource(ResourceType::Wood) > 0 {
-                                let amount = selected_inventory.transfer_to(
-                                    &mut inventory,
-                                    ResourceType::Wood,
-                                    1,
-                                    settings.max_stack_size
-                                );
 
-                                if amount > 0 {
-                                    info!("Transferred {} Wood to entity {:?}", amount, entity);
-                                }
-                            }
 
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+}    }        }            }                }                    }                        }                            break;                            }                                }                                    info!("Transferred {} Wood to entity {:?}", amount, entity);                                if amount > 0 {                                );
