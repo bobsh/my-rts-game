@@ -142,7 +142,7 @@ fn start_gathering(
         return;
     };
 
-    for (node_entity, transform, sprite, is_tree, is_mine, is_quarry) in &resource_nodes {
+    for (node_entity, transform, sprite, is_tree, is_mine, _is_quarry) in &resource_nodes {
         let size = sprite.custom_size.unwrap_or(Vec2::new(64.0, 64.0));
         let pos = transform.translation().truncate();
 
@@ -162,14 +162,14 @@ fn start_gathering(
                 ResourceType::Stone
             };
 
-            let skill_value = match resource_type {
+            let _skill_value = match resource_type {
                 ResourceType::Wood => skills.woodcutting,
                 ResourceType::Gold => skills.mining,
                 ResourceType::Stone => skills.harvesting,
             };
 
             commands.entity(character_entity).insert(GatheringIntent {
-                target: node_entity, // Remove the * operator
+                target: node_entity,
                 resource_type,
             });
 
@@ -328,7 +328,7 @@ fn update_character_info_ui(
                             font_size: 14.0,
                             ..default()
                         },
-                        TextColor(Color::rgb(0.0, 1.0, 0.0)), // Fix GREEN color
+                        TextColor(Color::srgb(0.0, 1.0, 0.0)), // GREEN color
                     ));
                 } else if let Ok(intent) = gathering_intent_query.get(entity) {
                     let resource_name = match intent.resource_type {
@@ -344,7 +344,7 @@ fn update_character_info_ui(
                             font_size: 14.0,
                             ..default()
                         },
-                        TextColor(Color::rgb(1.0, 1.0, 0.0)), // Fix YELLOW color
+                        TextColor(Color::srgb(1.0, 1.0, 0.0)), // YELLOW color
                     ));
                 }
 

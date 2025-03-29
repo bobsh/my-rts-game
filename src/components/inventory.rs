@@ -131,6 +131,7 @@ impl Inventory {
             .sum()
     }
 
+    #[allow(dead_code)]
     // Add a method to get capacity information
     pub fn capacity_info(&self) -> (usize, usize) {
         let used = self.slots.iter().filter(|slot| slot.is_some()).count();

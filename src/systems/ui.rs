@@ -87,6 +87,7 @@ fn update_entity_info_panel(
 }
 
 // Helper function to identify entity types without importing them directly
+#[allow(dead_code)]
 fn get_entity_type_name(entity: Entity, house_query: &Query<Entity, With<Name>>) -> String {
     // Try to determine what type of entity this is
     if house_query.contains(entity) {

@@ -6,8 +6,10 @@ pub struct Skills {
     pub mining: f32,        // Effectiveness at mining
     pub woodcutting: f32,   // Effectiveness at cutting trees
     pub harvesting: f32,    // Effectiveness at harvesting resources
+    #[allow(dead_code)]
     pub combat: f32,        // Combat effectiveness
     pub construction: f32,  // Building construction speed
+    #[allow(dead_code)]
     pub crafting: f32,      // Item crafting quality
 }
 
@@ -30,8 +32,10 @@ pub struct SkillProgression {
     pub mining_xp: f32,
     pub woodcutting_xp: f32,
     pub harvesting_xp: f32,
+    #[allow(dead_code)]
     pub combat_xp: f32,
     pub construction_xp: f32,
+    #[allow(dead_code)]
     pub crafting_xp: f32,
 }
 
