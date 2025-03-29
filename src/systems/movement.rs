@@ -1,5 +1,6 @@
 use crate::components::movement::*;
 use crate::components::unit::Selected;
+use crate::systems::resource_gathering::GatheringIntent;
 use bevy::input::mouse::MouseButton;
 use bevy::prelude::*;
 use bevy::window::Window;
@@ -21,9 +22,10 @@ impl Plugin for MovementPlugin {
     }
 }
 
-// Same systems but with updated pathfinding
+// Updated to handle non-gathering movement
 #[allow(clippy::type_complexity)]
 fn handle_movement_input(
+    mut commands: Commands,
     mouse_button: Res<ButtonInput<MouseButton>>,
     windows: Query<&Window>,
     camera_q: Query<(&Camera, &GlobalTransform)>,
@@ -31,9 +33,15 @@ fn handle_movement_input(
     selected_units: Query<(Entity, &GridCoords), (With<Selected>, With<Movable>)>,
     mut unit_targets: Query<&mut MoveTarget>,
     colliders: Query<&GridCoords, With<Collider>>,
+    keyboard: Res<ButtonInput<KeyCode>>,
 ) {
     // Only process right-clicks
     if !mouse_button.just_pressed(MouseButton::Right) {
+        return;
+    }
+
+    // Skip if Alt is pressed (for controlling gathering behavior in start_gathering)
+    if keyboard.pressed(KeyCode::AltLeft) || keyboard.pressed(KeyCode::AltRight) {
         return;
     }
 
@@ -56,41 +64,30 @@ fn handle_movement_input(
         Err(_) => return,
     };
 
-    // Debug info for world position
-    info!("Cursor world position: {:?}", cursor_pos);
-    info!(
-        "Level position: {:?}",
-        level_transform.translation.truncate()
-    );
-
     // Calculate grid position with the OFFSET CORRECTION
-    // Based on the debug logs, there's a consistent offset between entity grid coords
-    // and the calculated grid coordinates
     let grid_pos = GridCoords {
         x: ((cursor_pos.x - level_transform.translation.x) / TILE_SIZE).floor() as i32 + 30,
         y: ((cursor_pos.y - level_transform.translation.y) / TILE_SIZE).floor() as i32 + 29,
     };
-
-    info!("Calculated grid position: {:?}", grid_pos);
 
     // Collect all blocked grid coordinates
     let blocked_coords: HashSet<GridCoords> = colliders.iter().cloned().collect();
 
     // Set target for each selected unit
     for (entity, grid_coords) in selected_units.iter() {
-        info!("Selected unit at grid: {:?}", grid_coords);
+        // Don't create a path if clicking on the same cell
+        if grid_coords.x == grid_pos.x && grid_coords.y == grid_pos.y {
+            continue;
+        }
 
         if let Ok(mut move_target) = unit_targets.get_mut(entity) {
-            // Don't create a path if clicking on the same cell
-            if grid_coords.x == grid_pos.x && grid_coords.y == grid_pos.y {
-                continue;
-            }
-
             // Use A* to find a path avoiding obstacles
             move_target.destination = Some(grid_pos);
             let path = a_star_pathfinding(grid_coords, &grid_pos, &blocked_coords);
-            info!("Path found: {:?}", path);
             move_target.path = path;
+
+            // If we're starting new movement, remove any gathering intent
+            commands.entity(entity).remove::<GatheringIntent>();
         }
     }
 }

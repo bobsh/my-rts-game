@@ -2,7 +2,8 @@ use bevy::prelude::*;
 use crate::components::inventory::*;
 use crate::components::unit::Selected;
 use crate::components::unit::Selectable;
-use crate::components::movement::{Movable, MoveTarget};
+use crate::components::movement::{Movable, MoveTarget, Moving};
+use bevy_ecs_ldtk::prelude::GridCoords; // Import GridCoords directly
 use crate::components::ui::EntityInfoPanel;
 use crate::components::skills::{Skills, SkillProgression};
 use crate::entities::{Tree, Mine, Quarry};
@@ -13,6 +14,7 @@ impl Plugin for ResourceGatheringPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Update, gather_resources)
            .add_systems(Update, start_gathering)
+           .add_systems(Update, check_gathering_proximity)
            .add_systems(Update, update_skills_from_activities)
            .add_systems(Update, update_character_info_ui)
            .add_systems(Update, handle_resource_transfer);
@@ -27,6 +29,13 @@ pub struct Gathering {
     pub target: Entity,
     pub base_time: f32,
     pub skill_modifier: f32,
+}
+
+// New component to track gathering intent
+#[derive(Component, Debug)]
+pub struct GatheringIntent {
+    pub target: Entity,
+    pub resource_type: ResourceType,
 }
 
 // Simplified character marker
@@ -62,7 +71,6 @@ fn gather_resources(
                             _quarries.contains(gathering.target);
 
         if !target_exists {
-            info!("Resource node {:?} no longer exists, stopping gathering", gathering.target);
             commands.entity(entity).remove::<Gathering>();
             continue;
         }
@@ -95,7 +103,7 @@ fn gather_resources(
 
             if overflow == 0 {
                 gathering.progress = 0.0;
-                info!("Gathered {} {:?}, continuing to gather", total_yield, resource_type);
+                info!("Gathered {} {:?}", total_yield, resource_type);
             } else {
                 info!("Inventory full, stopping gathering");
                 commands.entity(entity).remove::<Gathering>();
@@ -104,56 +112,39 @@ fn gather_resources(
     }
 }
 
+// This system adds a GatheringIntent component and sets up movement to the resource
 fn start_gathering(
     mut commands: Commands,
     mouse_button: Res<ButtonInput<MouseButton>>,
     windows: Query<&Window>,
     camera_q: Query<(&Camera, &GlobalTransform)>,
-    selected_characters: Query<(Entity, &Skills), With<Selected>>,
-    all_characters: Query<(Entity, Option<&Selected>), With<Skills>>,
-    resource_nodes: Query<(Entity, &GlobalTransform, &Sprite), Or<(With<Tree>, With<Mine>, With<Quarry>)>>,
-    trees: Query<Entity, With<Tree>>,
-    mines: Query<Entity, With<Mine>>,
-    _quarries: Query<Entity, With<Quarry>>,
+    selected_characters: Query<(Entity, &Skills, &GridCoords), With<Selected>>,
+    mut move_targets: Query<&mut MoveTarget>,
+    resource_nodes: Query<(Entity, &GlobalTransform, &Sprite, Option<&Tree>, Option<&Mine>, Option<&Quarry>)>,
 ) {
     if !mouse_button.just_pressed(MouseButton::Right) {
         return;
     }
 
-    info!("Right-click detected");
-
-    info!("All characters and their selection status:");
-    for (entity, selected) in all_characters.iter() {
-        info!("Character {:?} - Selected: {}", entity, selected.is_some());
-    }
-
-    let Some((character_entity, skills)) = selected_characters.iter().next() else {
-        info!("No character selected");
-        return;
-    };
-
-    info!("Character {:?} is selected", character_entity);
-
     let window = windows.single();
     let Some(cursor_position) = window.cursor_position() else {
-        info!("Could not get cursor position");
         return;
     };
 
     let (camera, camera_transform) = camera_q.single();
     let Ok(cursor_ray) = camera.viewport_to_world(camera_transform, cursor_position) else {
-        info!("Could not convert cursor position to world coordinates");
         return;
     };
 
     let cursor_pos = cursor_ray.origin.truncate();
-    info!("Clicked at world position: {:?}", cursor_pos);
 
-    for (node_entity, transform, sprite) in &resource_nodes {
+    let Some((character_entity, skills, _)) = selected_characters.iter().next() else {
+        return;
+    };
+
+    for (node_entity, transform, sprite, is_tree, is_mine, is_quarry) in &resource_nodes {
         let size = sprite.custom_size.unwrap_or(Vec2::new(64.0, 64.0));
-
         let pos = transform.translation().truncate();
-        info!("Resource node {:?} at position: {:?} with size: {:?}", node_entity, pos, size);
 
         let min_x = pos.x - size.x / 2.0;
         let max_x = pos.x + size.x / 2.0;
@@ -162,29 +153,74 @@ fn start_gathering(
 
         if cursor_pos.x >= min_x && cursor_pos.x <= max_x &&
            cursor_pos.y >= min_y && cursor_pos.y <= max_y {
-            info!("Clicked on resource node {:?}", node_entity);
 
-            let (resource_type, skill_value) = if trees.contains(node_entity) {
-                info!("It's a tree");
-                (ResourceType::Wood, skills.woodcutting)
-            } else if mines.contains(node_entity) {
-                info!("It's a mine");
-                (ResourceType::Gold, skills.mining)
+            let resource_type = if is_tree.is_some() {
+                ResourceType::Wood
+            } else if is_mine.is_some() {
+                ResourceType::Gold
             } else {
-                info!("It's a quarry");
-                (ResourceType::Stone, skills.harvesting)
+                ResourceType::Stone
             };
 
-            info!("Starting gathering for character {:?} at resource node {:?}", character_entity, node_entity);
-            commands.entity(character_entity).insert(Gathering {
+            let skill_value = match resource_type {
+                ResourceType::Wood => skills.woodcutting,
+                ResourceType::Gold => skills.mining,
+                ResourceType::Stone => skills.harvesting,
+            };
+
+            commands.entity(character_entity).insert(GatheringIntent {
+                target: node_entity, // Remove the * operator
                 resource_type,
-                progress: 0.0,
-                target: node_entity,
-                base_time: 3.0,
-                skill_modifier: skill_value,
             });
 
+            commands.entity(character_entity).remove::<Gathering>();
+
+            if let Ok(mut move_target) = move_targets.get_mut(character_entity) {
+                move_target.destination = Some(GridCoords {
+                    x: (pos.x / 64.0).round() as i32,
+                    y: (pos.y / 64.0).round() as i32,
+                });
+
+                move_target.path.clear();
+            }
+
+            info!("Moving to gather from {:?}", resource_type);
             break;
+        }
+    }
+}
+
+// This system checks if characters with GatheringIntent are close enough to start gathering
+fn check_gathering_proximity(
+    mut commands: Commands,
+    characters: Query<(Entity, &GlobalTransform, &GatheringIntent, &Skills), (Without<Gathering>, Without<Moving>)>,
+    resources: Query<&GlobalTransform>,
+) {
+    const GATHERING_RANGE: f32 = 100.0;
+
+    for (entity, transform, intent, skills) in &characters {
+        if let Ok(resource_transform) = resources.get(intent.target) {
+            let distance = transform.translation().distance(resource_transform.translation());
+
+            if distance <= GATHERING_RANGE {
+                let skill_value = match intent.resource_type {
+                    ResourceType::Wood => skills.woodcutting,
+                    ResourceType::Gold => skills.mining,
+                    ResourceType::Stone => skills.harvesting,
+                };
+
+                commands.entity(entity).insert(Gathering {
+                    resource_type: intent.resource_type,
+                    progress: 0.0,
+                    target: intent.target,
+                    base_time: 3.0,
+                    skill_modifier: skill_value,
+                });
+
+                commands.entity(entity).remove::<GatheringIntent>();
+
+                info!("Started gathering {:?}", intent.resource_type);
+            }
         }
     }
 }
@@ -232,13 +268,12 @@ fn update_character_info_ui(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     gathering_query: Query<&Gathering>,
+    gathering_intent_query: Query<&GatheringIntent>,
 ) {
     if let Ok(panel_entity) = panel_query.get_single() {
         commands.entity(panel_entity).despawn_descendants();
 
         if let Ok((entity, skills, inventory)) = selected_entities.get_single() {
-            info!("Updating UI for entity: {:?}, has inventory: {}", entity, inventory.is_some());
-
             commands.entity(panel_entity).with_children(|parent| {
                 parent.spawn((
                     Text::new("Character Info"),
@@ -280,14 +315,36 @@ fn update_character_info_ui(
 
                 if let Ok(gathering) = gathering_query.get(entity) {
                     let progress_percent = (gathering.progress / gathering.base_time) * 100.0;
+                    let resource_name = match gathering.resource_type {
+                        ResourceType::Gold => "Gold",
+                        ResourceType::Wood => "Wood",
+                        ResourceType::Stone => "Stone",
+                    };
+
                     parent.spawn((
-                        Text::new(format!("Gathering: {:.1}%", progress_percent)),
+                        Text::new(format!("Gathering {}: {:.1}%", resource_name, progress_percent)),
                         TextFont {
                             font: asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf"),
                             font_size: 14.0,
                             ..default()
                         },
-                        TextColor(Color::WHITE),
+                        TextColor(Color::rgb(0.0, 1.0, 0.0)), // Fix GREEN color
+                    ));
+                } else if let Ok(intent) = gathering_intent_query.get(entity) {
+                    let resource_name = match intent.resource_type {
+                        ResourceType::Gold => "Gold",
+                        ResourceType::Wood => "Wood",
+                        ResourceType::Stone => "Stone",
+                    };
+
+                    parent.spawn((
+                        Text::new(format!("Moving to gather {}", resource_name)),
+                        TextFont {
+                            font: asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf"),
+                            font_size: 14.0,
+                            ..default()
+                        },
+                        TextColor(Color::rgb(1.0, 1.0, 0.0)), // Fix YELLOW color
                     ));
                 }
 
@@ -358,7 +415,9 @@ fn handle_resource_transfer(
     camera_q: Query<(&Camera, &GlobalTransform)>,
 ) {
     if keyboard.pressed(KeyCode::KeyT) && mouse_button.just_pressed(MouseButton::Right) {
-        if let Ok((selected_entity, mut selected_inventory, _selected_settings)) = selected_entity.get_single_mut() {
+        if let Ok((_selected_entity, mut selected_inventory, _selected_settings)) = selected_entity.get_single_mut() {
+            // Add underscore to fix unused variable warning
+
             let window = windows.single();
             if let Some(cursor_position) = window.cursor_position() {
                 let (camera, camera_transform) = camera_q.single();

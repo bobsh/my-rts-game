@@ -58,22 +58,22 @@ fn start_construction(
     mut commands: Commands,
     keyboard: Res<ButtonInput<KeyCode>>,
     mouse_button: Res<ButtonInput<MouseButton>>,
-    mut selected_builders: Query<(Entity, &Skills, &mut Inventory, &InventorySettings), With<Selected>>, // Make mutable
+    mut selected_builders: Query<(Entity, &Skills, &mut Inventory, &InventorySettings), With<Selected>>,
     windows: Query<&Window>,
     camera_q: Query<(&Camera, &GlobalTransform)>,
 ) {
     if keyboard.pressed(KeyCode::KeyB) && mouse_button.just_pressed(MouseButton::Left) {
         // Get the selected builder
-        if let Ok((builder_entity, skills, mut inventory, _settings)) = selected_builders.get_single_mut() { // Prefix with underscore
+        if let Ok((builder_entity, skills, mut inventory, _settings)) = selected_builders.get_single_mut() {
             // Get construction skill
             let construction_skill = skills.construction;
 
             // Get cursor position for placement
             let window = windows.single();
-            if let Some(_cursor_pos) = window.cursor_position() { // Prefix with underscore
+            if let Some(_cursor_pos) = window.cursor_position() {
                 let (camera, camera_transform) = camera_q.single();
                 if let Ok(cursor_ray) = camera.viewport_to_world(camera_transform, _cursor_pos) {
-                    let cursor_pos = cursor_ray.origin.truncate();
+                    let _cursor_pos = cursor_ray.origin.truncate();
 
                     // Determine building type (using keyboard modifier keys)
                     let building_type = if keyboard.pressed(KeyCode::ShiftLeft) {
@@ -122,7 +122,7 @@ fn process_construction(
     mut commands: Commands,
     time: Res<Time>,
     mut builders: Query<(Entity, &mut Constructing, &mut Skills, &mut SkillProgression)>,
-    _asset_server: Res<AssetServer>, // Prefix with underscore
+    _asset_server: Res<AssetServer>,
 ) {
     for (entity, mut constructing, mut skills, mut progression) in &mut builders {
         constructing.progress += time.delta_secs();
@@ -151,12 +151,12 @@ fn process_construction(
 // Update construction UI
 fn update_construction_ui(
     construction_query: Query<(Entity, &Constructing), With<Selected>>,
-    mut panel_query: Query<Entity, With<EntityInfoPanel>>,
+    panel_query: Query<Entity, With<EntityInfoPanel>>,
     mut commands: Commands,
-    _asset_server: Res<AssetServer>, // Prefix with underscore
+    _asset_server: Res<AssetServer>,
 ) {
     if let Ok(panel_entity) = panel_query.get_single() {
-        if let Ok((entity, constructing)) = construction_query.get_single() {
+        if let Ok((_entity, constructing)) = construction_query.get_single() {
             let progress_percent = (constructing.progress / constructing.required_time) * 100.0;
 
             commands.entity(panel_entity).with_children(|parent| {
