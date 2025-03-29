@@ -7,12 +7,10 @@ pub struct MovementPlugin;
 
 impl Plugin for MovementPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, (
-            handle_movement_input,
-            update_movement,
-            calculate_path,
-            move_along_path
-        ).chain());
+        app.add_systems(Update, handle_movement_input)
+           .add_systems(Update, update_movement.after(handle_movement_input))
+           .add_systems(Update, calculate_path.after(handle_movement_input))
+           .add_systems(Update, move_along_path.after(calculate_path));
     }
 }
 
@@ -24,10 +22,10 @@ fn handle_movement_input(
     selected_units: Query<(Entity, &GridCoords), With<crate::components::unit::Selected>>,
     mut move_targets: Query<&mut MoveTarget>,
     ldtk_tile_query: Query<&GridCoords, With<crate::components::movement::Collider>>,
-    resource_gathering_system: Option<Res<crate::systems::resource_gathering::Gathering>>,
+    gatherers: Query<(), With<crate::systems::resource_gathering::Gathering>>,
 ) {
     // Only process right-click inputs when not already gathering resources
-    if !mouse_button.just_pressed(MouseButton::Right) || resource_gathering_system.is_some() {
+    if !mouse_button.just_pressed(MouseButton::Right) || !gatherers.is_empty() {
         return;
     }
 
