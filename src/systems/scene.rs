@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
-
+use crate::systems::ldtk_calibration::LdtkCalibration;
 use crate::components::unit::Selected;
 
 pub struct ScenePlugin;
@@ -15,7 +15,8 @@ impl Plugin for ScenePlugin {
                 ..Default::default()
             })
             .add_systems(Update, level_selection_follow_player)
-            .add_systems(Startup, setup_scene);
+            .add_systems(Startup, setup_scene)
+            .add_systems(Startup, initialize_ldtk_offset);
     }
 }
 
@@ -29,6 +30,13 @@ pub fn setup_scene(mut commands: Commands, asset_server: Res<AssetServer>) {
         ldtk_handle: map_handle.into(),
         ..Default::default()
     });
+}
+
+// Add this new system to initialize the LDtk offset
+fn initialize_ldtk_offset(mut ldtk_calibration: ResMut<LdtkCalibration>) {
+    // You can experiment with different initial values
+    // These values will offset the entire world
+    ldtk_calibration.offset = Vec2::new(0.0, 0.0);
 }
 
 fn level_selection_follow_player(

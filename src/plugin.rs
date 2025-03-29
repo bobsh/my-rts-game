@@ -13,7 +13,8 @@ use crate::systems::scene::ScenePlugin;
 use crate::systems::selection::SelectionPlugin;
 use crate::systems::ui::UiPlugin;
 use crate::systems::window::WindowPlugin;
-use crate::systems::construction::ConstructionPlugin; // Ensure this is imported
+use crate::systems::construction::ConstructionPlugin;
+use crate::systems::ldtk_calibration::LdtkCalibrationPlugin; // Add this import
 
 pub struct RtsPlugin;
 
@@ -24,6 +25,7 @@ impl Plugin for RtsPlugin {
                 WorldInspectorPlugin::new().run_if(input_toggle_active(false, KeyCode::F10)),
             )
             .add_plugins(EntitiesPlugin)
+            .add_plugins(LdtkCalibrationPlugin) // Add this plugin first so its transforms take effect
             .add_plugins(MovementPlugin)
             .add_plugins(ResourceGatheringPlugin)
             .add_plugins(ConstructionPlugin)

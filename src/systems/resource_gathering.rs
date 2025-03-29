@@ -7,6 +7,7 @@ use bevy_ecs_ldtk::prelude::GridCoords;
 use crate::components::ui::EntityInfoPanel;
 use crate::components::skills::{Skills, SkillProgression};
 use crate::entities::{Tree, Mine, Quarry};
+use crate::systems::ldtk_calibration::LdtkCalibration;
 
 pub struct ResourceGatheringPlugin;
 
@@ -122,7 +123,7 @@ fn start_gathering(
     mut move_targets: Query<&mut MoveTarget>,
     resource_nodes: Query<(Entity, &GlobalTransform, &Sprite, Option<&Tree>, Option<&Mine>, Option<&Quarry>)>,
     gathering_intent_query: Query<&GatheringIntent>,
-    offset: Res<crate::systems::movement::CoordinateOffset>, // Add the offset resource
+    ldtk_calibration: Res<LdtkCalibration>, // Use LdtkCalibration instead of offset
 ) {
     if !mouse_button.just_pressed(MouseButton::Right) {
         return;
@@ -194,9 +195,12 @@ fn start_gathering(
             commands.entity(character_entity).remove::<Gathering>();
 
             if let Ok(mut move_target) = move_targets.get_mut(character_entity) {
+                // Convert resource position to grid coordinates, accounting for the world transform
+                let world_to_grid_pos = pos - ldtk_calibration.offset;
+
                 let resource_grid = GridCoords {
-                    x: ((pos.x + offset.x) / 64.0).round() as i32, // Apply the same offset here
-                    y: ((pos.y + offset.y) / 64.0).round() as i32, // Apply the same offset here
+                    x: (world_to_grid_pos.x / 64.0).round() as i32,
+                    y: (world_to_grid_pos.y / 64.0).round() as i32,
                 };
 
                 let character_grid = character_coords;
