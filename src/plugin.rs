@@ -25,6 +25,7 @@ impl Plugin for RtsPlugin {
             .add_plugins(EntitiesPlugin)
             .add_plugins(MovementPlugin)
             .add_plugins(ResourceGatheringPlugin)
+            .add_plugins(ConstructionPlugin)
             .add_plugins(InventoryPlugin)
             .add_plugins(CameraPlugin)
             .add_plugins(WindowPlugin)

@@ -130,4 +130,27 @@ impl Inventory {
             })
             .sum()
     }
+
+    // Add a method to get capacity information
+    pub fn capacity_info(&self) -> (usize, usize) {
+        let used = self.slots.iter().filter(|slot| slot.is_some()).count();
+        (used, self.max_slots)
+    }
+
+    // Add a simple item transfer system
+    pub fn transfer_to(&mut self, other: &mut Inventory, resource_type: ResourceType, quantity: u32, max_stack: u32) -> u32 {
+        // First remove from this inventory
+        let removed = self.remove_resource(resource_type, quantity);
+
+        // Then add to the other inventory
+        let overflow = other.add_resource(resource_type, removed, max_stack);
+
+        // If there was overflow, add it back to original inventory
+        if overflow > 0 {
+            self.add_resource(resource_type, overflow, max_stack);
+        }
+
+        // Return how much was successfully transferred
+        removed - overflow
+    }
 }
