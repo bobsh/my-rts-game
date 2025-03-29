@@ -21,8 +21,8 @@ impl Plugin for ScenePlugin {
 }
 
 pub fn setup_scene(mut commands: Commands, asset_server: Res<AssetServer>) {
-    // Adjust camera position to better view the map with our new offset
-    commands.spawn((Camera2d, Transform::from_xyz(1800.0, 1800.0, 0.0)));
+    // Return to the original camera position
+    commands.spawn((Camera2d, Transform::from_xyz(0.0, 0.0, 0.0)));
 
     // Load the ldtk map file
     let map_handle = asset_server.load("test-map.ldtk");
@@ -33,12 +33,11 @@ pub fn setup_scene(mut commands: Commands, asset_server: Res<AssetServer>) {
     });
 }
 
-// Add this new system to initialize the LDtk offset
+// Initialize with a conservative offset - the user can adjust using Shift+O+Arrow keys
 fn initialize_ldtk_offset(mut ldtk_calibration: ResMut<LdtkCalibration>) {
-    // Hard-code a significant offset to fix the positioning issue
-    // Using 37 blocks × 64 pixels/block = 2368 for both x and y
-    ldtk_calibration.offset = Vec2::new(2368.0, 2368.0);
-    info!("Initialized LDtk with HARD-CODED offset: {:?}", ldtk_calibration.offset);
+    // Starting with an offset of 0.0, to be adjusted by the user
+    ldtk_calibration.offset = Vec2::ZERO;
+    info!("Initialized LDtk with ZERO offset. Use Shift+O+Arrow keys to adjust if needed");
 }
 
 fn level_selection_follow_player(

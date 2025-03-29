@@ -24,7 +24,7 @@ fn handle_movement_input(
     mut move_targets: Query<&mut MoveTarget>,
     ldtk_tile_query: Query<&GridCoords, With<crate::components::movement::Collider>>,
     gatherers: Query<(), With<crate::systems::resource_gathering::Gathering>>,
-    ldtk_calibration: Res<LdtkCalibration>, // Use LdtkCalibration instead
+    ldtk_calibration: Res<LdtkCalibration>,
 ) {
     // Only process right-click inputs when not already gathering resources
     if !mouse_button.just_pressed(MouseButton::Right) || !gatherers.is_empty() {
@@ -48,15 +48,14 @@ fn handle_movement_input(
     info!("Raw cursor world position: {:?}", cursor_world_pos);
 
     // We need to convert the world position to grid coordinates in the LDtk space
-    // This is a critical change - we need to account for the world transform offset
     let world_to_grid_pos = cursor_world_pos - ldtk_calibration.offset;
 
     info!("Adjusted cursor world position: {:?}", world_to_grid_pos);
 
-    // Convert to grid coordinates
+    // Convert to grid coordinates - use floor instead of round for more predictable results
     let target_grid = GridCoords {
-        x: (world_to_grid_pos.x / 64.0).round() as i32,
-        y: (world_to_grid_pos.y / 64.0).round() as i32,
+        x: (world_to_grid_pos.x / 64.0).floor() as i32,
+        y: (world_to_grid_pos.y / 64.0).floor() as i32,
     };
 
     info!("Target grid coordinates: {:?}", target_grid);
@@ -71,7 +70,7 @@ fn handle_movement_input(
         let dy = target_grid.y - current_pos.y;
         let distance = ((dx * dx + dy * dy) as f32).sqrt();
 
-        info!("Movement distance: {:.1} grid cells ", distance);
+        info!("Movement distance: {:.1} grid cells", distance);
 
         // If the distance is too large, exit early
         if distance > 30.0 {
@@ -254,7 +253,6 @@ fn update_movement(
     mut query: Query<(Entity, &mut Transform, &mut Moving, &Movable)>,
     mut grid_coords: Query<&mut GridCoords>,
     time: Res<Time>,
-    ldtk_calibration: Res<LdtkCalibration>, // Add this
 ) {
     for (entity, mut transform, mut moving, movable) in &mut query {
         // Update progress
@@ -264,13 +262,14 @@ fn update_movement(
             // Movement complete
             transform.translation = moving.to;
 
-            // Update grid coordinates - this is where we need to be careful
+            // Update grid coordinates based on the target position directly
+            // This eliminates any potential for rounding errors
             if let Ok(mut coords) = grid_coords.get_mut(entity) {
-                // We need to convert the world position back to grid, taking into account the offset
-                let world_to_grid_pos = Vec2::new(moving.to.x, moving.to.y) - ldtk_calibration.offset;
+                // Calculate grid coords based on absolute world position / tile size
+                // Without using any offset conversion during movement
                 *coords = GridCoords {
-                    x: (world_to_grid_pos.x / 64.0).round() as i32,
-                    y: (world_to_grid_pos.y / 64.0).round() as i32,
+                    x: (moving.to.x / 64.0).floor() as i32,
+                    y: (moving.to.y / 64.0).floor() as i32,
                 };
             }
 

@@ -11,6 +11,7 @@ pub struct LdtkCalibration {
 impl Default for LdtkCalibration {
     fn default() -> Self {
         Self {
+            // Start with zero offset and let manual calibration find the correct value
             offset: Vec2::ZERO,
         }
     }
