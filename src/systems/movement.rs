@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 use crate::components::movement::{Movable, MoveTarget, Moving};
 use bevy_ecs_ldtk::prelude::*;
+use pathfinding::prelude::astar;
 
 pub struct MovementPlugin;
 
