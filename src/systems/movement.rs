@@ -8,10 +8,65 @@ pub struct MovementPlugin;
 impl Plugin for MovementPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Update, (
+            handle_movement_input,  // New system for handling input
             update_movement,
             calculate_path,
             move_along_path
         ).chain());
+    }
+}
+
+// New system to handle right-click movement input
+fn handle_movement_input(
+    mouse_button: Res<ButtonInput<MouseButton>>,
+    windows: Query<&Window>,
+    camera_q: Query<(&Camera, &GlobalTransform)>,
+    selected_units: Query<(Entity, &GridCoords), With<crate::components::unit::Selected>>,
+    mut move_targets: Query<&mut MoveTarget>,
+    ldtk_tile_query: Query<&GridCoords>,
+) {
+    // Only process right-click inputs
+    if !mouse_button.just_pressed(MouseButton::Right) {
+        return;
+    }
+
+    let window = windows.single();
+    let Some(cursor_position) = window.cursor_position() else {
+        return;
+    };
+
+    let (camera, camera_transform) = camera_q.single();
+    let Ok(cursor_ray) = camera.viewport_to_world(camera_transform, cursor_position) else {
+        return;
+    };
+
+    // Convert cursor world position to grid coordinates
+    let cursor_world_pos = cursor_ray.origin.truncate();
+    let target_grid = GridCoords {
+        x: (cursor_world_pos.x / 64.0).round() as i32,
+        y: (cursor_world_pos.y / 64.0).round() as i32,
+    };
+
+    // Check if the target position is occupied
+    let is_occupied = ldtk_tile_query.iter().any(|tile_pos| {
+        tile_pos.x == target_grid.x && tile_pos.y == target_grid.y
+    });
+
+    if !is_occupied {
+        // Set destination for all selected units
+        for (entity, _) in selected_units.iter() {
+            if let Ok(mut move_target) = move_targets.get_mut(entity) {
+                // Clear any existing path
+                move_target.path.clear();
+                // Set the new destination
+                move_target.destination = Some(target_grid);
+                info!("Setting movement destination to {:?} for entity {:?}", target_grid, entity);
+            } else {
+                info!("Selected entity {:?} has no MoveTarget component", entity);
+            }
+        }
+    } else {
+        info!("Target position {:?} is occupied", target_grid);
     }
 }
 
@@ -103,7 +158,6 @@ fn move_along_path(
                 current_pos.y as f32 * 64.0,
                 0.0
             );
-
             let next_world_pos = Vec3::new(
                 next_pos.x as f32 * 64.0,
                 next_pos.y as f32 * 64.0,
