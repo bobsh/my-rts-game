@@ -5,6 +5,7 @@ use bevy_ecs_ldtk::prelude::*;
 use crate::components::movement::{Collider, Movable, MoveTarget};
 use crate::components::unit::Selectable;
 use crate::components::inventory::{Inventory, InventorySettings};
+use crate::components::skills::{Skills, SkillProgression};
 
 pub struct EntitiesPlugin;
 
@@ -22,6 +23,10 @@ struct WarriorBundle {
     grid_coords: GridCoords,
     movable: Movable,
     move_target: MoveTarget,
+    inventory: Inventory,
+    inventory_settings: InventorySettings,
+    skills: Skills,
+    skill_progression: SkillProgression,
 }
 
 #[derive(Default, Component)]

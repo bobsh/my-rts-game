@@ -4,8 +4,8 @@ use crate::components::unit::Selected;
 use crate::components::unit::Selectable;
 use crate::components::movement::{Movable, MoveTarget};
 use crate::components::ui::EntityInfoPanel;
+use crate::components::skills::{Skills, SkillProgression};
 use crate::entities::{Tree, Mine, Quarry};
-use bevy_ecs_ldtk::{LdtkEntity, GridCoords};
 
 pub struct ResourceGatheringPlugin;
 
@@ -26,54 +26,6 @@ pub struct Gathering {
     pub target: Entity,
     pub base_time: f32,          // Base time in seconds
     pub skill_modifier: f32,    // Higher skill = faster gathering
-}
-
-// Skills component
-#[derive(Component, Debug, Clone)]
-pub struct Skills {
-    pub mining: f32,        // Effectiveness at mining
-    pub woodcutting: f32,   // Effectiveness at cutting trees
-    pub harvesting: f32,    // Effectiveness at harvesting resources
-    pub combat: f32,        // Combat effectiveness
-    pub construction: f32,  // Building construction speed
-    pub crafting: f32,      // Item crafting quality
-}
-
-impl Default for Skills {
-    fn default() -> Self {
-        Self {
-            mining: 1.0,
-            woodcutting: 1.0,
-            harvesting: 1.0,
-            combat: 1.0,
-            construction: 1.0,
-            crafting: 1.0,
-        }
-    }
-}
-
-// Experience gain component
-#[derive(Component, Debug)]
-pub struct SkillProgression {
-    pub mining_xp: f32,
-    pub woodcutting_xp: f32,
-    pub harvesting_xp: f32,
-    pub combat_xp: f32,
-    pub construction_xp: f32,
-    pub crafting_xp: f32,
-}
-
-impl Default for SkillProgression {
-    fn default() -> Self {
-        Self {
-            mining_xp: 0.0,
-            woodcutting_xp: 0.0,
-            harvesting_xp: 0.0,
-            combat_xp: 0.0,
-            construction_xp: 0.0,
-            crafting_xp: 0.0,
-        }
-    }
 }
 
 // Simplified character marker
@@ -99,8 +51,8 @@ fn gather_resources(
     time: Res<Time>,
     mut gatherers: Query<(Entity, &mut Gathering, &mut Inventory, &InventorySettings, &Skills)>,
     mut skill_progression: Query<&mut SkillProgression>,
-    trees: Query<Entity, With<Tree>>,
-    mines: Query<Entity, With<Mine>>,
+    _trees: Query<Entity, With<Tree>>,
+    _mines: Query<Entity, With<Mine>>,
     _quarries: Query<Entity, With<Quarry>>,
 ) {
     for (entity, mut gathering, mut inventory, settings, skills) in &mut gatherers {
@@ -283,12 +235,17 @@ fn update_skills_from_activities(
 // System to update character info UI
 fn update_character_info_ui(
     selected_entities: Query<(Entity, &Skills, Option<&Inventory>), With<Selected>>,
-    mut panel_query: Query<Entity, With<EntityInfoPanel>>,
+    panel_query: Query<Entity, With<EntityInfoPanel>>,
     mut commands: Commands,
     asset_server: Res<AssetServer>,
 ) {
     if let Ok(panel_entity) = panel_query.get_single() {
+        // First, clear any existing UI in the panel
+        commands.entity(panel_entity).despawn_descendants();
+
         if let Ok((entity, skills, inventory)) = selected_entities.get_single() {
+            info!("Updating UI for entity: {:?}, has inventory: {}", entity, inventory.is_some());
+
             commands.entity(panel_entity).with_children(|parent| {
                 // Title
                 parent.spawn((
@@ -362,8 +319,26 @@ fn update_character_info_ui(
                                 TextFont { font: asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf"), font_size: 14.0, ..default() },
                                 TextColor(Color::WHITE),
                             ));
+                        } else {
+                            // Show empty slots too
+                            parent.spawn((
+                                Text::new(format!("Slot {}: Empty", i + 1)),
+                                TextFont { font: asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf"), font_size: 14.0, ..default() },
+                                TextColor(Color::srgba(0.7, 0.7, 0.7, 1.0)),
+                            ));
                         }
                     }
+                } else {
+                    // Show a message if no inventory
+                    parent.spawn((
+                        Text::new("No inventory available"),
+                        TextFont {
+                            font: asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf"),
+                            font_size: 14.0,
+                            ..default()
+                        },
+                        TextColor(Color::srgba(0.9, 0.3, 0.3, 1.0)),
+                    ));
                 }
             });
         }
