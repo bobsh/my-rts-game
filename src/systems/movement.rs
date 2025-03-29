@@ -5,12 +5,64 @@ use pathfinding::prelude::astar;
 
 pub struct MovementPlugin;
 
+// Add a resource to store coordinate offsets that can be adjusted at runtime
+#[derive(Resource)]
+pub struct CoordinateOffset {
+    pub x: f32,
+    pub y: f32,
+}
+
+impl Default for CoordinateOffset {
+    fn default() -> Self {
+        Self {
+            x: 0.0,
+            y: 0.0
+        }
+    }
+}
+
 impl Plugin for MovementPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, handle_movement_input)
+        app.init_resource::<CoordinateOffset>()
+           .add_systems(Update, handle_movement_input)
            .add_systems(Update, update_movement.after(handle_movement_input))
            .add_systems(Update, calculate_path.after(handle_movement_input))
-           .add_systems(Update, move_along_path.after(calculate_path));
+           .add_systems(Update, move_along_path.after(calculate_path))
+           .add_systems(Update, adjust_coordinate_offset_debug); // Add a debug system to adjust offsets
+    }
+}
+
+// Debug system to adjust coordinate offset with keyboard
+fn adjust_coordinate_offset_debug(
+    keys: Res<ButtonInput<KeyCode>>,
+    mut offset: ResMut<CoordinateOffset>
+) {
+    // Only active in debug mode with Shift key held
+    if keys.pressed(KeyCode::ShiftLeft) {
+        if keys.pressed(KeyCode::KeyO) { // O for "Offset"
+            if keys.pressed(KeyCode::ArrowLeft) {
+                offset.x -= 1.0;
+                info!("Offset X: {}, Y: {}", offset.x, offset.y);
+            }
+            if keys.pressed(KeyCode::ArrowRight) {
+                offset.x += 1.0;
+                info!("Offset X: {}, Y: {}", offset.x, offset.y);
+            }
+            if keys.pressed(KeyCode::ArrowUp) {
+                offset.y += 1.0;
+                info!("Offset X: {}, Y: {}", offset.x, offset.y);
+            }
+            if keys.pressed(KeyCode::ArrowDown) {
+                offset.y -= 1.0;
+                info!("Offset X: {}, Y: {}", offset.x, offset.y);
+            }
+            // Reset to zero with R
+            if keys.just_pressed(KeyCode::KeyR) {
+                offset.x = 0.0;
+                offset.y = 0.0;
+                info!("Offset reset to zero");
+            }
+        }
     }
 }
 
@@ -23,6 +75,7 @@ fn handle_movement_input(
     mut move_targets: Query<&mut MoveTarget>,
     ldtk_tile_query: Query<&GridCoords, With<crate::components::movement::Collider>>,
     gatherers: Query<(), With<crate::systems::resource_gathering::Gathering>>,
+    offset: Res<CoordinateOffset>, // Use the offset resource
 ) {
     // Only process right-click inputs when not already gathering resources
     if !mouse_button.just_pressed(MouseButton::Right) || !gatherers.is_empty() {
@@ -39,17 +92,24 @@ fn handle_movement_input(
         return;
     };
 
-    // Convert cursor world position to grid coordinates - FIXED
+    // Convert cursor world position to grid coordinates
     let cursor_world_pos = cursor_ray.origin.truncate();
 
     // Log raw position for debugging
     info!("Raw cursor world position: {:?}", cursor_world_pos);
 
-    // FIXED: Division by tile size (64.0) to get grid coordinates
-    // Using floor to properly handle negative coordinates
+    // IMPORTANT: Apply the coordinate offset before conversion to grid coordinates
+    let adjusted_world_pos = Vec2::new(
+        cursor_world_pos.x + offset.x,
+        cursor_world_pos.y + offset.y
+    );
+
+    info!("Adjusted cursor world position: {:?}", adjusted_world_pos);
+
+    // Use round instead of floor for more accurate positioning
     let target_grid = GridCoords {
-        x: (cursor_world_pos.x / 64.0).floor() as i32,
-        y: (cursor_world_pos.y / 64.0).floor() as i32,
+        x: (adjusted_world_pos.x / 64.0).round() as i32,
+        y: (adjusted_world_pos.y / 64.0).round() as i32,
     };
 
     info!("Target grid coordinates: {:?}", target_grid);
@@ -66,7 +126,7 @@ fn handle_movement_input(
 
         info!("Movement distance: {:.1} grid cells", distance);
 
-        // IMPROVED: Reduced maximum allowed distance to 30.0 (was 50.0)
+        // If the distance is too large, exit early
         if distance > 30.0 {
             info!("Movement distance too large ({}), ignoring click", distance);
             return;
@@ -81,7 +141,7 @@ fn handle_movement_input(
             if let Ok(mut move_target) = move_targets.get_mut(entity) {
                 // Clear any existing path
                 move_target.path.clear();
-                // Set the new destination
+                // Set the new destination - this is what was actually causing the incorrect movement!
                 move_target.destination = Some(target_grid);
                 info!("Setting movement destination to {:?} for entity {:?}", target_grid, entity);
             } else {
@@ -102,19 +162,26 @@ fn calculate_path(
 ) {
     for (entity, current_pos, mut move_target) in &mut query {
         if let Some(destination) = move_target.destination {
+            // CRITICAL: Check if the destination is a reasonable distance
+            // This ensures we don't process destinations set from other systems that are too far
+            let dx = destination.x - current_pos.x;
+            let dy = destination.y - current_pos.y;
+            let distance = ((dx * dx + dy * dy) as f32).sqrt();
+
+            // Enforce maximum distance limit for ALL movement, even from other systems
+            if distance > 30.0 {
+                info!("Path distance too large ({:.1}), canceling movement to {:?}", distance, destination);
+                move_target.destination = None;
+                continue;
+            }
+
             if move_target.path.is_empty() {
-                // Only recalculate if we don't already have a path
                 info!("Calculating path from {:?} to {:?}", current_pos, destination);
 
-                // Collect obstacles for debugging
-                let obstacle_positions: Vec<(i32, i32)> = obstacles
-                    .iter()
-                    .map(|pos| (pos.x, pos.y))
-                    .collect();
+                // Store obstacle positions for debugging
+                let obstacle_count = obstacles.iter().count();
+                info!("Found {} obstacles", obstacle_count);
 
-                info!("Found {} obstacles", obstacle_positions.len());
-
-                // IMPROVED: Modified the function to use more realistic boundaries
                 // Define a function to find neighboring grid positions
                 let neighbors = |pos: &GridCoords| {
                     let dirs = [
@@ -128,8 +195,7 @@ fn calculate_path(
                             y: pos.y + dy,
                         })
                         .filter(|next_pos| {
-                            // IMPROVED: Use a more reasonable boundary
-                            // Don't allow positions that are too far from the current position or destination
+                            // Use reasonable boundaries
                             const MAX_BOUND: i32 = 50;
                             let min_x = (current_pos.x - MAX_BOUND).min(destination.x - MAX_BOUND);
                             let max_x = (current_pos.x + MAX_BOUND).max(destination.x + MAX_BOUND);
@@ -187,87 +253,13 @@ fn calculate_path(
                         move_target.destination = None;
                     }
                 } else {
-                    // No path found - provide detailed debug info
                     info!("No path found to destination for entity {:?}", entity);
-                    info!("Start: {:?}, End: {:?}, Distance: {}",
-                        current_pos,
-                        destination,
-                        ((current_pos.x - destination.x).pow(2) + (current_pos.y - destination.y).pow(2)) as f32
-                    );
-
-                    // IMPROVED: Better fallback path with obstacle avoidance
-                    let direct_path = create_safer_direct_path(current_pos, &destination, &obstacles);
-
-                    // IMPROVED: Only use fallback path if it's reasonably short
-                    if direct_path.len() <= 30 {
-                        move_target.path = direct_path;
-                        info!("Using fallback path with {} steps", move_target.path.len());
-                    } else {
-                        // Path is too long, likely invalid - cancel movement
-                        move_target.destination = None;
-                        info!("Fallback path too long ({} steps), canceling movement", direct_path.len());
-                    }
+                    // Clear the destination if no path is found
+                    move_target.destination = None;
                 }
             }
         }
     }
-}
-
-// IMPROVED: Better direct path creation that includes basic obstacle avoidance
-fn create_safer_direct_path(start: &GridCoords, end: &GridCoords,
-                          obstacles: &Query<&GridCoords, With<crate::components::movement::Collider>>) -> Vec<GridCoords> {
-    let mut path = Vec::new();
-    let dx = end.x - start.x;
-    let dy = end.y - start.y;
-    let steps = dx.abs().max(dy.abs());
-
-    if steps == 0 {
-        return path;
-    }
-
-    let step_x = dx as f32 / steps as f32;
-    let step_y = dy as f32 / steps as f32;
-
-    // Keep track of points we've tried to avoid obstacles
-    let mut detour_points = Vec::new();
-
-    for i in 1..=steps {
-        let x = start.x + (step_x * i as f32).round() as i32;
-        let y = start.y + (step_y * i as f32).round() as i32;
-        let point = GridCoords { x, y };
-
-        // Check if this point is blocked by an obstacle
-        let is_blocked = obstacles.iter().any(|obstacle|
-            obstacle.x == point.x && obstacle.y == point.y
-        );
-
-        if is_blocked {
-            // Try to find a way around - check adjacent non-diagonal cells
-            let adjacent_points = [
-                GridCoords { x: point.x + 1, y: point.y },
-                GridCoords { x: point.x - 1, y: point.y },
-                GridCoords { x: point.x, y: point.y + 1 },
-                GridCoords { x: point.x, y: point.y - 1 },
-            ];
-
-            // Find the first non-blocked adjacent point
-            for adj_point in adjacent_points.iter() {
-                let adj_blocked = obstacles.iter().any(|obstacle|
-                    obstacle.x == adj_point.x && obstacle.y == adj_point.y
-                );
-
-                if !adj_blocked && !detour_points.contains(adj_point) {
-                    path.push(*adj_point);
-                    detour_points.push(*adj_point);
-                    break;
-                }
-            }
-        } else {
-            path.push(point);
-        }
-    }
-
-    path
 }
 
 // System to move along the calculated path

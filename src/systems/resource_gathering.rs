@@ -122,6 +122,7 @@ fn start_gathering(
     mut move_targets: Query<&mut MoveTarget>,
     resource_nodes: Query<(Entity, &GlobalTransform, &Sprite, Option<&Tree>, Option<&Mine>, Option<&Quarry>)>,
     gathering_intent_query: Query<&GatheringIntent>,
+    offset: Res<crate::systems::movement::CoordinateOffset>, // Add the offset resource
 ) {
     if !mouse_button.just_pressed(MouseButton::Right) {
         return;
@@ -194,8 +195,8 @@ fn start_gathering(
 
             if let Ok(mut move_target) = move_targets.get_mut(character_entity) {
                 let resource_grid = GridCoords {
-                    x: (pos.x / 64.0).round() as i32,
-                    y: (pos.y / 64.0).round() as i32,
+                    x: ((pos.x + offset.x) / 64.0).round() as i32, // Apply the same offset here
+                    y: ((pos.y + offset.y) / 64.0).round() as i32, // Apply the same offset here
                 };
 
                 let character_grid = character_coords;
@@ -221,6 +222,17 @@ fn start_gathering(
                         (dx * dx + dy * dy) as u32  // Squared distance
                     })
                     .unwrap_or(&resource_grid);  // Fallback to resource position if no approach found
+
+                // CRITICAL: Add distance check before setting destination
+                let dx = destination.x - character_grid.x;
+                let dy = destination.y - character_grid.y;
+                let distance = ((dx * dx + dy * dy) as f32).sqrt();
+
+                if distance > 30.0 {
+                    info!("Resource too far away (distance: {:.1}), cannot gather", distance);
+                    commands.entity(character_entity).remove::<GatheringIntent>();
+                    return;
+                }
 
                 move_target.destination = Some(*destination);
                 move_target.path.clear();
