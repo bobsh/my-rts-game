@@ -51,7 +51,7 @@ fn adjust_ldtk_offset(
             // Reset to zero with R
             if keys.just_pressed(KeyCode::KeyR) {
                 calibration.offset = Vec2::ZERO;
-                info!("LDtk Calibration reset to zero");
+                info!("LDtk Calibration reset to zero ");
             }
         }
     }
