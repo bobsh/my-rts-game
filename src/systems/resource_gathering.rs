@@ -48,19 +48,19 @@ pub struct CharacterBundle {
 
 // Update the gathering process to use target and skill_modifier
 fn gather_resources(
-    mut commands: Commands,
+    mut commands: Commands, // Make mutable
     time: Res<Time>,
     mut gatherers: Query<(Entity, &mut Gathering, &mut Inventory, &InventorySettings, &Skills)>,
     mut skill_progression: Query<&mut SkillProgression>,
     trees: Query<Entity, With<Tree>>,
     mines: Query<Entity, With<Mine>>,
-    quarries: Query<Entity, With<Quarry>>,
+    _quarries: Query<Entity, With<Quarry>>, // Prefix with underscore
 ) {
     for (entity, mut gathering, mut inventory, settings, skills) in &mut gatherers {
         // Verify target still exists
         let target_exists = trees.contains(gathering.target) ||
                             mines.contains(gathering.target) ||
-                            quarries.contains(gathering.target);
+                            _quarries.contains(gathering.target);
 
         if !target_exists {
             info!("Resource node {:?} no longer exists, stopping gathering", gathering.target);
@@ -123,7 +123,7 @@ fn start_gathering(
     resource_nodes: Query<(Entity, &GlobalTransform, &Sprite), Or<(With<Tree>, With<Mine>, With<Quarry>)>>,
     trees: Query<Entity, With<Tree>>,
     mines: Query<Entity, With<Mine>>,
-    quarries: Query<Entity, With<Quarry>>,
+    _quarries: Query<Entity, With<Quarry>>, // Prefix with underscore
 ) {
     // Only process right-clicks
     if !mouse_button.just_pressed(MouseButton::Right) {
@@ -385,10 +385,10 @@ fn update_character_info_ui(
 
 // Add a new system for transferring resources between entities
 fn handle_resource_transfer(
-    mut commands: Commands,
+    _commands: Commands, // Prefix with underscore
     keyboard: Res<ButtonInput<KeyCode>>,
     mouse_button: Res<ButtonInput<MouseButton>>,
-    selected_entity: Query<(Entity, &mut Inventory, &InventorySettings), With<Selected>>,
+    mut selected_entity: Query<(Entity, &mut Inventory, &InventorySettings), With<Selected>>, // Make mutable
     mut entities_with_inventory: Query<(Entity, &mut Inventory, &InventorySettings, &GlobalTransform)>,
     windows: Query<&Window>,
     camera_q: Query<(&Camera, &GlobalTransform)>,
@@ -396,7 +396,7 @@ fn handle_resource_transfer(
     // Transfer items when holding T and right-clicking
     if keyboard.pressed(KeyCode::KeyT) && mouse_button.just_pressed(MouseButton::Right) {
         // Check if we have a selected entity
-        if let Ok((selected_entity, mut selected_inventory, selected_settings)) = selected_entity.get_single_mut() {
+        if let Ok((selected_entity, mut selected_inventory, _selected_settings)) = selected_entity.get_single_mut() {
             // Get click position
             let window = windows.single();
             if let Some(cursor_position) = window.cursor_position() {

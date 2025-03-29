@@ -2,15 +2,21 @@ use bevy::prelude::*;
 use crate::components::skills::{Skills, SkillProgression};
 use crate::components::inventory::{Inventory, ResourceType, InventorySettings};
 use crate::components::unit::Selected;
+use crate::components::ui::EntityInfoPanel; // Import EntityInfoPanel
 
 pub struct ConstructionPlugin;
 
 impl Plugin for ConstructionPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, start_construction)
+        app.add_systems(Update, construction_system)
+           .add_systems(Update, start_construction)
            .add_systems(Update, process_construction)
            .add_systems(Update, update_construction_ui);
     }
+}
+
+fn construction_system() {
+    // Placeholder system logic
 }
 
 // Component to track construction progress
@@ -52,21 +58,21 @@ fn start_construction(
     mut commands: Commands,
     keyboard: Res<ButtonInput<KeyCode>>,
     mouse_button: Res<ButtonInput<MouseButton>>,
-    selected_builders: Query<(Entity, &Skills, &mut Inventory, &InventorySettings), With<Selected>>,
+    mut selected_builders: Query<(Entity, &Skills, &mut Inventory, &InventorySettings), With<Selected>>, // Make mutable
     windows: Query<&Window>,
     camera_q: Query<(&Camera, &GlobalTransform)>,
 ) {
     if keyboard.pressed(KeyCode::KeyB) && mouse_button.just_pressed(MouseButton::Left) {
         // Get the selected builder
-        if let Ok((builder_entity, skills, mut inventory, settings)) = selected_builders.get_single_mut() {
+        if let Ok((builder_entity, skills, mut inventory, _settings)) = selected_builders.get_single_mut() { // Prefix with underscore
             // Get construction skill
             let construction_skill = skills.construction;
 
             // Get cursor position for placement
             let window = windows.single();
-            if let Some(cursor_position) = window.cursor_position() {
+            if let Some(_cursor_pos) = window.cursor_position() { // Prefix with underscore
                 let (camera, camera_transform) = camera_q.single();
-                if let Ok(cursor_ray) = camera.viewport_to_world(camera_transform, cursor_position) {
+                if let Ok(cursor_ray) = camera.viewport_to_world(camera_transform, _cursor_pos) {
                     let cursor_pos = cursor_ray.origin.truncate();
 
                     // Determine building type (using keyboard modifier keys)
@@ -116,7 +122,7 @@ fn process_construction(
     mut commands: Commands,
     time: Res<Time>,
     mut builders: Query<(Entity, &mut Constructing, &mut Skills, &mut SkillProgression)>,
-    asset_server: Res<AssetServer>,
+    _asset_server: Res<AssetServer>, // Prefix with underscore
 ) {
     for (entity, mut constructing, mut skills, mut progression) in &mut builders {
         constructing.progress += time.delta_secs();
@@ -147,7 +153,7 @@ fn update_construction_ui(
     construction_query: Query<(Entity, &Constructing), With<Selected>>,
     mut panel_query: Query<Entity, With<EntityInfoPanel>>,
     mut commands: Commands,
-    asset_server: Res<AssetServer>,
+    _asset_server: Res<AssetServer>, // Prefix with underscore
 ) {
     if let Ok(panel_entity) = panel_query.get_single() {
         if let Ok((entity, constructing)) = construction_query.get_single() {
@@ -160,7 +166,7 @@ fn update_construction_ui(
                         progress_percent
                     )),
                     TextFont {
-                        font: asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf"),
+                        font: _asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf"),
                         font_size: 16.0,
                         ..default()
                     },

@@ -13,6 +13,7 @@ use crate::systems::scene::ScenePlugin;
 use crate::systems::selection::SelectionPlugin;
 use crate::systems::ui::UiPlugin;
 use crate::systems::window::WindowPlugin;
+use crate::systems::construction::ConstructionPlugin; // Ensure this is imported
 
 pub struct RtsPlugin;
 
