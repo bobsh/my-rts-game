@@ -39,13 +39,14 @@ fn handle_movement_input(
         return;
     };
 
-    // Convert cursor world position to grid coordinates - FIXED CALCULATION
+    // Convert cursor world position to grid coordinates - FIXED
     let cursor_world_pos = cursor_ray.origin.truncate();
 
     // Log raw position for debugging
     info!("Raw cursor world position: {:?}", cursor_world_pos);
 
-    // Adjusted calculation that properly accounts for the grid size
+    // FIXED: Division by tile size (64.0) to get grid coordinates
+    // Using floor to properly handle negative coordinates
     let target_grid = GridCoords {
         x: (cursor_world_pos.x / 64.0).floor() as i32,
         y: (cursor_world_pos.y / 64.0).floor() as i32,
@@ -65,8 +66,8 @@ fn handle_movement_input(
 
         info!("Movement distance: {:.1} grid cells", distance);
 
-        // Safeguard against excessive movement
-        if distance > 50.0 {
+        // IMPROVED: Reduced maximum allowed distance to 30.0 (was 50.0)
+        if distance > 30.0 {
             info!("Movement distance too large ({}), ignoring click", distance);
             return;
         }
@@ -105,7 +106,7 @@ fn calculate_path(
                 // Only recalculate if we don't already have a path
                 info!("Calculating path from {:?} to {:?}", current_pos, destination);
 
-                // Extract obstacle positions for debugging
+                // Collect obstacles for debugging
                 let obstacle_positions: Vec<(i32, i32)> = obstacles
                     .iter()
                     .map(|pos| (pos.x, pos.y))
@@ -113,6 +114,7 @@ fn calculate_path(
 
                 info!("Found {} obstacles", obstacle_positions.len());
 
+                // IMPROVED: Modified the function to use more realistic boundaries
                 // Define a function to find neighboring grid positions
                 let neighbors = |pos: &GridCoords| {
                     let dirs = [
@@ -126,9 +128,16 @@ fn calculate_path(
                             y: pos.y + dy,
                         })
                         .filter(|next_pos| {
-                            // Don't allow positions outside reasonable bounds
-                            if next_pos.x < -100 || next_pos.x > 100 ||
-                               next_pos.y < -100 || next_pos.y > 100 {
+                            // IMPROVED: Use a more reasonable boundary
+                            // Don't allow positions that are too far from the current position or destination
+                            const MAX_BOUND: i32 = 50;
+                            let min_x = (current_pos.x - MAX_BOUND).min(destination.x - MAX_BOUND);
+                            let max_x = (current_pos.x + MAX_BOUND).max(destination.x + MAX_BOUND);
+                            let min_y = (current_pos.y - MAX_BOUND).min(destination.y - MAX_BOUND);
+                            let max_y = (current_pos.y + MAX_BOUND).max(destination.y + MAX_BOUND);
+
+                            if next_pos.x < min_x || next_pos.x > max_x ||
+                               next_pos.y < min_y || next_pos.y > max_y {
                                 return false;
                             }
 
@@ -186,18 +195,27 @@ fn calculate_path(
                         ((current_pos.x - destination.x).pow(2) + (current_pos.y - destination.y).pow(2)) as f32
                     );
 
-                    // Try a simple direct path as fallback
-                    let direct_path = create_direct_path(current_pos, &destination);
-                    move_target.path = direct_path;
-                    info!("Using simplified direct path with {} steps", move_target.path.len());
+                    // IMPROVED: Better fallback path with obstacle avoidance
+                    let direct_path = create_safer_direct_path(current_pos, &destination, &obstacles);
+
+                    // IMPROVED: Only use fallback path if it's reasonably short
+                    if direct_path.len() <= 30 {
+                        move_target.path = direct_path;
+                        info!("Using fallback path with {} steps", move_target.path.len());
+                    } else {
+                        // Path is too long, likely invalid - cancel movement
+                        move_target.destination = None;
+                        info!("Fallback path too long ({} steps), canceling movement", direct_path.len());
+                    }
                 }
             }
         }
     }
 }
 
-// Helper function to create a simplified direct path when A* fails
-fn create_direct_path(start: &GridCoords, end: &GridCoords) -> Vec<GridCoords> {
+// IMPROVED: Better direct path creation that includes basic obstacle avoidance
+fn create_safer_direct_path(start: &GridCoords, end: &GridCoords,
+                          obstacles: &Query<&GridCoords, With<crate::components::movement::Collider>>) -> Vec<GridCoords> {
     let mut path = Vec::new();
     let dx = end.x - start.x;
     let dy = end.y - start.y;
@@ -210,10 +228,43 @@ fn create_direct_path(start: &GridCoords, end: &GridCoords) -> Vec<GridCoords> {
     let step_x = dx as f32 / steps as f32;
     let step_y = dy as f32 / steps as f32;
 
+    // Keep track of points we've tried to avoid obstacles
+    let mut detour_points = Vec::new();
+
     for i in 1..=steps {
         let x = start.x + (step_x * i as f32).round() as i32;
         let y = start.y + (step_y * i as f32).round() as i32;
-        path.push(GridCoords { x, y });
+        let point = GridCoords { x, y };
+
+        // Check if this point is blocked by an obstacle
+        let is_blocked = obstacles.iter().any(|obstacle|
+            obstacle.x == point.x && obstacle.y == point.y
+        );
+
+        if is_blocked {
+            // Try to find a way around - check adjacent non-diagonal cells
+            let adjacent_points = [
+                GridCoords { x: point.x + 1, y: point.y },
+                GridCoords { x: point.x - 1, y: point.y },
+                GridCoords { x: point.x, y: point.y + 1 },
+                GridCoords { x: point.x, y: point.y - 1 },
+            ];
+
+            // Find the first non-blocked adjacent point
+            for adj_point in adjacent_points.iter() {
+                let adj_blocked = obstacles.iter().any(|obstacle|
+                    obstacle.x == adj_point.x && obstacle.y == adj_point.y
+                );
+
+                if !adj_blocked && !detour_points.contains(adj_point) {
+                    path.push(*adj_point);
+                    detour_points.push(*adj_point);
+                    break;
+                }
+            }
+        } else {
+            path.push(point);
+        }
     }
 
     path
