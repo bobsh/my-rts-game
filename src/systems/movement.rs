@@ -57,8 +57,8 @@ fn handle_movement_input(
 
     // Convert to grid coordinates with fixed grid offset as specified
     let target_grid = GridCoords {
-        x: (ldtk_relative_pos.x / 64.0).round() as i32 + 30, // Add 29 to x
-        y: (ldtk_relative_pos.y / 64.0).round() as i32 + 29, // Add 30 to y
+        x: (ldtk_relative_pos.x / 64.0).round() as i32 + 29, // Add 29 to x
+        y: (ldtk_relative_pos.y / 64.0).round() as i32 + 28, // Add 30 to y
     };
 
     info!("Target grid coordinates: {:?}", target_grid);
@@ -222,15 +222,16 @@ fn move_along_path(
             let next_pos = move_target.path[0];
 
             // Convert grid coordinates to world positions
+            // Add 32.0 (half tile size) to center movement on tiles
             let current_world_pos = Vec3::new(
-                current_pos.x as f32 * 64.0,
-                current_pos.y as f32 * 64.0,
+                current_pos.x as f32 * 64.0 + 32.0,
+                current_pos.y as f32 * 64.0 + 32.0,
                 0.0
             );
 
             let next_world_pos = Vec3::new(
-                next_pos.x as f32 * 64.0,
-                next_pos.y as f32 * 64.0,
+                next_pos.x as f32 * 64.0 + 32.0,
+                next_pos.y as f32 * 64.0 + 32.0,
                 0.0
             );
 
@@ -269,10 +270,10 @@ fn update_movement(
             // This eliminates any potential for rounding errors
             if let Ok(mut coords) = grid_coords.get_mut(entity) {
                 // Calculate grid coords based on absolute world position / tile size
-                // Without using any offset conversion during movement
+                // Subtract the 32.0 offset when converting from world to grid
                 *coords = GridCoords {
-                    x: (moving.to.x / 64.0).floor() as i32,
-                    y: (moving.to.y / 64.0).floor() as i32,
+                    x: ((moving.to.x - 32.0) / 64.0).floor() as i32,
+                    y: ((moving.to.y - 32.0) / 64.0).floor() as i32,
                 };
             }
 
