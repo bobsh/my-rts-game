@@ -157,7 +157,7 @@ fn start_gathering(
 
     info!("Resource gathering cursor position: {:?}", cursor_pos);
 
-    let Some((character_entity, skills, character_coords)) = selected_characters.iter().next()
+    let Some((character_entity, _skills, character_coords)) = selected_characters.iter().next()
     else {
         return;
     };
