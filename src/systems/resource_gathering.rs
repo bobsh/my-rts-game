@@ -147,7 +147,6 @@ fn start_gathering(
         return;
     };
 
-// Track if we found a resource to gather
     let mut found_resource = false;
 
     for (node_entity, transform, sprite, is_tree, is_mine, is_quarry) in &resource_nodes {
@@ -193,17 +192,20 @@ fn start_gathering(
             commands.entity(character_entity).remove::<Gathering>();
 
             if let Ok(mut move_target) = move_targets.get_mut(character_entity) {
-// Convert resource position to grid coordinates, accounting for the world transform
                 let world_to_grid_pos = pos - ldtk_calibration.offset;
 
+                let raw_grid_x = (world_to_grid_pos.x / 64.0).round() as i32;
+                let raw_grid_y = (world_to_grid_pos.y / 64.0).round() as i32;
+
                 let resource_grid = GridCoords {
-                    x: (world_to_grid_pos.x / 64.0).round() as i32 + 31,
-                    y: (world_to_grid_pos.y / 64.0).round() as i32 + 24,
+                    x: raw_grid_x + 30,
+                    y: raw_grid_y + 29,
                 };
 
                 let character_grid = character_coords;
 
                 info!("DEBUG - Character position: {:?}", character_grid);
+                info!("DEBUG - Resource raw grid position: ({}, {})", raw_grid_x, raw_grid_y);
                 info!("DEBUG - Resource position (after adjustment): {:?}", resource_grid);
                 info!("DEBUG - Resource world pos: {:?}, LdtkOffset: {:?}", pos, ldtk_calibration.offset);
 
@@ -227,53 +229,63 @@ fn start_gathering(
                     GridCoords { x: resource_grid.x + 1, y: resource_grid.y + 1 }, // Top-right
                 ];
 
+                info!("Evaluating adjacent positions for resource at {:?}", resource_grid);
+
                 let destination = approach_positions
                     .iter()
                     .filter(|pos| {
-                        let approach_dx = pos.x - character_grid.x;
-                        let approach_dy = pos.y - character_grid.y;
-                        let squared_dist_from_character = approach_dx * approach_dx + approach_dy * approach_dy;
+                        let resource_dx = (pos.x - resource_grid.x).abs();
+                        let resource_dy = (pos.y - resource_grid.y).abs();
+                        let chebyshev_dist = resource_dx.max(resource_dy);
 
-                        let resource_dx = pos.x - resource_grid.x;
-                        let resource_dy = pos.y - resource_grid.y;
-                        let squared_dist_from_resource = resource_dx * resource_dx + resource_dy * resource_dy;
+                        let is_adjacent = chebyshev_dist == 1;
 
-                        let is_adjacent_to_resource = squared_dist_from_resource <= 2;
-                        let is_closer_to_character = squared_dist_from_character < (dx * dx + dy * dy) as i32;
+                        info!("  Position {:?}: distance to resource = {}, is adjacent = {}",
+                              pos, chebyshev_dist, is_adjacent);
 
-                        info!("Evaluating approach pos {:?}: dist_from_char={}, dist_from_resource={}, is_adjacent={}, is_closer={}",
-                            pos, squared_dist_from_character, squared_dist_from_resource, is_adjacent_to_resource, is_closer_to_character);
-
-                        is_adjacent_to_resource
+                        is_adjacent
                     })
                     .min_by_key(|pos| {
-                        let approach_dx = pos.x - character_grid.x;
-                        let approach_dy = pos.y - character_grid.y;
-                        approach_dx * approach_dx + approach_dy * approach_dy
-                    })
-                    .unwrap_or(&approach_positions[0]);
+                        let char_dx = pos.x - character_grid.x;
+                        let char_dy = pos.y - character_grid.y;
+                        let squared_dist = char_dx * char_dx + char_dy * char_dy;
 
-                info!("DEBUG - Selected approach destination: {:?}", destination);
+                        info!("  Position {:?}: distance to character = {}",
+                              pos, (squared_dist as f32).sqrt());
 
-                let dest_dx = destination.x - character_grid.x;
-                let dest_dy = destination.y - character_grid.y;
-                let squared_distance = dest_dx * dest_dx + dest_dy * dest_dy;
-                let distance = (squared_distance as f32).sqrt();
+                        squared_dist
+                    });
 
-                info!("DEBUG - Distance to destination: dx={}, dy={}, squared={}, sqrt={:.2}",
-                      dest_dx, dest_dy, squared_distance, distance);
+                match destination {
+                    Some(dest) => {
+                        info!("DEBUG - Selected approach destination: {:?}", dest);
 
-                if distance > 30.0 {
-                    info!("Resource too far away (distance: {:.1}), cannot gather", distance);
-                    commands.entity(character_entity).remove::<GatheringIntent>();
-                    return;
+                        let dest_dx = dest.x - character_grid.x;
+                        let dest_dy = dest.y - character_grid.y;
+                        let squared_distance = dest_dx * dest_dx + dest_dy * dest_dy;
+                        let distance = (squared_distance as f32).sqrt();
+
+                        info!("DEBUG - Distance to destination: dx={}, dy={}, squared={}, sqrt={:.2}",
+                              dest_dx, dest_dy, squared_distance, distance);
+
+                        if distance > 30.0 {
+                            info!("Resource too far away (distance: {:.1}), cannot gather", distance);
+                            commands.entity(character_entity).remove::<GatheringIntent>();
+                            return;
+                        }
+
+                        move_target.destination = Some(*dest);
+                        move_target.path.clear();
+
+                        info!("Setting movement destination to {:?} to approach resource at {:?}",
+                            dest, resource_grid);
+                    },
+                    None => {
+                        info!("No valid adjacent position found for resource at {:?}", resource_grid);
+                        commands.entity(character_entity).remove::<GatheringIntent>();
+                        return;
+                    }
                 }
-
-                move_target.destination = Some(*destination);
-                move_target.path.clear();
-
-                info!("Setting movement destination to {:?} to approach resource at {:?}",
-                    destination, resource_grid);
             }
 
             info!("Moving to gather {}", resource_name);
@@ -293,7 +305,7 @@ fn check_gathering_proximity(
     resources: Query<(&GlobalTransform, &Transform, Option<&Tree>, Option<&Mine>, Option<&Quarry>)>,
     ldtk_calibration: Res<LdtkCalibration>,
 ) {
-    const GATHERING_RANGE_GRID: f32 = 2.0;
+    const GATHERING_RANGE_GRID: f32 = 1.5;
     const GATHERING_RANGE_WORLD: f32 = 300.0;
 
     for (entity, character_transform, character_grid, intent, skills) in &characters {
@@ -324,21 +336,32 @@ fn check_gathering_proximity(
             }
 
             let world_to_grid_pos = resource_transform.translation().truncate() - ldtk_calibration.offset;
+
+            let raw_grid_x = (world_to_grid_pos.x / 64.0).round() as i32;
+            let raw_grid_y = (world_to_grid_pos.y / 64.0).round() as i32;
+
             let resource_grid = GridCoords {
-                x: (world_to_grid_pos.x / 64.0).round() as i32 + 31,
-                y: (world_to_grid_pos.y / 64.0).round() as i32 + 24,
+                x: raw_grid_x + 30,
+                y: raw_grid_y + 29,
             };
 
+            // Use Chebyshev distance (max of |dx|, |dy|) to handle diagonal positions
+            let chebyshev_dx = (resource_grid.x - character_grid.x).abs();
+            let chebyshev_dy = (resource_grid.y - character_grid.y).abs();
+            let chebyshev_distance = chebyshev_dx.max(chebyshev_dy);
+
+            // Also calculate Euclidean distance for logging
             let dx = (resource_grid.x - character_grid.x) as f32;
             let dy = (resource_grid.y - character_grid.y) as f32;
             let grid_distance = (dx * dx + dy * dy).sqrt();
 
             let world_distance = character_transform.translation().distance(resource_transform.translation());
 
-            info!("Distance check - Grid: {:.1} (max: {:.1}), World: {:.1} (max: {:.1})",
-                  grid_distance, GATHERING_RANGE_GRID, world_distance, GATHERING_RANGE_WORLD);
+            info!("Distance check - Chebyshev: {}, Euclidean: {:.1} (max: {:.1}), World: {:.1} (max: {:.1})",
+                  chebyshev_distance, grid_distance, GATHERING_RANGE_GRID, world_distance, GATHERING_RANGE_WORLD);
 
-            if grid_distance <= GATHERING_RANGE_GRID || world_distance <= GATHERING_RANGE_WORLD {
+            // Allow gathering if adjacent (Chebyshev distance = 1) or within range
+            if chebyshev_distance <= 1 || grid_distance <= GATHERING_RANGE_GRID {
                 let skill_value = match intent.resource_type {
                     ResourceType::Wood => skills.woodcutting,
                     ResourceType::Gold => skills.mining,
@@ -356,16 +379,16 @@ fn check_gathering_proximity(
                 commands.entity(entity).remove::<GatheringIntent>();
 
                 let resource_name = match intent.resource_type {
-                    ResourceType::Wood => "wood from tree",
-                    ResourceType::Gold => "gold from mine",
-                    ResourceType::Stone => "stone from quarry",
+                    ResourceType::Gold => "Gold",
+                    ResourceType::Wood => "Wood",
+                    ResourceType::Stone => "Stone",
                 };
 
                 info!("Started gathering {} (Grid dist: {:.1}, World dist: {:.1})",
                       resource_name, grid_distance, world_distance);
             } else {
-                info!("Too far from resource: Grid distance {:.1} cells (need {:.1}), World distance {:.1} units (need {:.1})",
-                     grid_distance, GATHERING_RANGE_GRID, world_distance, GATHERING_RANGE_WORLD);
+                info!("Too far from resource: Chebyshev distance {} cells (need 1), Grid distance {:.1} cells (need {:.1})",
+                     chebyshev_distance, grid_distance, GATHERING_RANGE_GRID);
             }
         }
     }
