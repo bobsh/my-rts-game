@@ -275,8 +275,8 @@ fn start_gathering(
                     resource_grid
                 );
 
-                for dest in sorted_positions {
-                    move_target.destination = Some(dest);
+                if let Some(dest) = sorted_positions.first() {
+                    move_target.destination = Some(*dest);
                     move_target.path.clear();
 
                     info!(
@@ -285,7 +285,6 @@ fn start_gathering(
                     );
 
                     info!("Moving to gather {}", resource_name);
-                    break;
                 }
             }
 
