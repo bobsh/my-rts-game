@@ -4,7 +4,7 @@ use bevy::prelude::KeyCode;
 use bevy_ecs_ldtk::prelude::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
-use crate::entities::EntitiesPlugin;
+use crate::components::entities::EntitiesPlugin;
 use crate::systems::camera::CameraPlugin;
 use crate::systems::construction::ConstructionPlugin;
 use crate::systems::inventory::InventoryPlugin;

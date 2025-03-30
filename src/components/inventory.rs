@@ -21,6 +21,13 @@ pub struct Inventory {
     pub max_slots: usize,
 }
 
+// You'll need to implement Default for Inventory to make this work:
+impl Default for Inventory {
+    fn default() -> Self {
+        Self::new(4) // Default 4 slots for workers
+    }
+}
+
 // Maximum capacity for different entity types
 #[derive(Component, Debug)]
 pub struct InventorySettings {

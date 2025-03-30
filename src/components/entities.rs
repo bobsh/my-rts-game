@@ -4,17 +4,18 @@ use bevy_ecs_ldtk::prelude::*;
 
 use crate::components::inventory::{Inventory, InventorySettings};
 use crate::components::movement::{Collider, Movable, MoveTarget};
+use crate::components::resources::ResourceNode;
 use crate::components::skills::{SkillProgression, Skills};
 use crate::components::unit::Selectable;
 
 pub struct EntitiesPlugin;
 
 #[derive(Default, Component)]
-pub struct Warrior;
+pub struct Character;
 
 #[derive(Default, Bundle, LdtkEntity)]
-struct WarriorBundle {
-    warrior: Warrior,
+struct CharacterBundle {
+    character: Character,
     selectable: Selectable,
     collider: Collider,
     #[sprite_sheet]
@@ -30,36 +31,13 @@ struct WarriorBundle {
 }
 
 #[derive(Default, Component)]
-pub struct Worker;
-
-#[derive(Default, Bundle, LdtkEntity)]
-struct WorkerBundle {
-    worker: Worker,
-    selectable: Selectable,
-    collider: Collider,
-    #[sprite_sheet]
-    sprite_sheet: Sprite,
-    #[grid_coords]
-    grid_coords: GridCoords,
-    movable: Movable,
-    move_target: MoveTarget,
-    inventory: Inventory,
-    inventory_settings: InventorySettings,
-}
-
-// You'll need to implement Default for Inventory to make this work:
-impl Default for Inventory {
-    fn default() -> Self {
-        Self::new(4) // Default 4 slots for workers
-    }
-}
-
-#[derive(Default, Component)]
 pub struct Mine;
 
 #[derive(Default, Bundle, LdtkEntity)]
 struct MineBundle {
+    collider: Collider,
     mine: Mine,
+    resource_node: ResourceNode,
     selectable: Selectable,
     #[sprite_sheet]
     sprite_sheet: Sprite,
@@ -72,7 +50,9 @@ pub struct Quarry;
 
 #[derive(Default, Bundle, LdtkEntity)]
 struct QuarryBundle {
+    collider: Collider,
     quarry: Quarry,
+    resource_node: ResourceNode,
     selectable: Selectable,
     #[sprite_sheet]
     sprite_sheet: Sprite,
@@ -85,9 +65,10 @@ pub struct Tree;
 
 #[derive(Default, Bundle, LdtkEntity)]
 struct TreeBundle {
-    tree: Tree,
-    selectable: Selectable,
     collider: Collider,
+    resource_node: ResourceNode,
+    selectable: Selectable,
+    tree: Tree,
     #[sprite_sheet]
     sprite_sheet: Sprite,
     #[grid_coords]
@@ -112,8 +93,7 @@ struct HouseBundle {
 
 impl Plugin for EntitiesPlugin {
     fn build(&self, app: &mut App) {
-        app.register_ldtk_entity::<WarriorBundle>("Warrior")
-            .register_ldtk_entity::<WorkerBundle>("Worker")
+        app.register_ldtk_entity::<CharacterBundle>("Character")
             .register_ldtk_entity::<MineBundle>("Mine")
             .register_ldtk_entity::<QuarryBundle>("Quarry")
             .register_ldtk_entity::<TreeBundle>("Tree")

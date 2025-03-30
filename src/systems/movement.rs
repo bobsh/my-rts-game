@@ -15,6 +15,88 @@ impl Plugin for MovementPlugin {
     }
 }
 
+/// Calculates a grid position from cursor position and checks if it's valid
+pub fn calculate_cursor_grid_position(
+    cursor_position: Vec2,
+    camera_q: &Query<(&Camera, &GlobalTransform)>,
+    ldtk_worlds: &Query<&GlobalTransform, With<LdtkProjectHandle>>,
+    ldtk_calibration: &LdtkCalibration,
+) -> Option<GridCoords> {
+    // Process the cursor ray and get world position
+    let (camera, camera_transform) = camera_q.single();
+    let Ok(cursor_ray) = camera.viewport_to_world(camera_transform, cursor_position) else {
+        return None;
+    };
+
+    // Get the world position of the cursor
+    let cursor_world_pos = cursor_ray.origin.truncate();
+
+    // Get the LDTK world transform
+    let ldtk_world_transform = ldtk_worlds.single();
+
+    // To get a position relative to LDTK world, we need to account for the world transform
+    let ldtk_relative_pos = cursor_world_pos - ldtk_world_transform.translation().truncate();
+
+    // Convert to grid coordinates with fixed grid offset as specified
+    let target_grid = GridCoords {
+        x: ((ldtk_relative_pos.x) / 64.0).floor() as i32 + ldtk_calibration.grid_offset.x,
+        y: ((ldtk_relative_pos.y) / 64.0).floor() as i32 + ldtk_calibration.grid_offset.y,
+    };
+
+    Some(target_grid)
+}
+
+/// Sets a movement target for an entity if the target position is valid
+pub fn set_movement_target(
+    entity: Entity,
+    target_grid: GridCoords,
+    current_pos: &GridCoords,
+    ldtk_tile_query: &Query<&GridCoords, With<crate::components::movement::Collider>>,
+    move_targets: &mut Query<&mut MoveTarget>,
+) -> bool {
+    // Calculate distance to verify it's reasonable
+    let dx = target_grid.x - current_pos.x;
+    let dy = target_grid.y - current_pos.y;
+    let distance = ((dx * dx + dy * dy) as f32).sqrt();
+
+    // If the distance is too large, exit early
+    if distance > 30.0 {
+        info!(
+            "Movement distance too large ({:.1}), ignoring click",
+            distance
+        );
+        return false;
+    }
+
+    // Check if the target position is occupied by a collider
+    let is_occupied = ldtk_tile_query
+        .iter()
+        .any(|tile_pos| tile_pos.x == target_grid.x && tile_pos.y == target_grid.y);
+
+    if !is_occupied {
+        if let Ok(mut move_target) = move_targets.get_mut(entity) {
+            // Clear any existing path
+            move_target.path.clear();
+            // Set the new destination
+            move_target.destination = Some(target_grid);
+            info!(
+                "Setting movement destination to {:?} for entity {:?}",
+                target_grid, entity
+            );
+            return true;
+        } else {
+            info!("Entity {:?} has no MoveTarget component", entity);
+        }
+    } else {
+        info!(
+            "Target position {:?} is occupied by a collider",
+            target_grid
+        );
+    }
+
+    false
+}
+
 // Fixed system to handle right-click movement input
 #[allow(clippy::too_many_arguments)]
 fn handle_movement_input(
@@ -24,12 +106,12 @@ fn handle_movement_input(
     selected_units: Query<(Entity, &GridCoords), With<crate::components::unit::Selected>>,
     mut move_targets: Query<&mut MoveTarget>,
     ldtk_tile_query: Query<&GridCoords, With<crate::components::movement::Collider>>,
-    gatherers: Query<(), With<crate::systems::resource_gathering::Gathering>>,
+    gatherers: Query<Entity, With<crate::systems::resource_gathering::Gathering>>,
     ldtk_calibration: Res<LdtkCalibration>,
     ldtk_worlds: Query<&GlobalTransform, With<LdtkProjectHandle>>,
 ) {
-    // Only process right-click inputs when not already gathering resources
-    if !mouse_button.just_pressed(MouseButton::Right) || !gatherers.is_empty() {
+    // Only process right-click inputs
+    if !mouse_button.just_pressed(MouseButton::Right) {
         return;
     }
 
@@ -38,78 +120,39 @@ fn handle_movement_input(
         return;
     };
 
-    let (camera, camera_transform) = camera_q.single();
-    let Ok(cursor_ray) = camera.viewport_to_world(camera_transform, cursor_position) else {
+    // Get the first selected unit
+    let Some((entity, current_pos)) = selected_units.iter().next() else {
         return;
     };
 
-    // Get the world position of the cursor
-    let cursor_world_pos = cursor_ray.origin.truncate();
-    info!("Raw cursor world position: {:?}", cursor_world_pos);
+    // Skip if this entity is gathering (movement interruption is handled in resource_gathering.rs)
+    if gatherers.contains(entity) {
+        info!("Entity is currently gathering, ignoring movement command");
+        return;
+    }
 
-    // Get the LDTK world transform
-    let ldtk_world_transform = ldtk_worlds.single();
-
-    // To get a position relative to LDTK world, we need to account for the world transform
-    // Subtract the world position (the offset is already applied to the transform)
-    let ldtk_relative_pos = cursor_world_pos - ldtk_world_transform.translation().truncate();
-
-    info!("LDTK-relative cursor position: {:?}", ldtk_relative_pos);
-
-    // Convert to grid coordinates with fixed grid offset as specified
-    let target_grid = GridCoords {
-        x: ((ldtk_relative_pos.x) / 64.0).floor() as i32 + ldtk_calibration.grid_offset.x,
-        y: ((ldtk_relative_pos.y) / 64.0).floor() as i32 + ldtk_calibration.grid_offset.y,
+    // Calculate grid position from cursor
+    let Some(target_grid) =
+        calculate_cursor_grid_position(cursor_position, &camera_q, &ldtk_worlds, &ldtk_calibration)
+    else {
+        return;
     };
 
+    info!("Raw cursor world position: {:?}", cursor_position);
     info!("Target grid coordinates: {:?}", target_grid);
+    info!(
+        "Current position: {:?}, Target: {:?}",
+        current_pos, target_grid
+    );
 
-    // Get the first selected unit's position for reference
-    if let Some((entity, current_pos)) = selected_units.iter().next() {
-        // Log the current position and calculated target for debugging
-        info!(
-            "Current position: {:?}, Target: {:?}",
-            current_pos, target_grid
-        );
-
-        // Calculate distance to verify it's reasonable
-        let dx = target_grid.x - current_pos.x;
-        let dy = target_grid.y - current_pos.y;
-        let distance = ((dx * dx + dy * dy) as f32).sqrt();
-
-        info!("Movement distance: {:.1} grid cells", distance);
-
-        // If the distance is too large, exit early
-        if distance > 30.0 {
-            info!("Movement distance too large ({}), ignoring click", distance);
-            return;
-        }
-
-        // Check if the target position is occupied by a collider
-        let is_occupied = ldtk_tile_query
-            .iter()
-            .any(|tile_pos| tile_pos.x == target_grid.x && tile_pos.y == target_grid.y);
-
-        if !is_occupied {
-            if let Ok(mut move_target) = move_targets.get_mut(entity) {
-                // Clear any existing path
-                move_target.path.clear();
-                // Set the new destination
-                move_target.destination = Some(target_grid);
-                info!(
-                    "Setting movement destination to {:?} for entity {:?}",
-                    target_grid, entity
-                );
-            } else {
-                info!("Selected entity {:?} has no MoveTarget component", entity);
-            }
-        } else {
-            info!(
-                "Target position {:?} is occupied by a collider",
-                target_grid
-            );
-        }
-    }
+    // Try to set movement target
+    set_movement_target(
+        entity,
+        target_grid,
+        current_pos,
+        &ldtk_tile_query,
+        &mut move_targets,
+    );
 }
 
 // System to calculate a path when a destination is set
