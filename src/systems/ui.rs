@@ -1,6 +1,6 @@
+use crate::components::inventory::{Inventory, InventorySettings}; // Add this import
 use crate::components::ui::{EntityInfoPanel, EntityNameText};
 use crate::components::unit::Selected;
-use crate::components::inventory::{Inventory, InventorySettings}; // Add this import
 use bevy::prelude::*;
 
 pub struct UiPlugin;
@@ -78,7 +78,6 @@ fn update_entity_info_panel(
             }
 
             // Inventory will be displayed by the inventory system
-
         } else {
             // Hide the panel when nothing is selected
             panel_node.display = Display::None;

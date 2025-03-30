@@ -29,9 +29,7 @@ pub struct InventorySettings {
 
 impl Default for InventorySettings {
     fn default() -> Self {
-        Self {
-            max_stack_size: 10,
-        }
+        Self { max_stack_size: 10 }
     }
 }
 
@@ -45,7 +43,12 @@ impl Inventory {
     }
 
     // Add resources to inventory, returns amount that couldn't fit
-    pub fn add_resource(&mut self, resource_type: ResourceType, quantity: u32, max_stack: u32) -> u32 {
+    pub fn add_resource(
+        &mut self,
+        resource_type: ResourceType,
+        quantity: u32,
+        max_stack: u32,
+    ) -> u32 {
         let mut remaining = quantity;
 
         // First fill existing stacks of same resource type
@@ -139,7 +142,13 @@ impl Inventory {
     }
 
     // Add a simple item transfer system
-    pub fn transfer_to(&mut self, other: &mut Inventory, resource_type: ResourceType, quantity: u32, max_stack: u32) -> u32 {
+    pub fn transfer_to(
+        &mut self,
+        other: &mut Inventory,
+        resource_type: ResourceType,
+        quantity: u32,
+        max_stack: u32,
+    ) -> u32 {
         // First remove from this inventory
         let removed = self.remove_resource(resource_type, quantity);
 

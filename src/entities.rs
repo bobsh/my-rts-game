@@ -2,10 +2,10 @@ use bevy::app::{App, Plugin};
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 
-use crate::components::movement::{Collider, Movable, MoveTarget};
-use crate::components::unit::Selectable;
 use crate::components::inventory::{Inventory, InventorySettings};
-use crate::components::skills::{Skills, SkillProgression};
+use crate::components::movement::{Collider, Movable, MoveTarget};
+use crate::components::skills::{SkillProgression, Skills};
+use crate::components::unit::Selectable;
 
 pub struct EntitiesPlugin;
 

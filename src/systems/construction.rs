@@ -1,17 +1,17 @@
-use bevy::prelude::*;
-use crate::components::skills::{Skills, SkillProgression};
-use crate::components::inventory::{Inventory, ResourceType, InventorySettings};
+use crate::components::inventory::{Inventory, InventorySettings, ResourceType};
+use crate::components::skills::{SkillProgression, Skills};
+use crate::components::ui::EntityInfoPanel;
 use crate::components::unit::Selected;
-use crate::components::ui::EntityInfoPanel; // Import EntityInfoPanel
+use bevy::prelude::*; // Import EntityInfoPanel
 
 pub struct ConstructionPlugin;
 
 impl Plugin for ConstructionPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Update, construction_system)
-           .add_systems(Update, start_construction)
-           .add_systems(Update, process_construction)
-           .add_systems(Update, update_construction_ui);
+            .add_systems(Update, start_construction)
+            .add_systems(Update, process_construction)
+            .add_systems(Update, update_construction_ui);
     }
 }
 
@@ -37,18 +37,13 @@ pub enum BuildingType {
 impl BuildingType {
     pub fn get_cost(&self) -> Vec<(ResourceType, u32)> {
         match self {
-            BuildingType::House => vec![
-                (ResourceType::Wood, 5),
-                (ResourceType::Stone, 3),
-            ],
+            BuildingType::House => vec![(ResourceType::Wood, 5), (ResourceType::Stone, 3)],
             BuildingType::Workshop => vec![
                 (ResourceType::Wood, 10),
                 (ResourceType::Stone, 5),
                 (ResourceType::Gold, 2),
             ],
-            BuildingType::Wall => vec![
-                (ResourceType::Stone, 5),
-            ],
+            BuildingType::Wall => vec![(ResourceType::Stone, 5)],
         }
     }
 }
@@ -58,13 +53,18 @@ fn start_construction(
     mut commands: Commands,
     keyboard: Res<ButtonInput<KeyCode>>,
     mouse_button: Res<ButtonInput<MouseButton>>,
-    mut selected_builders: Query<(Entity, &Skills, &mut Inventory, &InventorySettings), With<Selected>>,
+    mut selected_builders: Query<
+        (Entity, &Skills, &mut Inventory, &InventorySettings),
+        With<Selected>,
+    >,
     windows: Query<&Window>,
     camera_q: Query<(&Camera, &GlobalTransform)>,
 ) {
     if keyboard.pressed(KeyCode::KeyB) && mouse_button.just_pressed(MouseButton::Left) {
         // Get the selected builder
-        if let Ok((builder_entity, skills, mut inventory, _settings)) = selected_builders.get_single_mut() {
+        if let Ok((builder_entity, skills, mut inventory, _settings)) =
+            selected_builders.get_single_mut()
+        {
             // Get construction skill
             let construction_skill = skills.construction;
 
@@ -121,7 +121,12 @@ fn start_construction(
 fn process_construction(
     mut commands: Commands,
     time: Res<Time>,
-    mut builders: Query<(Entity, &mut Constructing, &mut Skills, &mut SkillProgression)>,
+    mut builders: Query<(
+        Entity,
+        &mut Constructing,
+        &mut Skills,
+        &mut SkillProgression,
+    )>,
     _asset_server: Res<AssetServer>,
 ) {
     for (entity, mut constructing, mut skills, mut progression) in &mut builders {
@@ -139,7 +144,10 @@ fn process_construction(
             if progression.construction_xp >= 100.0 * skills.construction {
                 progression.construction_xp = 0.0;
                 skills.construction += 0.1;
-                info!("Character improved construction to {:.1}", skills.construction);
+                info!(
+                    "Character improved construction to {:.1}",
+                    skills.construction
+                );
             }
 
             // Remove construction component
@@ -161,9 +169,9 @@ fn update_construction_ui(
 
             commands.entity(panel_entity).with_children(|parent| {
                 parent.spawn((
-                    Text::new(format!("Building {:?}: {:.1}%",
-                        constructing.building_type,
-                        progress_percent
+                    Text::new(format!(
+                        "Building {:?}: {:.1}%",
+                        constructing.building_type, progress_percent
                     )),
                     TextFont {
                         font: _asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf"),

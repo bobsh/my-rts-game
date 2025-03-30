@@ -1,17 +1,17 @@
-use bevy::prelude::*;
 use crate::components::movement::{Movable, MoveTarget, Moving};
+use crate::systems::ldtk_calibration::LdtkCalibration;
+use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 use pathfinding::prelude::astar;
-use crate::systems::ldtk_calibration::LdtkCalibration;
 
 pub struct MovementPlugin;
 
 impl Plugin for MovementPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Update, handle_movement_input)
-           .add_systems(Update, update_movement.after(handle_movement_input))
-           .add_systems(Update, calculate_path.after(handle_movement_input))
-           .add_systems(Update, move_along_path.after(calculate_path));
+            .add_systems(Update, update_movement.after(handle_movement_input))
+            .add_systems(Update, calculate_path.after(handle_movement_input))
+            .add_systems(Update, move_along_path.after(calculate_path));
     }
 }
 
@@ -68,7 +68,10 @@ fn handle_movement_input(
     // Get the first selected unit's position for reference
     if let Some((entity, current_pos)) = selected_units.iter().next() {
         // Log the current position and calculated target for debugging
-        info!("Current position: {:?}, Target: {:?}", current_pos, target_grid);
+        info!(
+            "Current position: {:?}, Target: {:?}",
+            current_pos, target_grid
+        );
 
         // Calculate distance to verify it's reasonable
         let dx = target_grid.x - current_pos.x;
@@ -84,9 +87,9 @@ fn handle_movement_input(
         }
 
         // Check if the target position is occupied by a collider
-        let is_occupied = ldtk_tile_query.iter().any(|tile_pos| {
-            tile_pos.x == target_grid.x && tile_pos.y == target_grid.y
-        });
+        let is_occupied = ldtk_tile_query
+            .iter()
+            .any(|tile_pos| tile_pos.x == target_grid.x && tile_pos.y == target_grid.y);
 
         if !is_occupied {
             if let Ok(mut move_target) = move_targets.get_mut(entity) {
@@ -94,12 +97,18 @@ fn handle_movement_input(
                 move_target.path.clear();
                 // Set the new destination
                 move_target.destination = Some(target_grid);
-                info!("Setting movement destination to {:?} for entity {:?}", target_grid, entity);
+                info!(
+                    "Setting movement destination to {:?} for entity {:?}",
+                    target_grid, entity
+                );
             } else {
                 info!("Selected entity {:?} has no MoveTarget component", entity);
             }
         } else {
-            info!("Target position {:?} is occupied by a collider", target_grid);
+            info!(
+                "Target position {:?} is occupied by a collider",
+                target_grid
+            );
         }
     }
 }
@@ -121,13 +130,19 @@ fn calculate_path(
 
             // Enforce maximum distance limit for ALL movement, even from other systems
             if distance > 30.0 {
-                info!("Path distance too large ({:.1}), canceling movement to {:?}", distance, destination);
+                info!(
+                    "Path distance too large ({:.1}), canceling movement to {:?}",
+                    distance, destination
+                );
                 move_target.destination = None;
                 continue;
             }
 
             if move_target.path.is_empty() {
-                info!("Calculating path from {:?} to {:?}", current_pos, destination);
+                info!(
+                    "Calculating path from {:?} to {:?}",
+                    current_pos, destination
+                );
 
                 // Store obstacle positions for debugging
                 let obstacle_count = obstacles.iter().count();
@@ -136,8 +151,14 @@ fn calculate_path(
                 // Define a function to find neighboring grid positions
                 let neighbors = |pos: &GridCoords| {
                     let dirs = [
-                        (0, 1), (1, 0), (0, -1), (-1, 0), // Cardinal directions
-                        (1, 1), (1, -1), (-1, 1), (-1, -1), // Diagonals
+                        (0, 1),
+                        (1, 0),
+                        (0, -1),
+                        (-1, 0), // Cardinal directions
+                        (1, 1),
+                        (1, -1),
+                        (-1, 1),
+                        (-1, -1), // Diagonals
                     ];
 
                     dirs.iter()
@@ -153,8 +174,11 @@ fn calculate_path(
                             let min_y = (current_pos.y - MAX_BOUND).min(destination.y - MAX_BOUND);
                             let max_y = (current_pos.y + MAX_BOUND).max(destination.y + MAX_BOUND);
 
-                            if next_pos.x < min_x || next_pos.x > max_x ||
-                               next_pos.y < min_y || next_pos.y > max_y {
+                            if next_pos.x < min_x
+                                || next_pos.x > max_x
+                                || next_pos.y < min_y
+                                || next_pos.y > max_y
+                            {
                                 return false;
                             }
 
@@ -193,12 +217,16 @@ fn calculate_path(
                     current_pos,
                     |pos| neighbors(pos),
                     |pos| heuristic(pos),
-                    |pos| pos.x == destination.x && pos.y == destination.y
+                    |pos| pos.x == destination.x && pos.y == destination.y,
                 ) {
                     // Skip the first position (current position)
                     if path.len() > 1 {
                         move_target.path = path.into_iter().skip(1).collect();
-                        info!("Path found with {} steps for entity {:?}", move_target.path.len(), entity);
+                        info!(
+                            "Path found with {} steps for entity {:?}",
+                            move_target.path.len(),
+                            entity
+                        );
                     } else {
                         info!("Path is too short, already at destination");
                         move_target.destination = None;
@@ -228,13 +256,13 @@ fn move_along_path(
             let current_world_pos = Vec3::new(
                 current_pos.x as f32 * 64.0 + 32.0,
                 current_pos.y as f32 * 64.0 + 32.0,
-                0.0
+                0.0,
             );
 
             let next_world_pos = Vec3::new(
                 next_pos.x as f32 * 64.0 + 32.0,
                 next_pos.y as f32 * 64.0 + 32.0,
-                0.0
+                0.0,
             );
 
             // Start moving to the next position

@@ -1,24 +1,24 @@
-use bevy::prelude::*;
 use crate::components::inventory::*;
-use crate::components::unit::Selected;
-use crate::components::unit::Selectable;
 use crate::components::movement::{Movable, MoveTarget, Moving};
-use bevy_ecs_ldtk::prelude::GridCoords;
+use crate::components::skills::{SkillProgression, Skills};
 use crate::components::ui::EntityInfoPanel;
-use crate::components::skills::{Skills, SkillProgression};
-use crate::entities::{Tree, Mine, Quarry};
+use crate::components::unit::Selectable;
+use crate::components::unit::Selected;
+use crate::entities::{Mine, Quarry, Tree};
 use crate::systems::ldtk_calibration::LdtkCalibration;
+use bevy::prelude::*;
+use bevy_ecs_ldtk::prelude::GridCoords;
 
 pub struct ResourceGatheringPlugin;
 
 impl Plugin for ResourceGatheringPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Update, gather_resources)
-           .add_systems(Update, start_gathering)
-           .add_systems(Update, check_gathering_proximity)
-           .add_systems(Update, update_skills_from_activities)
-           .add_systems(Update, update_character_info_ui)
-           .add_systems(Update, handle_resource_transfer);
+            .add_systems(Update, start_gathering)
+            .add_systems(Update, check_gathering_proximity)
+            .add_systems(Update, update_skills_from_activities)
+            .add_systems(Update, update_character_info_ui)
+            .add_systems(Update, handle_resource_transfer);
     }
 }
 
@@ -60,16 +60,22 @@ pub struct CharacterBundle {
 fn gather_resources(
     mut commands: Commands,
     time: Res<Time>,
-    mut gatherers: Query<(Entity, &mut Gathering, &mut Inventory, &InventorySettings, &Skills)>,
+    mut gatherers: Query<(
+        Entity,
+        &mut Gathering,
+        &mut Inventory,
+        &InventorySettings,
+        &Skills,
+    )>,
     mut skill_progression: Query<&mut SkillProgression>,
     trees: Query<Entity, With<Tree>>,
     mines: Query<Entity, With<Mine>>,
     quarries: Query<Entity, With<Quarry>>,
 ) {
     for (entity, mut gathering, mut inventory, settings, skills) in &mut gatherers {
-        let target_exists = trees.contains(gathering.target) ||
-                            mines.contains(gathering.target) ||
-                            quarries.contains(gathering.target);
+        let target_exists = trees.contains(gathering.target)
+            || mines.contains(gathering.target)
+            || quarries.contains(gathering.target);
 
         if !target_exists {
             commands.entity(entity).remove::<Gathering>();
@@ -92,7 +98,8 @@ fn gather_resources(
             let bonus_yield = (skill_value / 3.0).floor() as u32;
             let total_yield = base_yield + bonus_yield;
 
-            let overflow = inventory.add_resource(resource_type, total_yield, settings.max_stack_size);
+            let overflow =
+                inventory.add_resource(resource_type, total_yield, settings.max_stack_size);
 
             if let Ok(mut progression) = skill_progression.get_mut(entity) {
                 match resource_type {
@@ -121,7 +128,14 @@ fn start_gathering(
     camera_q: Query<(&Camera, &GlobalTransform)>,
     selected_characters: Query<(Entity, &Skills, &GridCoords), With<Selected>>,
     mut move_targets: Query<&mut MoveTarget>,
-    resource_nodes: Query<(Entity, &GlobalTransform, &Sprite, Option<&Tree>, Option<&Mine>, Option<&Quarry>)>,
+    resource_nodes: Query<(
+        Entity,
+        &GlobalTransform,
+        &Sprite,
+        Option<&Tree>,
+        Option<&Mine>,
+        Option<&Quarry>,
+    )>,
     gathering_intent_query: Query<&GatheringIntent>,
     ldtk_calibration: Res<LdtkCalibration>,
 ) {
@@ -143,7 +157,8 @@ fn start_gathering(
 
     info!("Resource gathering cursor position: {:?}", cursor_pos);
 
-    let Some((character_entity, skills, character_coords)) = selected_characters.iter().next() else {
+    let Some((character_entity, skills, character_coords)) = selected_characters.iter().next()
+    else {
         return;
     };
 
@@ -158,9 +173,11 @@ fn start_gathering(
         let min_y = pos.y - size.y / 2.0;
         let max_y = pos.y + size.y / 2.0;
 
-        if cursor_pos.x >= min_x && cursor_pos.x <= max_x &&
-           cursor_pos.y >= min_y && cursor_pos.y <= max_y {
-
+        if cursor_pos.x >= min_x
+            && cursor_pos.x <= max_x
+            && cursor_pos.y >= min_y
+            && cursor_pos.y <= max_y
+        {
             found_resource = true;
 
             if !is_tree.is_some() && !is_mine.is_some() && !is_quarry.is_some() {
@@ -205,31 +222,70 @@ fn start_gathering(
                 let character_grid = character_coords;
 
                 info!("DEBUG - Character position: {:?}", character_grid);
-                info!("DEBUG - Resource raw grid position: ({}, {})", raw_grid_x, raw_grid_y);
-                info!("DEBUG - Resource position (after adjustment): {:?}", resource_grid);
-                info!("DEBUG - Resource world pos: {:?}, LdtkOffset: {:?}", pos, ldtk_calibration.offset);
+                info!(
+                    "DEBUG - Resource raw grid position: ({}, {})",
+                    raw_grid_x, raw_grid_y
+                );
+                info!(
+                    "DEBUG - Resource position (after adjustment): {:?}",
+                    resource_grid
+                );
+                info!(
+                    "DEBUG - Resource world pos: {:?}, LdtkOffset: {:?}",
+                    pos, ldtk_calibration.offset
+                );
 
                 let dx = (resource_grid.x - character_grid.x) as f32;
                 let dy = (resource_grid.y - character_grid.y) as f32;
                 let current_distance = (dx * dx + dy * dy).sqrt();
 
                 if current_distance <= 1.5 {
-                    info!("Already adjacent to resource (distance: {:.1}), not moving", current_distance);
+                    info!(
+                        "Already adjacent to resource (distance: {:.1}), not moving",
+                        current_distance
+                    );
                     continue;
                 }
 
                 let approach_positions = [
-                    GridCoords { x: resource_grid.x - 1, y: resource_grid.y },     // Left
-                    GridCoords { x: resource_grid.x + 1, y: resource_grid.y },     // Right
-                    GridCoords { x: resource_grid.x, y: resource_grid.y - 1 },     // Below
-                    GridCoords { x: resource_grid.x, y: resource_grid.y + 1 },     // Above
-                    GridCoords { x: resource_grid.x - 1, y: resource_grid.y - 1 }, // Bottom-left
-                    GridCoords { x: resource_grid.x + 1, y: resource_grid.y - 1 }, // Bottom-right
-                    GridCoords { x: resource_grid.x - 1, y: resource_grid.y + 1 }, // Top-left
-                    GridCoords { x: resource_grid.x + 1, y: resource_grid.y + 1 }, // Top-right
+                    GridCoords {
+                        x: resource_grid.x - 1,
+                        y: resource_grid.y,
+                    }, // Left
+                    GridCoords {
+                        x: resource_grid.x + 1,
+                        y: resource_grid.y,
+                    }, // Right
+                    GridCoords {
+                        x: resource_grid.x,
+                        y: resource_grid.y - 1,
+                    }, // Below
+                    GridCoords {
+                        x: resource_grid.x,
+                        y: resource_grid.y + 1,
+                    }, // Above
+                    GridCoords {
+                        x: resource_grid.x - 1,
+                        y: resource_grid.y - 1,
+                    }, // Bottom-left
+                    GridCoords {
+                        x: resource_grid.x + 1,
+                        y: resource_grid.y - 1,
+                    }, // Bottom-right
+                    GridCoords {
+                        x: resource_grid.x - 1,
+                        y: resource_grid.y + 1,
+                    }, // Top-left
+                    GridCoords {
+                        x: resource_grid.x + 1,
+                        y: resource_grid.y + 1,
+                    }, // Top-right
                 ];
 
-                info!("Evaluating adjacent positions for resource at {:?}", resource_grid);
+                info!(
+                    "Evaluating adjacent positions for resource at {:?}",
+                    resource_grid
+                );
 
                 let destination = approach_positions
                     .iter()
@@ -240,8 +296,10 @@ fn start_gathering(
 
                         let is_adjacent = chebyshev_dist == 1;
 
-                        info!("  Position {:?}: distance to resource = {}, is adjacent = {}",
-                              pos, chebyshev_dist, is_adjacent);
+                        info!(
+                            "  Position {:?}: distance to resource = {}, is adjacent = {}",
+                            pos, chebyshev_dist, is_adjacent
+                        );
 
                         is_adjacent
                     })
@@ -250,8 +308,11 @@ fn start_gathering(
                         let char_dy = pos.y - character_grid.y;
                         let squared_dist = char_dx * char_dx + char_dy * char_dy;
 
-                        info!("  Position {:?}: distance to character = {}",
-                              pos, (squared_dist as f32).sqrt());
+                        info!(
+                            "  Position {:?}: distance to character = {}",
+                            pos,
+                            (squared_dist as f32).sqrt()
+                        );
 
                         squared_dist
                     });
@@ -265,24 +326,38 @@ fn start_gathering(
                         let squared_distance = dest_dx * dest_dx + dest_dy * dest_dy;
                         let distance = (squared_distance as f32).sqrt();
 
-                        info!("DEBUG - Distance to destination: dx={}, dy={}, squared={}, sqrt={:.2}",
-                              dest_dx, dest_dy, squared_distance, distance);
+                        info!(
+                            "DEBUG - Distance to destination: dx={}, dy={}, squared={}, sqrt={:.2}",
+                            dest_dx, dest_dy, squared_distance, distance
+                        );
 
                         if distance > 30.0 {
-                            info!("Resource too far away (distance: {:.1}), cannot gather", distance);
-                            commands.entity(character_entity).remove::<GatheringIntent>();
+                            info!(
+                                "Resource too far away (distance: {:.1}), cannot gather",
+                                distance
+                            );
+                            commands
+                                .entity(character_entity)
+                                .remove::<GatheringIntent>();
                             return;
                         }
 
                         move_target.destination = Some(*dest);
                         move_target.path.clear();
 
-                        info!("Setting movement destination to {:?} to approach resource at {:?}",
-                            dest, resource_grid);
-                    },
+                        info!(
+                            "Setting movement destination to {:?} to approach resource at {:?}",
+                            dest, resource_grid
+                        );
+                    }
                     None => {
-                        info!("No valid adjacent position found for resource at {:?}", resource_grid);
-                        commands.entity(character_entity).remove::<GatheringIntent>();
+                        info!(
+                            "No valid adjacent position found for resource at {:?}",
+                            resource_grid
+                        );
+                        commands
+                            .entity(character_entity)
+                            .remove::<GatheringIntent>();
                         return;
                     }
                 }
@@ -301,15 +376,32 @@ fn start_gathering(
 // This system checks if characters with GatheringIntent are close enough to start gathering
 fn check_gathering_proximity(
     mut commands: Commands,
-    characters: Query<(Entity, &GlobalTransform, &GridCoords, &GatheringIntent, &Skills), (Without<Gathering>, Without<Moving>)>,
-    resources: Query<(&GlobalTransform, &Transform, Option<&Tree>, Option<&Mine>, Option<&Quarry>)>,
+    characters: Query<
+        (
+            Entity,
+            &GlobalTransform,
+            &GridCoords,
+            &GatheringIntent,
+            &Skills,
+        ),
+        (Without<Gathering>, Without<Moving>),
+    >,
+    resources: Query<(
+        &GlobalTransform,
+        &Transform,
+        Option<&Tree>,
+        Option<&Mine>,
+        Option<&Quarry>,
+    )>,
     ldtk_calibration: Res<LdtkCalibration>,
 ) {
     const GATHERING_RANGE_GRID: f32 = 1.5;
     const GATHERING_RANGE_WORLD: f32 = 300.0;
 
     for (entity, character_transform, character_grid, intent, skills) in &characters {
-        if let Ok((resource_transform, resource_transform_relative, is_tree, is_mine, is_quarry)) = resources.get(intent.target) {
+        if let Ok((resource_transform, resource_transform_relative, is_tree, is_mine, is_quarry)) =
+            resources.get(intent.target)
+        {
             if !is_tree.is_some() && !is_mine.is_some() && !is_quarry.is_some() {
                 info!("Invalid resource target, removing gathering intent");
                 commands.entity(entity).remove::<GatheringIntent>();
@@ -329,13 +421,16 @@ fn check_gathering_proximity(
             };
 
             if actual_resource_type != intent.resource_type {
-                info!("Resource type mismatch: expected {:?}, found {:?}",
-                     intent.resource_type, actual_resource_type);
+                info!(
+                    "Resource type mismatch: expected {:?}, found {:?}",
+                    intent.resource_type, actual_resource_type
+                );
                 commands.entity(entity).remove::<GatheringIntent>();
                 continue;
             }
 
-            let world_to_grid_pos = resource_transform.translation().truncate() - ldtk_calibration.offset;
+            let world_to_grid_pos =
+                resource_transform.translation().truncate() - ldtk_calibration.offset;
 
             let raw_grid_x = (world_to_grid_pos.x / 64.0).round() as i32;
             let raw_grid_y = (world_to_grid_pos.y / 64.0).round() as i32;
@@ -355,7 +450,9 @@ fn check_gathering_proximity(
             let dy = (resource_grid.y - character_grid.y) as f32;
             let grid_distance = (dx * dx + dy * dy).sqrt();
 
-            let world_distance = character_transform.translation().distance(resource_transform.translation());
+            let world_distance = character_transform
+                .translation()
+                .distance(resource_transform.translation());
 
             info!("Distance check - Chebyshev: {}, Euclidean: {:.1} (max: {:.1}), World: {:.1} (max: {:.1})",
                   chebyshev_distance, grid_distance, GATHERING_RANGE_GRID, world_distance, GATHERING_RANGE_WORLD);
@@ -384,8 +481,10 @@ fn check_gathering_proximity(
                     ResourceType::Stone => "Stone",
                 };
 
-                info!("Started gathering {} (Grid dist: {:.1}, World dist: {:.1})",
-                      resource_name, grid_distance, world_distance);
+                info!(
+                    "Started gathering {} (Grid dist: {:.1}, World dist: {:.1})",
+                    resource_name, grid_distance, world_distance
+                );
             } else {
                 info!("Too far from resource: Chebyshev distance {} cells (need 1), Grid distance {:.1} cells (need {:.1})",
                      chebyshev_distance, grid_distance, GATHERING_RANGE_GRID);
@@ -407,25 +506,34 @@ fn update_skills_from_activities(
                     if progression.woodcutting_xp >= 100.0 * skills.woodcutting {
                         progression.woodcutting_xp = 0.0;
                         skills.woodcutting += 0.1;
-                        info!("Character {:?} improved woodcutting to {:.1}", entity, skills.woodcutting);
+                        info!(
+                            "Character {:?} improved woodcutting to {:.1}",
+                            entity, skills.woodcutting
+                        );
                     }
-                },
+                }
                 ResourceType::Gold => {
                     progression.mining_xp += time.delta_secs() * 0.2;
                     if progression.mining_xp >= 100.0 * skills.mining {
                         progression.mining_xp = 0.0;
                         skills.mining += 0.1;
-                        info!("Character {:?} improved mining to {:.1}", entity, skills.mining);
+                        info!(
+                            "Character {:?} improved mining to {:.1}",
+                            entity, skills.mining
+                        );
                     }
-                },
+                }
                 ResourceType::Stone => {
                     progression.harvesting_xp += time.delta_secs() * 0.2;
                     if progression.harvesting_xp >= 100.0 * skills.harvesting {
                         progression.harvesting_xp = 0.0;
                         skills.harvesting += 0.1;
-                        info!("Character {:?} improved harvesting to {:.1}", entity, skills.harvesting);
+                        info!(
+                            "Character {:?} improved harvesting to {:.1}",
+                            entity, skills.harvesting
+                        );
                     }
-                },
+                }
             }
         }
     }
@@ -466,19 +574,31 @@ fn update_character_info_ui(
 
                 parent.spawn((
                     Text::new(format!("Mining: {:.1}", skills.mining)),
-                    TextFont { font: asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf"), font_size: 14.0, ..default() },
+                    TextFont {
+                        font: asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf"),
+                        font_size: 14.0,
+                        ..default()
+                    },
                     TextColor(Color::WHITE),
                 ));
 
                 parent.spawn((
                     Text::new(format!("Woodcutting: {:.1}", skills.woodcutting)),
-                    TextFont { font: asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf"), font_size: 14.0, ..default() },
+                    TextFont {
+                        font: asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf"),
+                        font_size: 14.0,
+                        ..default()
+                    },
                     TextColor(Color::WHITE),
                 ));
 
                 parent.spawn((
                     Text::new(format!("Harvesting: {:.1}", skills.harvesting)),
-                    TextFont { font: asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf"), font_size: 14.0, ..default() },
+                    TextFont {
+                        font: asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf"),
+                        font_size: 14.0,
+                        ..default()
+                    },
                     TextColor(Color::WHITE),
                 ));
 
@@ -491,7 +611,10 @@ fn update_character_info_ui(
                     };
 
                     parent.spawn((
-                        Text::new(format!("Gathering {}: {:.1}%", resource_name, progress_percent)),
+                        Text::new(format!(
+                            "Gathering {}: {:.1}%",
+                            resource_name, progress_percent
+                        )),
                         TextFont {
                             font: asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf"),
                             font_size: 14.0,
@@ -546,14 +669,25 @@ fn update_character_info_ui(
                             };
 
                             parent.spawn((
-                                Text::new(format!("{} {} x{}", resource_icon, resource_name, inv_slot.quantity)),
-                                TextFont { font: asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf"), font_size: 14.0, ..default() },
+                                Text::new(format!(
+                                    "{} {} x{}",
+                                    resource_icon, resource_name, inv_slot.quantity
+                                )),
+                                TextFont {
+                                    font: asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf"),
+                                    font_size: 14.0,
+                                    ..default()
+                                },
                                 TextColor(Color::WHITE),
                             ));
                         } else {
                             parent.spawn((
                                 Text::new(format!("Slot {}: Empty", i + 1)),
-                                TextFont { font: asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf"), font_size: 14.0, ..default() },
+                                TextFont {
+                                    font: asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf"),
+                                    font_size: 14.0,
+                                    ..default()
+                                },
                                 TextColor(Color::srgba(0.7, 0.7, 0.7, 1.0)),
                             ));
                         }
@@ -579,18 +713,25 @@ fn handle_resource_transfer(
     keyboard: Res<ButtonInput<KeyCode>>,
     mouse_button: Res<ButtonInput<MouseButton>>,
     mut selected_entity: Query<(Entity, &mut Inventory, &InventorySettings), With<Selected>>,
-    mut entities_with_inventory: Query<(Entity, &mut Inventory, &InventorySettings, &GlobalTransform), Without<Selected>>,
+    mut entities_with_inventory: Query<
+        (Entity, &mut Inventory, &InventorySettings, &GlobalTransform),
+        Without<Selected>,
+    >,
     windows: Query<&Window>,
     camera_q: Query<(&Camera, &GlobalTransform)>,
 ) {
     if keyboard.pressed(KeyCode::KeyT) && mouse_button.just_pressed(MouseButton::Right) {
-        if let Ok((_selected_entity, mut selected_inventory, _selected_settings)) = selected_entity.get_single_mut() {
+        if let Ok((_selected_entity, mut selected_inventory, _selected_settings)) =
+            selected_entity.get_single_mut()
+        {
             let window = windows.single();
             if let Some(cursor_position) = window.cursor_position() {
                 let (camera, camera_transform) = camera_q.single();
-                if let Ok(cursor_ray) = camera.viewport_to_world(camera_transform, cursor_position) {
+                if let Ok(cursor_ray) = camera.viewport_to_world(camera_transform, cursor_position)
+                {
                     let cursor_pos = cursor_ray.origin.truncate();
-                    for (entity, mut inventory, settings, transform) in &mut entities_with_inventory {
+                    for (entity, mut inventory, settings, transform) in &mut entities_with_inventory
+                    {
                         let entity_pos = transform.translation().truncate();
                         let distance = cursor_pos.distance(entity_pos);
                         if distance < 100.0 {
@@ -599,7 +740,7 @@ fn handle_resource_transfer(
                                     &mut inventory,
                                     ResourceType::Wood,
                                     1,
-                                    settings.max_stack_size
+                                    settings.max_stack_size,
                                 );
                                 info!("Transferred {} Wood to entity {:?}", amount, entity);
                                 if amount > 0 {

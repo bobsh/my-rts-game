@@ -3,14 +3,14 @@ use bevy::prelude::*;
 // Skills component
 #[derive(Component, Debug, Clone)]
 pub struct Skills {
-    pub mining: f32,        // Effectiveness at mining
-    pub woodcutting: f32,   // Effectiveness at cutting trees
-    pub harvesting: f32,    // Effectiveness at harvesting resources
+    pub mining: f32,      // Effectiveness at mining
+    pub woodcutting: f32, // Effectiveness at cutting trees
+    pub harvesting: f32,  // Effectiveness at harvesting resources
     #[allow(dead_code)]
-    pub combat: f32,        // Combat effectiveness
-    pub construction: f32,  // Building construction speed
+    pub combat: f32, // Combat effectiveness
+    pub construction: f32, // Building construction speed
     #[allow(dead_code)]
-    pub crafting: f32,      // Item crafting quality
+    pub crafting: f32, // Item crafting quality
 }
 
 impl Default for Skills {

@@ -1,15 +1,15 @@
-use bevy::prelude::*;
 use crate::components::inventory::*;
-use crate::components::unit::Selected;
-use crate::entities::{Worker, Warrior, House};
 use crate::components::ui::EntityInfoPanel;
+use crate::components::unit::Selected;
+use crate::entities::{House, Warrior, Worker};
+use bevy::prelude::*;
 
 pub struct InventoryPlugin;
 
 impl Plugin for InventoryPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, setup_entity_inventories)
-           .add_systems(Update, update_inventory_ui);
+            .add_systems(Update, update_inventory_ui);
     }
 }
 
@@ -22,21 +22,24 @@ fn setup_entity_inventories(
 ) {
     // Set up worker inventories (4 slots)
     for entity in &workers {
-        commands.entity(entity)
+        commands
+            .entity(entity)
             .insert(Inventory::new(4))
             .insert(InventorySettings::default());
     }
 
     // Set up warrior inventories (2 slots)
     for entity in &warriors {
-        commands.entity(entity)
+        commands
+            .entity(entity)
             .insert(Inventory::new(2))
             .insert(InventorySettings::default());
     }
 
     // Set up house inventories (20 slots)
     for entity in &houses {
-        commands.entity(entity)
+        commands
+            .entity(entity)
             .insert(Inventory::new(20))
             .insert(InventorySettings::default());
     }
@@ -87,7 +90,8 @@ fn update_inventory_ui(
                         };
 
                         parent.spawn((
-                            Text::new(format!("Slot {}: {} {} x{}/{}",
+                            Text::new(format!(
+                                "Slot {}: {} {} x{}/{}",
                                 i + 1,
                                 resource_icon,
                                 resource_name,
