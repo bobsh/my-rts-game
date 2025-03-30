@@ -148,7 +148,7 @@
 			"fieldDefs": []
 		},
 		{
-			"identifier": "Warrior",
+			"identifier": "Character",
 			"uid": 23,
 			"tags": [],
 			"exportToToc": false,
@@ -656,7 +656,7 @@
 					"gridTiles": [],
 					"entityInstances": [
 						{
-							"__identifier": "Warrior",
+							"__identifier": "Character",
 							"__grid": [21,20],
 							"__pivot": [0,0],
 							"__tags": [],
@@ -3134,22 +3134,6 @@
 							"fieldInstances": [],
 							"__worldX": 576,
 							"__worldY": 512
-						},
-						{
-							"__identifier": "Worker",
-							"__grid": [19,20],
-							"__pivot": [0,0],
-							"__tags": [],
-							"__tile": { "tilesetUid": 29, "x": 0, "y": 0, "w": 64, "h": 64 },
-							"__smartColor": "#0099DB",
-							"iid": "76d5eae0-e920-11ef-b03d-4d94dfc5337b",
-							"width": 64,
-							"height": 64,
-							"defUid": 28,
-							"px": [1216,1280],
-							"fieldInstances": [],
-							"__worldX": -704,
-							"__worldY": 1088
 						},
 						{
 							"__identifier": "Tree",
