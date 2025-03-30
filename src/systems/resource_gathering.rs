@@ -8,6 +8,7 @@ use crate::components::unit::Selected;
 use crate::systems::ldtk_calibration::LdtkCalibration;
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::GridCoords;
+use bevy_ecs_ldtk::prelude::LdtkProjectHandle;
 
 pub struct ResourceGatheringPlugin;
 
@@ -139,6 +140,8 @@ fn start_gathering(
     gathering_intent_query: Query<&GatheringIntent>,
     ldtk_calibration: Res<LdtkCalibration>,
     obstacles: Query<&GridCoords, With<crate::components::movement::Collider>>,
+    ldtk_worlds: Query<&GlobalTransform, With<LdtkProjectHandle>>,
+    ldtk_tile_query: Query<&GridCoords, With<crate::components::movement::Collider>>,
 ) {
     if !mouse_button.just_pressed(MouseButton::Right) {
         return;
@@ -292,6 +295,22 @@ fn start_gathering(
         if is_gathering.is_some() {
             info!("Interrupting gathering to move elsewhere");
             commands.entity(character_entity).remove::<Gathering>();
+
+            // Use the helper functions from movement.rs to set the new destination
+            if let Some(target_grid) = crate::systems::movement::calculate_cursor_grid_position(
+                cursor_position,
+                &camera_q,
+                &ldtk_worlds,
+                &ldtk_calibration
+            ) {
+                crate::systems::movement::set_movement_target(
+                    character_entity,
+                    target_grid,
+                    character_coords,
+                    &ldtk_tile_query,
+                    &mut move_targets
+                );
+            }
         }
 
         // Also remove gathering intent if it exists
