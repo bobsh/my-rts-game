@@ -123,7 +123,7 @@ fn start_gathering(
     mut move_targets: Query<&mut MoveTarget>,
     resource_nodes: Query<(Entity, &GlobalTransform, &Sprite, Option<&Tree>, Option<&Mine>, Option<&Quarry>)>,
     gathering_intent_query: Query<&GatheringIntent>,
-    ldtk_calibration: Res<LdtkCalibration>, // Use LdtkCalibration instead of offset
+    ldtk_calibration: Res<LdtkCalibration>,
 ) {
     if !mouse_button.just_pressed(MouseButton::Right) {
         return;
@@ -141,14 +141,13 @@ fn start_gathering(
 
     let cursor_pos = cursor_ray.origin.truncate();
 
-    // Log cursor position for debugging
     info!("Resource gathering cursor position: {:?}", cursor_pos);
 
     let Some((character_entity, skills, character_coords)) = selected_characters.iter().next() else {
         return;
     };
 
-    // Track if we found a resource to gather
+// Track if we found a resource to gather
     let mut found_resource = false;
 
     for (node_entity, transform, sprite, is_tree, is_mine, is_quarry) in &resource_nodes {
@@ -165,6 +164,11 @@ fn start_gathering(
 
             found_resource = true;
 
+            if !is_tree.is_some() && !is_mine.is_some() && !is_quarry.is_some() {
+                info!("Clicked on a sprite that isn't a valid resource, ignoring");
+                continue;
+            }
+
             let (resource_type, resource_name) = if is_tree.is_some() {
                 (ResourceType::Wood, "wood from tree")
             } else if is_mine.is_some() {
@@ -172,13 +176,7 @@ fn start_gathering(
             } else if is_quarry.is_some() {
                 (ResourceType::Stone, "stone from quarry")
             } else {
-                (ResourceType::Stone, "unknown resource")
-            };
-
-            let _skill_value = match resource_type {
-                ResourceType::Wood => skills.woodcutting,
-                ResourceType::Gold => skills.mining,
-                ResourceType::Stone => skills.harvesting,
+                continue;
             };
 
             if let Ok(gathering_intent) = gathering_intent_query.get(character_entity) {
@@ -195,17 +193,29 @@ fn start_gathering(
             commands.entity(character_entity).remove::<Gathering>();
 
             if let Ok(mut move_target) = move_targets.get_mut(character_entity) {
-                // Convert resource position to grid coordinates, accounting for the world transform
+// Convert resource position to grid coordinates, accounting for the world transform
                 let world_to_grid_pos = pos - ldtk_calibration.offset;
 
                 let resource_grid = GridCoords {
-                    x: (world_to_grid_pos.x / 64.0).round() as i32,
-                    y: (world_to_grid_pos.y / 64.0).round() as i32,
+                    x: (world_to_grid_pos.x / 64.0).round() as i32 + 31,
+                    y: (world_to_grid_pos.y / 64.0).round() as i32 + 24,
                 };
 
                 let character_grid = character_coords;
 
-                // Calculate approach positions (adjacent cells around the resource)
+                info!("DEBUG - Character position: {:?}", character_grid);
+                info!("DEBUG - Resource position (after adjustment): {:?}", resource_grid);
+                info!("DEBUG - Resource world pos: {:?}, LdtkOffset: {:?}", pos, ldtk_calibration.offset);
+
+                let dx = (resource_grid.x - character_grid.x) as f32;
+                let dy = (resource_grid.y - character_grid.y) as f32;
+                let current_distance = (dx * dx + dy * dy).sqrt();
+
+                if current_distance <= 1.5 {
+                    info!("Already adjacent to resource (distance: {:.1}), not moving", current_distance);
+                    continue;
+                }
+
                 let approach_positions = [
                     GridCoords { x: resource_grid.x - 1, y: resource_grid.y },     // Left
                     GridCoords { x: resource_grid.x + 1, y: resource_grid.y },     // Right
@@ -217,20 +227,41 @@ fn start_gathering(
                     GridCoords { x: resource_grid.x + 1, y: resource_grid.y + 1 }, // Top-right
                 ];
 
-                // Find the closest approach position
                 let destination = approach_positions
                     .iter()
-                    .min_by_key(|pos| {
-                        let dx = pos.x - character_grid.x;
-                        let dy = pos.y - character_grid.y;
-                        (dx * dx + dy * dy) as u32  // Squared distance
-                    })
-                    .unwrap_or(&resource_grid);  // Fallback to resource position if no approach found
+                    .filter(|pos| {
+                        let approach_dx = pos.x - character_grid.x;
+                        let approach_dy = pos.y - character_grid.y;
+                        let squared_dist_from_character = approach_dx * approach_dx + approach_dy * approach_dy;
 
-                // CRITICAL: Add distance check before setting destination
-                let dx = destination.x - character_grid.x;
-                let dy = destination.y - character_grid.y;
-                let distance = ((dx * dx + dy * dy) as f32).sqrt();
+                        let resource_dx = pos.x - resource_grid.x;
+                        let resource_dy = pos.y - resource_grid.y;
+                        let squared_dist_from_resource = resource_dx * resource_dx + resource_dy * resource_dy;
+
+                        let is_adjacent_to_resource = squared_dist_from_resource <= 2;
+                        let is_closer_to_character = squared_dist_from_character < (dx * dx + dy * dy) as i32;
+
+                        info!("Evaluating approach pos {:?}: dist_from_char={}, dist_from_resource={}, is_adjacent={}, is_closer={}",
+                            pos, squared_dist_from_character, squared_dist_from_resource, is_adjacent_to_resource, is_closer_to_character);
+
+                        is_adjacent_to_resource
+                    })
+                    .min_by_key(|pos| {
+                        let approach_dx = pos.x - character_grid.x;
+                        let approach_dy = pos.y - character_grid.y;
+                        approach_dx * approach_dx + approach_dy * approach_dy
+                    })
+                    .unwrap_or(&approach_positions[0]);
+
+                info!("DEBUG - Selected approach destination: {:?}", destination);
+
+                let dest_dx = destination.x - character_grid.x;
+                let dest_dy = destination.y - character_grid.y;
+                let squared_distance = dest_dx * dest_dx + dest_dy * dest_dy;
+                let distance = (squared_distance as f32).sqrt();
+
+                info!("DEBUG - Distance to destination: dx={}, dy={}, squared={}, sqrt={:.2}",
+                      dest_dx, dest_dy, squared_distance, distance);
 
                 if distance > 30.0 {
                     info!("Resource too far away (distance: {:.1}), cannot gather", distance);
@@ -250,7 +281,6 @@ fn start_gathering(
         }
     }
 
-    // If we didn't find a resource, let the movement system handle it
     if !found_resource {
         info!("No resource found at click position, deferring to movement system");
     }
@@ -259,16 +289,56 @@ fn start_gathering(
 // This system checks if characters with GatheringIntent are close enough to start gathering
 fn check_gathering_proximity(
     mut commands: Commands,
-    characters: Query<(Entity, &GlobalTransform, &GatheringIntent, &Skills), (Without<Gathering>, Without<Moving>)>,
-    resources: Query<&GlobalTransform>,
+    characters: Query<(Entity, &GlobalTransform, &GridCoords, &GatheringIntent, &Skills), (Without<Gathering>, Without<Moving>)>,
+    resources: Query<(&GlobalTransform, &Transform, Option<&Tree>, Option<&Mine>, Option<&Quarry>)>,
+    ldtk_calibration: Res<LdtkCalibration>,
 ) {
-    const GATHERING_RANGE: f32 = 150.0;
+    const GATHERING_RANGE_GRID: f32 = 2.0;
+    const GATHERING_RANGE_WORLD: f32 = 300.0;
 
-    for (entity, transform, intent, skills) in &characters {
-        if let Ok(resource_transform) = resources.get(intent.target) {
-            let distance = transform.translation().distance(resource_transform.translation());
+    for (entity, character_transform, character_grid, intent, skills) in &characters {
+        if let Ok((resource_transform, resource_transform_relative, is_tree, is_mine, is_quarry)) = resources.get(intent.target) {
+            if !is_tree.is_some() && !is_mine.is_some() && !is_quarry.is_some() {
+                info!("Invalid resource target, removing gathering intent");
+                commands.entity(entity).remove::<GatheringIntent>();
+                continue;
+            }
 
-            if distance <= GATHERING_RANGE {
+            let actual_resource_type = if is_tree.is_some() {
+                ResourceType::Wood
+            } else if is_mine.is_some() {
+                ResourceType::Gold
+            } else if is_quarry.is_some() {
+                ResourceType::Stone
+            } else {
+                info!("Resource doesn't match any known type, removing gathering intent");
+                commands.entity(entity).remove::<GatheringIntent>();
+                continue;
+            };
+
+            if actual_resource_type != intent.resource_type {
+                info!("Resource type mismatch: expected {:?}, found {:?}",
+                     intent.resource_type, actual_resource_type);
+                commands.entity(entity).remove::<GatheringIntent>();
+                continue;
+            }
+
+            let world_to_grid_pos = resource_transform.translation().truncate() - ldtk_calibration.offset;
+            let resource_grid = GridCoords {
+                x: (world_to_grid_pos.x / 64.0).round() as i32 + 31,
+                y: (world_to_grid_pos.y / 64.0).round() as i32 + 24,
+            };
+
+            let dx = (resource_grid.x - character_grid.x) as f32;
+            let dy = (resource_grid.y - character_grid.y) as f32;
+            let grid_distance = (dx * dx + dy * dy).sqrt();
+
+            let world_distance = character_transform.translation().distance(resource_transform.translation());
+
+            info!("Distance check - Grid: {:.1} (max: {:.1}), World: {:.1} (max: {:.1})",
+                  grid_distance, GATHERING_RANGE_GRID, world_distance, GATHERING_RANGE_WORLD);
+
+            if grid_distance <= GATHERING_RANGE_GRID || world_distance <= GATHERING_RANGE_WORLD {
                 let skill_value = match intent.resource_type {
                     ResourceType::Wood => skills.woodcutting,
                     ResourceType::Gold => skills.mining,
@@ -291,9 +361,11 @@ fn check_gathering_proximity(
                     ResourceType::Stone => "stone from quarry",
                 };
 
-                info!("Started gathering {}", resource_name);
+                info!("Started gathering {} (Grid dist: {:.1}, World dist: {:.1})",
+                      resource_name, grid_distance, world_distance);
             } else {
-                info!("Too far from resource: {:.1} units away (need {:.1})", distance, GATHERING_RANGE);
+                info!("Too far from resource: Grid distance {:.1} cells (need {:.1}), World distance {:.1} units (need {:.1})",
+                     grid_distance, GATHERING_RANGE_GRID, world_distance, GATHERING_RANGE_WORLD);
             }
         }
     }
