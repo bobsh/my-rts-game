@@ -257,6 +257,93 @@ jobs:
           name: windows-installer
           path: installer/*.exe
 
+  build-linux:
+    name: Build Linux
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Install Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libasound2-dev libudev-dev pkg-config libx11-dev libxcb-shape0-dev libxcb-xfixes0-dev libwayland-dev libxkbcommon-dev ruby ruby-dev rubygems build-essential rpm
+          sudo gem install --no-document fpm
+
+      - name: Configure sparse index
+        run: |
+          mkdir -p .cargo
+          echo '[registries.crates-io]' > .cargo/config.toml
+          echo 'protocol = "sparse"' >> .cargo/config.toml
+          echo '[target.x86_64-unknown-linux-gnu]' >> .cargo/config.toml
+          echo 'linker = "clang"' >> .cargo/config.toml
+          echo 'rustflags = ["-C", "link-arg=-fuse-ld=lld"]' >> .cargo/config.toml
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust dependencies
+        id: rust-cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true
+          shared-key: "${{ runner.os }}-rust-${{ hashFiles('**/Cargo.lock') }}"
+
+      - name: Build
+        run: cargo build --release
+
+      - name: Create game directory structure
+        run: |
+          mkdir -p dist/usr/local/bin
+          mkdir -p dist/usr/local/share/my-rts-game/assets
+
+          # Copy executable
+          cp target/release/my-rts-game dist/usr/local/bin/
+
+          # Copy assets
+          cp -r assets/* dist/usr/local/share/my-rts-game/assets/
+
+          # Create desktop entry
+          mkdir -p dist/usr/local/share/applications
+          cat > dist/usr/local/share/applications/my-rts-game.desktop << EOL
+          [Desktop Entry]
+          Type=Application
+          Name=My RTS Game
+          Exec=/usr/local/bin/my-rts-game
+          Icon=/usr/local/share/my-rts-game/assets/icons/icon.png
+          Categories=Game;
+          EOL
+
+      - name: Package as DEB
+        run: |
+          fpm -s dir -t deb -n my-rts-game -v 0.1.0 \
+            --description "A real-time strategy game" \
+            --url "https://github.com/username/my-rts-game" \
+            --license "MIT" \
+            --vendor "Your Name" \
+            -C dist .
+
+      - name: Package as RPM
+        run: |
+          fpm -s dir -t rpm -n my-rts-game -v 0.1.0 \
+            --description "A real-time strategy game" \
+            --url "https://github.com/username/my-rts-game" \
+            --license "MIT" \
+            --vendor "Your Name" \
+            -C dist .
+
+      - name: Upload Linux artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-packages
+          path: |
+            *.deb
+            *.rpm
+
   build-wasm:
     name: Build WASM
     runs-on: ubuntu-latest
@@ -380,7 +467,7 @@ jobs:
 
   create-release:
     name: Create Release
-    needs: [build-windows, build-wasm]
+    needs: [build-windows, build-wasm, build-linux]
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
@@ -390,6 +477,8 @@ jobs:
 
       - name: Download all artifacts
         uses: actions/download-artifact@v4
+        with:
+          path: artifacts
 
       - name: Create Nightly Release
         uses: softprops/action-gh-release@v2
@@ -400,5 +489,7 @@ jobs:
             windows-installer/*.exe
             windows-zip/*.zip
             wasm-zip/*.zip
+            linux-packages/*.deb
+            linux-packages/*.rpm
           prerelease: true
           generate_release_notes: true
