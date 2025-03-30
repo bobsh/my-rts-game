@@ -399,7 +399,7 @@ fn check_gathering_proximity(
     const GATHERING_RANGE_WORLD: f32 = 300.0;
 
     for (entity, character_transform, character_grid, intent, skills) in &characters {
-        if let Ok((resource_transform, resource_transform_relative, is_tree, is_mine, is_quarry)) =
+        if let Ok((resource_transform, _resource_transform_relative, is_tree, is_mine, is_quarry)) =
             resources.get(intent.target)
         {
             if is_tree.is_none() && is_mine.is_none() && is_quarry.is_none() {
