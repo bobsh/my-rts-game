@@ -1,47 +1,13 @@
 use crate::components::inventory::*;
 use crate::components::ui::EntityInfoPanel;
 use crate::components::unit::Selected;
-use crate::entities::{House, Warrior, Worker};
 use bevy::prelude::*;
 
 pub struct InventoryPlugin;
 
 impl Plugin for InventoryPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, setup_entity_inventories)
-            .add_systems(Update, update_inventory_ui);
-    }
-}
-
-// Set up inventories for all entities that should have them
-fn setup_entity_inventories(
-    mut commands: Commands,
-    workers: Query<Entity, With<Worker>>,
-    warriors: Query<Entity, With<Warrior>>,
-    houses: Query<Entity, With<House>>,
-) {
-    // Set up worker inventories (4 slots)
-    for entity in &workers {
-        commands
-            .entity(entity)
-            .insert(Inventory::new(4))
-            .insert(InventorySettings::default());
-    }
-
-    // Set up warrior inventories (2 slots)
-    for entity in &warriors {
-        commands
-            .entity(entity)
-            .insert(Inventory::new(2))
-            .insert(InventorySettings::default());
-    }
-
-    // Set up house inventories (20 slots)
-    for entity in &houses {
-        commands
-            .entity(entity)
-            .insert(Inventory::new(20))
-            .insert(InventorySettings::default());
+        app.add_systems(Update, update_inventory_ui);
     }
 }
 

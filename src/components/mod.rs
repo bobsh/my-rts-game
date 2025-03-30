@@ -1,3 +1,4 @@
+pub mod entities;
 pub mod inventory;
 pub mod movement;
 pub mod resources;

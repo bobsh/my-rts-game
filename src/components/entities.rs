@@ -11,11 +11,11 @@ use crate::components::unit::Selectable;
 pub struct EntitiesPlugin;
 
 #[derive(Default, Component)]
-pub struct Warrior;
+pub struct Character;
 
 #[derive(Default, Bundle, LdtkEntity)]
-struct WarriorBundle {
-    warrior: Warrior,
+struct CharacterBundle {
+    character: Character,
     selectable: Selectable,
     collider: Collider,
     #[sprite_sheet]
@@ -28,31 +28,6 @@ struct WarriorBundle {
     inventory_settings: InventorySettings,
     skills: Skills,
     skill_progression: SkillProgression,
-}
-
-#[derive(Default, Component)]
-pub struct Worker;
-
-#[derive(Default, Bundle, LdtkEntity)]
-struct WorkerBundle {
-    worker: Worker,
-    selectable: Selectable,
-    collider: Collider,
-    #[sprite_sheet]
-    sprite_sheet: Sprite,
-    #[grid_coords]
-    grid_coords: GridCoords,
-    movable: Movable,
-    move_target: MoveTarget,
-    inventory: Inventory,
-    inventory_settings: InventorySettings,
-}
-
-// You'll need to implement Default for Inventory to make this work:
-impl Default for Inventory {
-    fn default() -> Self {
-        Self::new(4) // Default 4 slots for workers
-    }
 }
 
 #[derive(Default, Component)]
@@ -116,8 +91,7 @@ struct HouseBundle {
 
 impl Plugin for EntitiesPlugin {
     fn build(&self, app: &mut App) {
-        app.register_ldtk_entity::<WarriorBundle>("Warrior")
-            .register_ldtk_entity::<WorkerBundle>("Worker")
+        app.register_ldtk_entity::<CharacterBundle>("Character")
             .register_ldtk_entity::<MineBundle>("Mine")
             .register_ldtk_entity::<QuarryBundle>("Quarry")
             .register_ldtk_entity::<TreeBundle>("Tree")

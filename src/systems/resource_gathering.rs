@@ -1,10 +1,10 @@
+use crate::components::entities::{Mine, Quarry, Tree};
 use crate::components::inventory::*;
 use crate::components::movement::{Movable, MoveTarget, Moving};
 use crate::components::skills::{SkillProgression, Skills};
 use crate::components::ui::EntityInfoPanel;
 use crate::components::unit::Selectable;
 use crate::components::unit::Selected;
-use crate::entities::{Mine, Quarry, Tree};
 use crate::systems::ldtk_calibration::LdtkCalibration;
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::GridCoords;
