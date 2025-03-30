@@ -15,7 +15,6 @@ fn main() {
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
                 title: "RTS Game".to_string(),
-                // These settings are critical for WASM viewport filling
                 fit_canvas_to_parent: true,
                 canvas: Some("#bevy".to_string()),
                 ..Default::default()

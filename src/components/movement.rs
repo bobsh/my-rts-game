@@ -1,33 +1,44 @@
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 
-// Add a Movable component to entities that can move
-#[derive(Component)]
+#[derive(Component, Debug)]
 pub struct Movable {
-    pub speed: f32, // Grid cells per second
+    pub speed: f32,
 }
 
 impl Default for Movable {
     fn default() -> Self {
-        Self { speed: 3.0 } // Units move at 3 grid cells per second
+        Self { speed: 3.0 }
     }
 }
 
-// Add a MoveTarget component to entities that are moving
-#[derive(Component, Default)]
+#[derive(Component, Debug, Default)]
 pub struct MoveTarget {
     pub destination: Option<GridCoords>,
     pub path: Vec<GridCoords>,
 }
 
-// Add a Moving component to entities that are currently moving
-#[derive(Component)]
+#[derive(Component, Debug)]
 pub struct Moving {
     pub from: Vec3,
     pub to: Vec3,
     pub progress: f32,
 }
 
-// Add a collider component to entities that should block movement
 #[derive(Component, Default)]
 pub struct Collider;
+
+// New component to track if an entity is busy doing something else
+#[derive(Component)]
+#[allow(dead_code)]
+pub struct Busy {
+    pub reason: BusyReason,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[allow(dead_code)]
+pub enum BusyReason {
+    Gathering,
+    Building,
+    Fighting,
+}

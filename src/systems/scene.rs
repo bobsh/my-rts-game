@@ -1,7 +1,7 @@
+use crate::components::unit::Selected;
+use crate::systems::ldtk_calibration::LdtkCalibration;
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
-
-use crate::components::unit::Selected;
 
 pub struct ScenePlugin;
 
@@ -15,12 +15,15 @@ impl Plugin for ScenePlugin {
                 ..Default::default()
             })
             .add_systems(Update, level_selection_follow_player)
-            .add_systems(Startup, setup_scene);
+            .add_systems(Startup, setup_scene)
+            .add_systems(Startup, initialize_ldtk_offset);
     }
 }
 
 pub fn setup_scene(mut commands: Commands, asset_server: Res<AssetServer>) {
-    commands.spawn((Camera2d, Transform::from_xyz(-550.0, -1050.0, 0.0)));
+    // Position the camera above the house area where the worker and warrior start
+    // Using coordinates based on your map layout - adjust as needed for your specific map
+    commands.spawn((Camera2d, Transform::from_xyz(-800.0, -1000.0, 0.0)));
 
     // Load the ldtk map file
     let map_handle = asset_server.load("test-map.ldtk");
@@ -29,6 +32,13 @@ pub fn setup_scene(mut commands: Commands, asset_server: Res<AssetServer>) {
         ldtk_handle: map_handle.into(),
         ..Default::default()
     });
+}
+
+// Initialize with a conservative offset - the user can adjust using Shift+O+Arrow keys
+fn initialize_ldtk_offset(mut ldtk_calibration: ResMut<LdtkCalibration>) {
+    // Starting with an offset of 0.0, to be adjusted by the user
+    ldtk_calibration.offset = Vec2::ZERO;
+    info!("Initialized LDtk with ZERO offset. Use Shift+O+Arrow keys to adjust if needed");
 }
 
 fn level_selection_follow_player(

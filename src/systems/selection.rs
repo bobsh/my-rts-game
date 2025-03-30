@@ -48,8 +48,6 @@ fn selection_system(
         if let Ok(world_position) = camera.viewport_to_world(camera_transform, cursor_position) {
             let world_position = world_position.origin.truncate();
 
-            info!("Click at world position: {:?}", world_position);
-
             // Remove selection rings
             for entity in selection_ring_query.iter() {
                 commands.entity(entity).despawn();
@@ -65,13 +63,6 @@ fn selection_system(
                 // Get entity size from sprite
                 let entity_size = get_entity_size(sprite, &images);
 
-                // Debug info
-                info!(
-                    "Entity at position: {:?} with size: {:?}",
-                    transform.translation().truncate(),
-                    entity_size
-                );
-
                 // Simple AABB collision detection with dynamic size
                 let min_x = transform.translation().x - entity_size.x / 2.0;
                 let max_x = transform.translation().x + entity_size.x / 2.0;
@@ -83,7 +74,9 @@ fn selection_system(
                     && world_position.y >= min_y
                     && world_position.y <= max_y
                 {
+                    // Only log significant events
                     info!("Selected entity: {:?}", entity);
+
                     // Add Selected component
                     commands.entity(entity).insert(Selected);
                     break;

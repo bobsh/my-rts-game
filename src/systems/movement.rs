@@ -1,39 +1,35 @@
-use crate::components::movement::*;
-use crate::components::unit::Selected;
-use bevy::input::mouse::MouseButton;
+use crate::components::movement::{Movable, MoveTarget, Moving};
+use crate::systems::ldtk_calibration::LdtkCalibration;
 use bevy::prelude::*;
-use bevy::window::Window;
 use bevy_ecs_ldtk::prelude::*;
-use std::cmp::Ordering;
-use std::collections::{BinaryHeap, HashMap, HashSet};
-
-// Define a constant for tile size - adjust this to match your game
-const TILE_SIZE: f32 = 64.0;
+use pathfinding::prelude::astar;
 
 pub struct MovementPlugin;
 
 impl Plugin for MovementPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(
-            Update,
-            (handle_movement_input, start_unit_movement, move_units).chain(),
-        );
+        app.add_systems(Update, handle_movement_input)
+            .add_systems(Update, update_movement.after(handle_movement_input))
+            .add_systems(Update, calculate_path.after(handle_movement_input))
+            .add_systems(Update, move_along_path.after(calculate_path));
     }
 }
 
-// Same systems but with updated pathfinding
-#[allow(clippy::type_complexity)]
+// Fixed system to handle right-click movement input
+#[allow(clippy::too_many_arguments)]
 fn handle_movement_input(
     mouse_button: Res<ButtonInput<MouseButton>>,
     windows: Query<&Window>,
     camera_q: Query<(&Camera, &GlobalTransform)>,
-    level_query: Query<&Transform, With<LdtkProjectHandle>>,
-    selected_units: Query<(Entity, &GridCoords), (With<Selected>, With<Movable>)>,
-    mut unit_targets: Query<&mut MoveTarget>,
-    colliders: Query<&GridCoords, With<Collider>>,
+    selected_units: Query<(Entity, &GridCoords), With<crate::components::unit::Selected>>,
+    mut move_targets: Query<&mut MoveTarget>,
+    ldtk_tile_query: Query<&GridCoords, With<crate::components::movement::Collider>>,
+    gatherers: Query<(), With<crate::systems::resource_gathering::Gathering>>,
+    ldtk_calibration: Res<LdtkCalibration>,
+    ldtk_worlds: Query<&GlobalTransform, With<LdtkProjectHandle>>,
 ) {
-    // Only process right-clicks
-    if !mouse_button.just_pressed(MouseButton::Right) {
+    // Only process right-click inputs when not already gathering resources
+    if !mouse_button.just_pressed(MouseButton::Right) || !gatherers.is_empty() {
         return;
     }
 
@@ -42,319 +38,276 @@ fn handle_movement_input(
         return;
     };
 
-    // Get camera transform to convert screen to world coordinates
     let (camera, camera_transform) = camera_q.single();
     let Ok(cursor_ray) = camera.viewport_to_world(camera_transform, cursor_position) else {
         return;
     };
 
-    let cursor_pos = cursor_ray.origin.truncate();
+    // Get the world position of the cursor
+    let cursor_world_pos = cursor_ray.origin.truncate();
+    info!("Raw cursor world position: {:?}", cursor_world_pos);
 
-    // Get the level transform
-    let level_transform = match level_query.get_single() {
-        Ok(transform) => transform,
-        Err(_) => return,
+    // Get the LDTK world transform
+    let ldtk_world_transform = ldtk_worlds.single();
+
+    // To get a position relative to LDTK world, we need to account for the world transform
+    // Subtract the world position (the offset is already applied to the transform)
+    let ldtk_relative_pos = cursor_world_pos - ldtk_world_transform.translation().truncate();
+
+    info!("LDTK-relative cursor position: {:?}", ldtk_relative_pos);
+
+    // Convert to grid coordinates with fixed grid offset as specified
+    let target_grid = GridCoords {
+        x: ((ldtk_relative_pos.x) / 64.0).floor() as i32 + ldtk_calibration.grid_offset.x,
+        y: ((ldtk_relative_pos.y) / 64.0).floor() as i32 + ldtk_calibration.grid_offset.y,
     };
 
-    // Debug info for world position
-    info!("Cursor world position: {:?}", cursor_pos);
-    info!(
-        "Level position: {:?}",
-        level_transform.translation.truncate()
-    );
+    info!("Target grid coordinates: {:?}", target_grid);
 
-    // Calculate grid position with the OFFSET CORRECTION
-    // Based on the debug logs, there's a consistent offset between entity grid coords
-    // and the calculated grid coordinates
-    let grid_pos = GridCoords {
-        x: ((cursor_pos.x - level_transform.translation.x) / TILE_SIZE).floor() as i32 + 30,
-        y: ((cursor_pos.y - level_transform.translation.y) / TILE_SIZE).floor() as i32 + 29,
-    };
+    // Get the first selected unit's position for reference
+    if let Some((entity, current_pos)) = selected_units.iter().next() {
+        // Log the current position and calculated target for debugging
+        info!(
+            "Current position: {:?}, Target: {:?}",
+            current_pos, target_grid
+        );
 
-    info!("Calculated grid position: {:?}", grid_pos);
+        // Calculate distance to verify it's reasonable
+        let dx = target_grid.x - current_pos.x;
+        let dy = target_grid.y - current_pos.y;
+        let distance = ((dx * dx + dy * dy) as f32).sqrt();
 
-    // Collect all blocked grid coordinates
-    let blocked_coords: HashSet<GridCoords> = colliders.iter().cloned().collect();
+        info!("Movement distance: {:.1} grid cells", distance);
 
-    // Set target for each selected unit
-    for (entity, grid_coords) in selected_units.iter() {
-        info!("Selected unit at grid: {:?}", grid_coords);
+        // If the distance is too large, exit early
+        if distance > 30.0 {
+            info!("Movement distance too large ({}), ignoring click", distance);
+            return;
+        }
 
-        if let Ok(mut move_target) = unit_targets.get_mut(entity) {
-            // Don't create a path if clicking on the same cell
-            if grid_coords.x == grid_pos.x && grid_coords.y == grid_pos.y {
+        // Check if the target position is occupied by a collider
+        let is_occupied = ldtk_tile_query
+            .iter()
+            .any(|tile_pos| tile_pos.x == target_grid.x && tile_pos.y == target_grid.y);
+
+        if !is_occupied {
+            if let Ok(mut move_target) = move_targets.get_mut(entity) {
+                // Clear any existing path
+                move_target.path.clear();
+                // Set the new destination
+                move_target.destination = Some(target_grid);
+                info!(
+                    "Setting movement destination to {:?} for entity {:?}",
+                    target_grid, entity
+                );
+            } else {
+                info!("Selected entity {:?} has no MoveTarget component", entity);
+            }
+        } else {
+            info!(
+                "Target position {:?} is occupied by a collider",
+                target_grid
+            );
+        }
+    }
+}
+
+// System to calculate a path when a destination is set
+fn calculate_path(
+    _commands: Commands,
+    mut query: Query<(Entity, &GridCoords, &mut MoveTarget), (With<Movable>, Without<Moving>)>,
+    obstacles: Query<&GridCoords, With<crate::components::movement::Collider>>,
+    _ldtk_level: Query<&LevelIid>,
+) {
+    for (entity, current_pos, mut move_target) in &mut query {
+        if let Some(destination) = move_target.destination {
+            // CRITICAL: Check if the destination is a reasonable distance
+            // This ensures we don't process destinations set from other systems that are too far
+            let dx = destination.x - current_pos.x;
+            let dy = destination.y - current_pos.y;
+            let distance = ((dx * dx + dy * dy) as f32).sqrt();
+
+            // Enforce maximum distance limit for ALL movement, even from other systems
+            if distance > 30.0 {
+                info!(
+                    "Path distance too large ({:.1}), canceling movement to {:?}",
+                    distance, destination
+                );
+                move_target.destination = None;
                 continue;
             }
 
-            // Use A* to find a path avoiding obstacles
-            move_target.destination = Some(grid_pos);
-            let path = a_star_pathfinding(grid_coords, &grid_pos, &blocked_coords);
-            info!("Path found: {:?}", path);
-            move_target.path = path;
-        }
-    }
-}
+            if move_target.path.is_empty() {
+                info!(
+                    "Calculating path from {:?} to {:?}",
+                    current_pos, destination
+                );
 
-// Same start_unit_movement function
-#[allow(clippy::type_complexity)]
-fn start_unit_movement(
-    mut commands: Commands,
-    level_transform: Query<&GlobalTransform, With<LdtkProjectHandle>>,
-    mut movable_units: Query<
-        (Entity, &Transform, &GridCoords, &mut MoveTarget, &Movable),
-        Without<Moving>,
-    >,
-    colliders: Query<&GridCoords, With<Collider>>,
-) {
-    let level_transform = match level_transform.get_single() {
-        Ok(transform) => transform,
-        Err(_) => return,
-    };
+                // Store obstacle positions for debugging
+                let obstacle_count = obstacles.iter().count();
+                info!("Found {} obstacles", obstacle_count);
 
-    // Collect all blocked grid coordinates
-    let blocked_coords: HashSet<GridCoords> = colliders.iter().cloned().collect();
+                // Define a function to find neighboring grid positions
+                let neighbors = |pos: &GridCoords| {
+                    let dirs = [
+                        (0, 1),
+                        (1, 0),
+                        (0, -1),
+                        (-1, 0), // Cardinal directions
+                        (1, 1),
+                        (1, -1),
+                        (-1, 1),
+                        (-1, -1), // Diagonals
+                    ];
 
-    for (entity, transform, grid_coords, mut move_target, _) in movable_units.iter_mut() {
-        // If there's no path or the path is empty but there's a destination,
-        // calculate a new path
-        if move_target.path.is_empty() && move_target.destination.is_some() {
-            let destination = move_target.destination.unwrap();
-            move_target.path = a_star_pathfinding(grid_coords, &destination, &blocked_coords);
-        }
+                    dirs.iter()
+                        .map(|(dx, dy)| GridCoords {
+                            x: pos.x + dx,
+                            y: pos.y + dy,
+                        })
+                        .filter(|next_pos| {
+                            // Use reasonable boundaries
+                            const MAX_BOUND: i32 = 50;
+                            let min_x = (current_pos.x - MAX_BOUND).min(destination.x - MAX_BOUND);
+                            let max_x = (current_pos.x + MAX_BOUND).max(destination.x + MAX_BOUND);
+                            let min_y = (current_pos.y - MAX_BOUND).min(destination.y - MAX_BOUND);
+                            let max_y = (current_pos.y + MAX_BOUND).max(destination.y + MAX_BOUND);
 
-        // If there's a path, start moving to the next cell
-        if !move_target.path.is_empty() {
-            let next_pos = move_target.path.remove(0);
+                            if next_pos.x < min_x
+                                || next_pos.x > max_x
+                                || next_pos.y < min_y
+                                || next_pos.y > max_y
+                            {
+                                return false;
+                            }
 
-            // Calculate world positions
-            let current_pos = transform.translation;
+                            // Only filter out positions occupied by actual obstacles
+                            !obstacles.iter().any(|obstacle_pos| {
+                                obstacle_pos.x == next_pos.x && obstacle_pos.y == next_pos.y
+                            })
+                        })
+                        .map(|pos| {
+                            // Cost is 1 for cardinal, sqrt(2) for diagonal (scaled to int)
+                            let dx = (pos.x - current_pos.x).abs();
+                            let dy = (pos.y - current_pos.y).abs();
+                            if dx == 1 && dy == 1 {
+                                (pos, 14) // Approximate sqrt(2) * 10
+                            } else {
+                                (pos, 10) // 10 for scaling purposes
+                            }
+                        })
+                        .collect::<Vec<_>>()
+                };
 
-            // Add half a tile size to position units at the center of grid cells
-            let target_world_x =
-                level_transform.translation().x + (next_pos.x as f32 + 0.5) * TILE_SIZE;
-            let target_world_y =
-                level_transform.translation().y + (next_pos.y as f32 + 0.5) * TILE_SIZE;
-            let target_pos = Vec3::new(target_world_x, target_world_y, current_pos.z);
+                // Calculate heuristic (Manhattan distance)
+                let heuristic = |pos: &GridCoords| {
+                    ((pos.x - destination.x).abs() + (pos.y - destination.y).abs()) as u32 * 10
+                };
 
-            // Start movement animation
-            commands.entity(entity).insert(Moving {
-                from: current_pos,
-                to: target_pos,
-                progress: 0.0,
-            });
+                // Check if already at destination
+                if current_pos.x == destination.x && current_pos.y == destination.y {
+                    // Already at destination, clear the target
+                    move_target.destination = None;
+                    continue;
+                }
 
-            // Update grid coordinates (logical position change)
-            commands.entity(entity).insert(next_pos);
-
-            // If the path is now empty and we've reached the destination,
-            // clear the destination too
-            if move_target.path.is_empty()
-                && move_target.destination.is_some()
-                && next_pos == move_target.destination.unwrap()
-            {
-                move_target.destination = None;
+                // Find path using A* algorithm
+                if let Some((path, _)) = astar(current_pos, neighbors, heuristic, |pos| {
+                    pos.x == destination.x && pos.y == destination.y
+                }) {
+                    // Skip the first position (current position)
+                    if path.len() > 1 {
+                        move_target.path = path.into_iter().skip(1).collect();
+                        info!(
+                            "Path found with {} steps for entity {:?}",
+                            move_target.path.len(),
+                            entity
+                        );
+                    } else {
+                        info!("Path is too short, already at destination");
+                        move_target.destination = None;
+                    }
+                } else {
+                    info!("No path found to destination for entity {:?}", entity);
+                    // Clear the destination if no path is found
+                    move_target.destination = None;
+                }
             }
         }
     }
 }
 
-fn move_units(
+// System to move along the calculated path
+fn move_along_path(
     mut commands: Commands,
-    time: Res<Time>,
-    mut moving_units: Query<(Entity, &mut Transform, &mut Moving, &Movable)>,
+    mut query: Query<(Entity, &GridCoords, &mut MoveTarget, &Movable), Without<Moving>>,
+    _time: Res<Time>,
 ) {
-    for (entity, mut transform, mut moving, movable) in moving_units.iter_mut() {
-        // Update progress based on time and speed
+    for (entity, current_pos, mut move_target, _movable) in &mut query {
+        if !move_target.path.is_empty() {
+            let next_pos = move_target.path[0];
+
+            // Convert grid coordinates to world positions
+            // Add 32.0 (half tile size) to center movement on tiles
+            let current_world_pos = Vec3::new(
+                current_pos.x as f32 * 64.0 + 32.0,
+                current_pos.y as f32 * 64.0 + 32.0,
+                0.0,
+            );
+
+            let next_world_pos = Vec3::new(
+                next_pos.x as f32 * 64.0 + 32.0,
+                next_pos.y as f32 * 64.0 + 32.0,
+                0.0,
+            );
+
+            // Start moving to the next position
+            commands.entity(entity).insert(Moving {
+                from: current_world_pos,
+                to: next_world_pos,
+                progress: 0.0,
+            });
+
+            // Remove the position we're moving to from the path
+            move_target.path.remove(0);
+        } else if move_target.destination.is_some() {
+            // We've reached the end of the path, clear the destination
+            move_target.destination = None;
+        }
+    }
+}
+
+// System to update entity position while moving
+fn update_movement(
+    mut commands: Commands,
+    mut query: Query<(Entity, &mut Transform, &mut Moving, &Movable)>,
+    mut grid_coords: Query<&mut GridCoords>,
+    time: Res<Time>,
+) {
+    for (entity, mut transform, mut moving, movable) in &mut query {
+        // Update progress
         moving.progress += time.delta_secs() * movable.speed;
 
         if moving.progress >= 1.0 {
             // Movement complete
             transform.translation = moving.to;
+
+            // Update grid coordinates based on the target position directly
+            // This eliminates any potential for rounding errors
+            if let Ok(mut coords) = grid_coords.get_mut(entity) {
+                // Calculate grid coords based on absolute world position / tile size
+                // Subtract the 32.0 offset when converting from world to grid
+                *coords = GridCoords {
+                    x: ((moving.to.x - 32.0) / 64.0).floor() as i32,
+                    y: ((moving.to.y - 32.0) / 64.0).floor() as i32,
+                };
+            }
+
+            // Remove Moving component
             commands.entity(entity).remove::<Moving>();
         } else {
-            // Smooth interpolation between grid cells
+            // Interpolate position
             transform.translation = moving.from.lerp(moving.to, moving.progress);
         }
     }
-}
-
-// A* Node for priority queue
-#[derive(Copy, Clone, Eq, PartialEq)]
-struct Node {
-    position: GridCoords,
-    f_score: i32, // f = g + h
-    g_score: i32, // cost from start
-}
-
-// Required for BinaryHeap
-impl Ord for Node {
-    fn cmp(&self, other: &Self) -> Ordering {
-        // Reverse ordering for min-heap
-        other.f_score.cmp(&self.f_score)
-    }
-}
-
-impl PartialOrd for Node {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
-    }
-}
-
-// A* pathfinding algorithm
-fn a_star_pathfinding(
-    start: &GridCoords,
-    end: &GridCoords,
-    blocked: &HashSet<GridCoords>,
-) -> Vec<GridCoords> {
-    // If the destination is blocked, we can't go there
-    if blocked.contains(end) {
-        return Vec::new();
-    }
-
-    // Initialize data structures
-    let mut open_set = BinaryHeap::new();
-    let mut came_from: HashMap<GridCoords, GridCoords> = HashMap::new();
-    let mut g_score: HashMap<GridCoords, i32> = HashMap::new();
-    let mut f_score: HashMap<GridCoords, i32> = HashMap::new();
-    let mut closed_set: HashSet<GridCoords> = HashSet::new();
-
-    // Start node
-    g_score.insert(*start, 0);
-    f_score.insert(*start, heuristic(start, end));
-    open_set.push(Node {
-        position: *start,
-        f_score: heuristic(start, end),
-        g_score: 0,
-    });
-
-    while let Some(current) = open_set.pop() {
-        let current_pos = current.position;
-
-        // Check if we reached the goal
-        if current_pos == *end {
-            return reconstruct_path(&came_from, current_pos);
-        }
-
-        // Mark as visited
-        closed_set.insert(current_pos);
-
-        // Check all neighbors
-        for neighbor_pos in get_neighbors(&current_pos) {
-            // Skip if already visited or blocked
-            if closed_set.contains(&neighbor_pos) || blocked.contains(&neighbor_pos) {
-                continue;
-            }
-
-            // Calculate tentative g score
-            let movement_cost = if is_diagonal(&current_pos, &neighbor_pos) {
-                14
-            } else {
-                10
-            };
-            let tentative_g = current.g_score + movement_cost;
-
-            // If this path is better than any previous one
-            let is_better = match g_score.get(&neighbor_pos) {
-                Some(score) => tentative_g < *score,
-                None => true,
-            };
-
-            if is_better {
-                // Record this path
-                came_from.insert(neighbor_pos, current_pos);
-                g_score.insert(neighbor_pos, tentative_g);
-
-                let h = heuristic(&neighbor_pos, end);
-                let f = tentative_g + h;
-                f_score.insert(neighbor_pos, f);
-
-                // Only add to open set if not already there
-                if !open_set.iter().any(|n| n.position == neighbor_pos) {
-                    open_set.push(Node {
-                        position: neighbor_pos,
-                        f_score: f,
-                        g_score: tentative_g,
-                    });
-                }
-            }
-        }
-    }
-
-    // No path found
-    Vec::new()
-}
-
-// Manhattan distance heuristic
-fn heuristic(a: &GridCoords, b: &GridCoords) -> i32 {
-    let dx = (b.x - a.x).abs();
-    let dy = (b.y - a.y).abs();
-    10 * (dx + dy)
-}
-
-// Check if movement between two coords is diagonal
-fn is_diagonal(a: &GridCoords, b: &GridCoords) -> bool {
-    a.x != b.x && a.y != b.y
-}
-
-// Get all valid adjacent positions
-fn get_neighbors(pos: &GridCoords) -> Vec<GridCoords> {
-    let neighbors = vec![
-        GridCoords {
-            x: pos.x + 1,
-            y: pos.y,
-        },
-        GridCoords {
-            x: pos.x - 1,
-            y: pos.y,
-        },
-        GridCoords {
-            x: pos.x,
-            y: pos.y + 1,
-        },
-        GridCoords {
-            x: pos.x,
-            y: pos.y - 1,
-        },
-        GridCoords {
-            x: pos.x + 1,
-            y: pos.y + 1,
-        },
-        GridCoords {
-            x: pos.x + 1,
-            y: pos.y - 1,
-        },
-        GridCoords {
-            x: pos.x - 1,
-            y: pos.y + 1,
-        },
-        GridCoords {
-            x: pos.x - 1,
-            y: pos.y - 1,
-        },
-    ];
-
-    neighbors
-}
-
-// Reconstruct path from came_from map
-fn reconstruct_path(
-    came_from: &HashMap<GridCoords, GridCoords>,
-    end: GridCoords,
-) -> Vec<GridCoords> {
-    let mut path = Vec::new();
-    let mut current = end;
-
-    while let Some(&prev) = came_from.get(&current) {
-        path.push(current);
-        current = prev;
-
-        // Safety check for cycles (shouldn't happen with A* but just in case)
-        if path.len() > 1000 {
-            break;
-        }
-    }
-
-    // Path is from end to start, so reverse it
-    path.reverse();
-    path
 }

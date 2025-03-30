@@ -1,3 +1,4 @@
+use crate::components::inventory::{Inventory, InventorySettings}; // Add this import
 use crate::components::ui::{EntityInfoPanel, EntityNameText};
 use crate::components::unit::Selected;
 use bevy::prelude::*;
@@ -49,33 +50,34 @@ fn setup_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
         });
 }
 
+// Update your UI system to include inventory visualization:
+
 fn update_entity_info_panel(
-    selected_entities: Query<Entity, With<Selected>>,
-    house_query: Query<Entity, With<Name>>,
-    unit_query: Query<&Name>,
-    mut entity_name_text: Query<&mut Text, With<EntityNameText>>,
+    selected_entities: Query<(Entity, Option<&Name>, Option<&Inventory>), With<Selected>>,
+    _house_query: Query<Entity, With<Name>>,
     mut panel_query: Query<&mut Node, With<EntityInfoPanel>>,
+    mut entity_name_text: Query<&mut Text, With<EntityNameText>>,
+    _inventory_settings: Query<&InventorySettings>,
 ) {
     // Get a mutable reference to the panel to control visibility
     if let Ok(mut panel_node) = panel_query.get_single_mut() {
         // Check if there's a selected entity
-        if let Some(entity) = selected_entities.iter().next() {
+        if let Ok((_entity, name, _inventory)) = selected_entities.get_single() {
             // Show the panel when something is selected
             panel_node.display = Display::Flex;
 
-            // Try to get the entity's name
-            let entity_name = match unit_query.get(entity) {
-                Ok(name) => name.as_str().to_string(),
-                Err(_) => {
-                    // Fall back to type detection logic
-                    get_entity_type_name(entity, &house_query)
-                }
-            };
-
             // Update the title text to show the entity name
             if let Ok(mut name_text) = entity_name_text.get_single_mut() {
+                let entity_name = if let Some(name) = name {
+                    name.as_str().to_string()
+                } else {
+                    "Entity".to_string()
+                };
+
                 *name_text = Text::new(entity_name);
             }
+
+            // Inventory will be displayed by the inventory system
         } else {
             // Hide the panel when nothing is selected
             panel_node.display = Display::None;
@@ -84,6 +86,7 @@ fn update_entity_info_panel(
 }
 
 // Helper function to identify entity types without importing them directly
+#[allow(dead_code)]
 fn get_entity_type_name(entity: Entity, house_query: &Query<Entity, With<Name>>) -> String {
     // Try to determine what type of entity this is
     if house_query.contains(entity) {

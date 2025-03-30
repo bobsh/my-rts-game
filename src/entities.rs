@@ -2,13 +2,15 @@ use bevy::app::{App, Plugin};
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 
+use crate::components::inventory::{Inventory, InventorySettings};
 use crate::components::movement::{Collider, Movable, MoveTarget};
+use crate::components::skills::{SkillProgression, Skills};
 use crate::components::unit::Selectable;
 
 pub struct EntitiesPlugin;
 
 #[derive(Default, Component)]
-struct Warrior;
+pub struct Warrior;
 
 #[derive(Default, Bundle, LdtkEntity)]
 struct WarriorBundle {
@@ -21,10 +23,14 @@ struct WarriorBundle {
     grid_coords: GridCoords,
     movable: Movable,
     move_target: MoveTarget,
+    inventory: Inventory,
+    inventory_settings: InventorySettings,
+    skills: Skills,
+    skill_progression: SkillProgression,
 }
 
 #[derive(Default, Component)]
-struct Worker;
+pub struct Worker;
 
 #[derive(Default, Bundle, LdtkEntity)]
 struct WorkerBundle {
@@ -37,16 +43,24 @@ struct WorkerBundle {
     grid_coords: GridCoords,
     movable: Movable,
     move_target: MoveTarget,
+    inventory: Inventory,
+    inventory_settings: InventorySettings,
+}
+
+// You'll need to implement Default for Inventory to make this work:
+impl Default for Inventory {
+    fn default() -> Self {
+        Self::new(4) // Default 4 slots for workers
+    }
 }
 
 #[derive(Default, Component)]
-struct Mine;
+pub struct Mine;
 
 #[derive(Default, Bundle, LdtkEntity)]
 struct MineBundle {
     mine: Mine,
     selectable: Selectable,
-    collider: Collider,
     #[sprite_sheet]
     sprite_sheet: Sprite,
     #[grid_coords]
@@ -54,13 +68,12 @@ struct MineBundle {
 }
 
 #[derive(Default, Component)]
-struct Quarry;
+pub struct Quarry;
 
 #[derive(Default, Bundle, LdtkEntity)]
 struct QuarryBundle {
     quarry: Quarry,
     selectable: Selectable,
-    collider: Collider,
     #[sprite_sheet]
     sprite_sheet: Sprite,
     #[grid_coords]
@@ -68,7 +81,7 @@ struct QuarryBundle {
 }
 
 #[derive(Default, Component)]
-struct Tree;
+pub struct Tree;
 
 #[derive(Default, Bundle, LdtkEntity)]
 struct TreeBundle {
@@ -82,7 +95,7 @@ struct TreeBundle {
 }
 
 #[derive(Default, Component)]
-struct House;
+pub struct House;
 
 #[derive(Default, Bundle, LdtkEntity)]
 struct HouseBundle {
@@ -93,6 +106,8 @@ struct HouseBundle {
     sprite_sheet: Sprite,
     #[grid_coords]
     grid_coords: GridCoords,
+    inventory: Inventory,
+    inventory_settings: InventorySettings,
 }
 
 impl Plugin for EntitiesPlugin {
