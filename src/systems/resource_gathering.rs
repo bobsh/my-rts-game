@@ -126,7 +126,7 @@ fn start_gathering(
     mouse_button: Res<ButtonInput<MouseButton>>,
     windows: Query<&Window>,
     camera_q: Query<(&Camera, &GlobalTransform)>,
-    selected_characters: Query<(Entity, &Skills, &GridCoords), With<Selected>>,
+    selected_characters: Query<(Entity, &Skills, &GridCoords, Option<&Gathering>), With<Selected>>,
     mut move_targets: Query<&mut MoveTarget>,
     resource_nodes: Query<(
         Entity,
@@ -158,7 +158,7 @@ fn start_gathering(
 
     info!("Resource gathering cursor position: {:?}", cursor_pos);
 
-    let Some((character_entity, _skills, character_coords)) = selected_characters.iter().next()
+    let Some((character_entity, _skills, character_coords, is_gathering)) = selected_characters.iter().next()
     else {
         return;
     };
@@ -179,12 +179,13 @@ fn start_gathering(
             && cursor_pos.y >= min_y
             && cursor_pos.y <= max_y
         {
-            found_resource = true;
-
             if is_tree.is_none() && is_mine.is_none() && is_quarry.is_none() {
                 info!("Clicked on a sprite that isn't a valid resource, ignoring");
                 continue;
             }
+
+            // Only set found_resource to true AFTER confirming it's a valid resource
+            found_resource = true;
 
             let (resource_type, resource_name) = if is_tree.is_some() {
                 (ResourceType::Wood, "wood from tree")
@@ -200,6 +201,12 @@ fn start_gathering(
                 if gathering_intent.target == node_entity {
                     return;
                 }
+            }
+
+            // If character is currently gathering, stop it
+            if is_gathering.is_some() {
+                info!("Interrupting current gathering to gather a different resource");
+                commands.entity(character_entity).remove::<Gathering>();
             }
 
             commands.entity(character_entity).insert(GatheringIntent {
@@ -281,6 +288,17 @@ fn start_gathering(
     }
 
     if !found_resource {
+        // If clicking on an empty area, interrupt gathering if in progress
+        if is_gathering.is_some() {
+            info!("Interrupting gathering to move elsewhere");
+            commands.entity(character_entity).remove::<Gathering>();
+        }
+
+        // Also remove gathering intent if it exists
+        if gathering_intent_query.contains(character_entity) {
+            commands.entity(character_entity).remove::<GatheringIntent>();
+        }
+
         info!("No resource found at click position, deferring to movement system");
     }
 }
