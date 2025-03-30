@@ -4,6 +4,7 @@ use bevy_ecs_ldtk::prelude::*;
 
 use crate::components::inventory::{Inventory, InventorySettings};
 use crate::components::movement::{Collider, Movable, MoveTarget};
+use crate::components::resources::ResourceNode;
 use crate::components::skills::{SkillProgression, Skills};
 use crate::components::unit::Selectable;
 
@@ -60,6 +61,7 @@ pub struct Mine;
 #[derive(Default, Bundle, LdtkEntity)]
 struct MineBundle {
     mine: Mine,
+    resource_node: ResourceNode,
     selectable: Selectable,
     #[sprite_sheet]
     sprite_sheet: Sprite,
@@ -73,6 +75,7 @@ pub struct Quarry;
 #[derive(Default, Bundle, LdtkEntity)]
 struct QuarryBundle {
     quarry: Quarry,
+    resource_node: ResourceNode,
     selectable: Selectable,
     #[sprite_sheet]
     sprite_sheet: Sprite,
@@ -85,9 +88,10 @@ pub struct Tree;
 
 #[derive(Default, Bundle, LdtkEntity)]
 struct TreeBundle {
-    tree: Tree,
-    selectable: Selectable,
     collider: Collider,
+    resource_node: ResourceNode,
+    selectable: Selectable,
+    tree: Tree,
     #[sprite_sheet]
     sprite_sheet: Sprite,
     #[grid_coords]
