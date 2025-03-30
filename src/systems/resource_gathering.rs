@@ -161,7 +161,8 @@ fn start_gathering(
 
     info!("Resource gathering cursor position: {:?}", cursor_pos);
 
-    let Some((character_entity, _skills, character_coords, is_gathering)) = selected_characters.iter().next()
+    let Some((character_entity, _skills, character_coords, is_gathering)) =
+        selected_characters.iter().next()
     else {
         return;
     };
@@ -253,7 +254,9 @@ fn start_gathering(
                         "No valid adjacent positions found for resource at {:?}",
                         resource_grid
                     );
-                    commands.entity(character_entity).remove::<GatheringIntent>();
+                    commands
+                        .entity(character_entity)
+                        .remove::<GatheringIntent>();
                     return;
                 }
 
@@ -301,21 +304,23 @@ fn start_gathering(
                 cursor_position,
                 &camera_q,
                 &ldtk_worlds,
-                &ldtk_calibration
+                &ldtk_calibration,
             ) {
                 crate::systems::movement::set_movement_target(
                     character_entity,
                     target_grid,
                     character_coords,
                     &ldtk_tile_query,
-                    &mut move_targets
+                    &mut move_targets,
                 );
             }
         }
 
         // Also remove gathering intent if it exists
         if gathering_intent_query.contains(character_entity) {
-            commands.entity(character_entity).remove::<GatheringIntent>();
+            commands
+                .entity(character_entity)
+                .remove::<GatheringIntent>();
         }
 
         info!("No resource found at click position, deferring to movement system");

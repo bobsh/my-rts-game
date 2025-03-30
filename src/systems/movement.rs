@@ -61,7 +61,10 @@ pub fn set_movement_target(
 
     // If the distance is too large, exit early
     if distance > 30.0 {
-        info!("Movement distance too large ({:.1}), ignoring click", distance);
+        info!(
+            "Movement distance too large ({:.1}), ignoring click",
+            distance
+        );
         return false;
     }
 
@@ -129,21 +132,27 @@ fn handle_movement_input(
     }
 
     // Calculate grid position from cursor
-    let Some(target_grid) = calculate_cursor_grid_position(
-        cursor_position,
-        &camera_q,
-        &ldtk_worlds,
-        &ldtk_calibration
-    ) else {
+    let Some(target_grid) =
+        calculate_cursor_grid_position(cursor_position, &camera_q, &ldtk_worlds, &ldtk_calibration)
+    else {
         return;
     };
 
     info!("Raw cursor world position: {:?}", cursor_position);
     info!("Target grid coordinates: {:?}", target_grid);
-    info!("Current position: {:?}, Target: {:?}", current_pos, target_grid);
+    info!(
+        "Current position: {:?}, Target: {:?}",
+        current_pos, target_grid
+    );
 
     // Try to set movement target
-    set_movement_target(entity, target_grid, current_pos, &ldtk_tile_query, &mut move_targets);
+    set_movement_target(
+        entity,
+        target_grid,
+        current_pos,
+        &ldtk_tile_query,
+        &mut move_targets,
+    );
 }
 
 // System to calculate a path when a destination is set
