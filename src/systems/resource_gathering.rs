@@ -180,7 +180,7 @@ fn start_gathering(
         {
             found_resource = true;
 
-            if !is_tree.is_some() && !is_mine.is_some() && !is_quarry.is_some() {
+            if is_tree.is_none() && is_mine.is_none() && is_quarry.is_none() {
                 info!("Clicked on a sprite that isn't a valid resource, ignoring");
                 continue;
             }
@@ -215,8 +215,8 @@ fn start_gathering(
                 let raw_grid_y = (world_to_grid_pos.y / 64.0).round() as i32;
 
                 let resource_grid = GridCoords {
-                    x: raw_grid_x + 30,
-                    y: raw_grid_y + 29,
+                    x: raw_grid_x + ldtk_calibration.grid_offset.x,
+                    y: raw_grid_y + ldtk_calibration.grid_offset.y,
                 };
 
                 let character_grid = character_coords;
@@ -402,7 +402,7 @@ fn check_gathering_proximity(
         if let Ok((resource_transform, resource_transform_relative, is_tree, is_mine, is_quarry)) =
             resources.get(intent.target)
         {
-            if !is_tree.is_some() && !is_mine.is_some() && !is_quarry.is_some() {
+            if is_tree.is_none() && is_mine.is_none() && is_quarry.is_none() {
                 info!("Invalid resource target, removing gathering intent");
                 commands.entity(entity).remove::<GatheringIntent>();
                 continue;
@@ -734,18 +734,16 @@ fn handle_resource_transfer(
                     {
                         let entity_pos = transform.translation().truncate();
                         let distance = cursor_pos.distance(entity_pos);
-                        if distance < 100.0 {
-                            if selected_inventory.count_resource(ResourceType::Wood) > 0 {
-                                let amount = selected_inventory.transfer_to(
-                                    &mut inventory,
-                                    ResourceType::Wood,
-                                    1,
-                                    settings.max_stack_size,
-                                );
-                                info!("Transferred {} Wood to entity {:?}", amount, entity);
-                                if amount > 0 {
-                                    break;
-                                }
+                        if distance < 100.0 && selected_inventory.count_resource(ResourceType::Wood) > 0 {
+                            let amount = selected_inventory.transfer_to(
+                                &mut inventory,
+                                ResourceType::Wood,
+                                1,
+                                settings.max_stack_size,
+                            );
+                            info!("Transferred {} Wood to entity {:?}", amount, entity);
+                            if amount > 0 {
+                                break;
                             }
                         }
                     }

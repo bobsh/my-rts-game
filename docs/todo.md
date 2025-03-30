@@ -49,6 +49,6 @@
 - [x] Try a different house sprite
 - [x] Every unit needs an inventory system
 - [x] Gathering
-- [ ] There is a problem with the offset of the map, not sure why, but the offset of 30,29 needs to be centralised in ldtk_calibration.rs I think.
+- [x] There is a problem with the offset of the map, not sure why, but the offset of 30,29 needs to be centralised in ldtk_calibration.rs I think.
 - [ ] Remove the other character, lets just start with 1 for now, or maybe spawn 2 of the same type, but lets keep it simple and for now not assign a rpg class.
 - [ ] Fog of war

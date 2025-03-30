@@ -6,6 +6,7 @@ pub struct LdtkCalibrationPlugin;
 #[derive(Resource)]
 pub struct LdtkCalibration {
     pub offset: Vec2,
+    pub grid_offset: IVec2, // New field for the grid offset
 }
 
 impl Default for LdtkCalibration {
@@ -13,6 +14,7 @@ impl Default for LdtkCalibration {
         Self {
             // Start with zero offset and let manual calibration find the correct value
             offset: Vec2::ZERO,
+            grid_offset: IVec2::new(30, 29), // Default grid offset that was hardcoded
         }
     }
 }
@@ -28,42 +30,40 @@ impl Plugin for LdtkCalibrationPlugin {
 // System to adjust the calibration with keyboard input
 fn adjust_ldtk_offset(keys: Res<ButtonInput<KeyCode>>, mut calibration: ResMut<LdtkCalibration>) {
     // Only active when Shift key held
-    if keys.pressed(KeyCode::ShiftLeft) {
-        if keys.pressed(KeyCode::KeyO) {
-            // O for "Offset"
-            if keys.pressed(KeyCode::ArrowLeft) {
-                calibration.offset.x -= 1.0;
-                info!(
-                    "LDtk Calibration X: {}, Y: {}",
-                    calibration.offset.x, calibration.offset.y
-                );
-            }
-            if keys.pressed(KeyCode::ArrowRight) {
-                calibration.offset.x += 1.0;
-                info!(
-                    "LDtk Calibration X: {}, Y: {}",
-                    calibration.offset.x, calibration.offset.y
-                );
-            }
-            if keys.pressed(KeyCode::ArrowUp) {
-                calibration.offset.y += 1.0;
-                info!(
-                    "LDtk Calibration X: {}, Y: {}",
-                    calibration.offset.x, calibration.offset.y
-                );
-            }
-            if keys.pressed(KeyCode::ArrowDown) {
-                calibration.offset.y -= 1.0;
-                info!(
-                    "LDtk Calibration X: {}, Y: {}",
-                    calibration.offset.x, calibration.offset.y
-                );
-            }
-            // Reset to zero with R
-            if keys.just_pressed(KeyCode::KeyR) {
-                calibration.offset = Vec2::ZERO;
-                info!("LDtk Calibration reset to zero ");
-            }
+    if keys.pressed(KeyCode::ShiftLeft) && keys.pressed(KeyCode::KeyO) {
+        // O for "Offset"
+        if keys.pressed(KeyCode::ArrowLeft) {
+            calibration.offset.x -= 1.0;
+            info!(
+                "LDtk Calibration X: {}, Y: {}",
+                calibration.offset.x, calibration.offset.y
+            );
+        }
+        if keys.pressed(KeyCode::ArrowRight) {
+            calibration.offset.x += 1.0;
+            info!(
+                "LDtk Calibration X: {}, Y: {}",
+                calibration.offset.x, calibration.offset.y
+            );
+        }
+        if keys.pressed(KeyCode::ArrowUp) {
+            calibration.offset.y += 1.0;
+            info!(
+                "LDtk Calibration X: {}, Y: {}",
+                calibration.offset.x, calibration.offset.y
+            );
+        }
+        if keys.pressed(KeyCode::ArrowDown) {
+            calibration.offset.y -= 1.0;
+            info!(
+                "LDtk Calibration X: {}, Y: {}",
+                calibration.offset.x, calibration.offset.y
+            );
+        }
+        // Reset to zero with R
+        if keys.just_pressed(KeyCode::KeyR) {
+            calibration.offset = Vec2::ZERO;
+            info!("LDtk Calibration reset to zero ");
         }
     }
 }

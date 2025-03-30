@@ -13,19 +13,12 @@ impl Default for Movable {
 }
 
 #[derive(Component, Debug)]
+#[derive(Default)]
 pub struct MoveTarget {
     pub destination: Option<GridCoords>,
     pub path: Vec<GridCoords>,
 }
 
-impl Default for MoveTarget {
-    fn default() -> Self {
-        Self {
-            destination: None,
-            path: Vec::new(),
-        }
-    }
-}
 
 #[derive(Component, Debug)]
 pub struct Moving {
