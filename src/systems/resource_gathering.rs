@@ -734,7 +734,9 @@ fn handle_resource_transfer(
                     {
                         let entity_pos = transform.translation().truncate();
                         let distance = cursor_pos.distance(entity_pos);
-                        if distance < 100.0 && selected_inventory.count_resource(ResourceType::Wood) > 0 {
+                        if distance < 100.0
+                            && selected_inventory.count_resource(ResourceType::Wood) > 0
+                        {
                             let amount = selected_inventory.transfer_to(
                                 &mut inventory,
                                 ResourceType::Wood,

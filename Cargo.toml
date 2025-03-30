@@ -28,3 +28,10 @@ pathfinding = "4.3.0"
 
 [build-dependencies]
 winres = "0.1"
+
+[lints.clippy]
+# Disable specific clippy lints that are too strict for Bevy patterns:
+# - type_complexity: Bevy's ECS queries often require complex type signatures with multiple components
+type_complexity = "allow"
+# - too_many_arguments: Bevy systems frequently need access to many different resources and queries
+too_many_arguments = "allow"

@@ -16,6 +16,7 @@ impl Plugin for MovementPlugin {
 }
 
 // Fixed system to handle right-click movement input
+#[allow(clippy::too_many_arguments)]
 fn handle_movement_input(
     mouse_button: Res<ButtonInput<MouseButton>>,
     windows: Query<&Window>,
@@ -211,12 +212,9 @@ fn calculate_path(
                 }
 
                 // Find path using A* algorithm
-                if let Some((path, _)) = astar(
-                    current_pos,
-                    neighbors,
-                    heuristic,
-                    |pos| pos.x == destination.x && pos.y == destination.y,
-                ) {
+                if let Some((path, _)) = astar(current_pos, neighbors, heuristic, |pos| {
+                    pos.x == destination.x && pos.y == destination.y
+                }) {
                     // Skip the first position (current position)
                     if path.len() > 1 {
                         move_target.path = path.into_iter().skip(1).collect();
