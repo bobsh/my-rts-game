@@ -41,8 +41,7 @@ jobs:
       - name: Configure sparse index
         shell: bash
         run: |
-          mkdir -p .cargo
-          echo '[registries.crates-io]' > .cargo/config.toml
+          echo '[registries.crates-io]' >> .cargo/config.toml
           echo 'protocol = "sparse"' >> .cargo/config.toml
 
       - name: Setup Rust
@@ -111,8 +110,7 @@ jobs:
 
       - name: Configure sparse index
         run: |
-          mkdir -p .cargo
-          echo '[registries.crates-io]' > .cargo\config.toml
+          echo '[registries.crates-io]' >> .cargo\config.toml
           echo 'protocol = "sparse"' >> .cargo\config.toml
         shell: pwsh
 
@@ -276,8 +274,7 @@ jobs:
 
       - name: Configure sparse index
         run: |
-          mkdir -p .cargo
-          echo '[registries.crates-io]' > .cargo/config.toml
+          echo '[registries.crates-io]' >> .cargo/config.toml
           echo 'protocol = "sparse"' >> .cargo/config.toml
           echo '[target.x86_64-unknown-linux-gnu]' >> .cargo/config.toml
           echo 'linker = "clang"' >> .cargo/config.toml
@@ -361,8 +358,7 @@ jobs:
 
       - name: Configure sparse index
         run: |
-          mkdir -p .cargo
-          echo '[registries.crates-io]' > .cargo/config.toml
+          echo '[registries.crates-io]' >> .cargo/config.toml
           echo 'protocol = "sparse"' >> .cargo/config.toml
 
       - name: Setup Rust
