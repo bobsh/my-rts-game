@@ -276,9 +276,6 @@ jobs:
         run: |
           echo '[registries.crates-io]' >> .cargo/config.toml
           echo 'protocol = "sparse"' >> .cargo/config.toml
-          echo '[target.x86_64-unknown-linux-gnu]' >> .cargo/config.toml
-          echo 'linker = "clang"' >> .cargo/config.toml
-          echo 'rustflags = ["-C", "link-arg=-fuse-ld=lld"]' >> .cargo/config.toml
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
