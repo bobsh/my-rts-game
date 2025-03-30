@@ -56,9 +56,11 @@ fn handle_movement_input(
     info!("LDTK-relative cursor position: {:?}", ldtk_relative_pos);
 
     // Convert to grid coordinates with fixed grid offset as specified
+    // ISSUE: We need to subtract half the tile size (32.0) before dividing,
+    // and use floor instead of round to handle grid cell boundaries correctly
     let target_grid = GridCoords {
-        x: (ldtk_relative_pos.x / 64.0).round() as i32 + 29, // Add 29 to x
-        y: (ldtk_relative_pos.y / 64.0).round() as i32 + 28, // Add 30 to y
+        x: ((ldtk_relative_pos.x) / 64.0).floor() as i32 + 30, // Add 29 to x
+        y: ((ldtk_relative_pos.y) / 64.0).floor() as i32 + 29, // Add 28 to y
     };
 
     info!("Target grid coordinates: {:?}", target_grid);
