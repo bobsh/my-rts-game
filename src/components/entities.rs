@@ -35,6 +35,7 @@ pub struct Mine;
 
 #[derive(Default, Bundle, LdtkEntity)]
 struct MineBundle {
+    collider: Collider,
     mine: Mine,
     resource_node: ResourceNode,
     selectable: Selectable,
@@ -49,6 +50,7 @@ pub struct Quarry;
 
 #[derive(Default, Bundle, LdtkEntity)]
 struct QuarryBundle {
+    collider: Collider,
     quarry: Quarry,
     resource_node: ResourceNode,
     selectable: Selectable,

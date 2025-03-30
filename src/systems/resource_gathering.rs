@@ -138,6 +138,7 @@ fn start_gathering(
     )>,
     gathering_intent_query: Query<&GatheringIntent>,
     ldtk_calibration: Res<LdtkCalibration>,
+    obstacles: Query<&GridCoords, With<crate::components::movement::Collider>>,
 ) {
     if !mouse_button.just_pressed(MouseButton::Right) {
         return;
@@ -235,135 +236,46 @@ fn start_gathering(
                     pos, ldtk_calibration.offset
                 );
 
-                let dx = (resource_grid.x - character_grid.x) as f32;
-                let dy = (resource_grid.y - character_grid.y) as f32;
-                let current_distance = (dx * dx + dy * dy).sqrt();
+                let adjacent_positions = find_adjacent_positions(resource_grid, &obstacles);
 
-                if current_distance <= 1.5 {
+                if adjacent_positions.is_empty() {
                     info!(
-                        "Already adjacent to resource (distance: {:.1}), not moving",
-                        current_distance
+                        "No valid adjacent positions found for resource at {:?}",
+                        resource_grid
                     );
-                    continue;
+                    commands.entity(character_entity).remove::<GatheringIntent>();
+                    return;
                 }
 
-                let approach_positions = [
-                    GridCoords {
-                        x: resource_grid.x - 1,
-                        y: resource_grid.y,
-                    }, // Left
-                    GridCoords {
-                        x: resource_grid.x + 1,
-                        y: resource_grid.y,
-                    }, // Right
-                    GridCoords {
-                        x: resource_grid.x,
-                        y: resource_grid.y - 1,
-                    }, // Below
-                    GridCoords {
-                        x: resource_grid.x,
-                        y: resource_grid.y + 1,
-                    }, // Above
-                    GridCoords {
-                        x: resource_grid.x - 1,
-                        y: resource_grid.y - 1,
-                    }, // Bottom-left
-                    GridCoords {
-                        x: resource_grid.x + 1,
-                        y: resource_grid.y - 1,
-                    }, // Bottom-right
-                    GridCoords {
-                        x: resource_grid.x - 1,
-                        y: resource_grid.y + 1,
-                    }, // Top-left
-                    GridCoords {
-                        x: resource_grid.x + 1,
-                        y: resource_grid.y + 1,
-                    }, // Top-right
-                ];
+                let mut sorted_positions = adjacent_positions.clone();
+                sorted_positions.sort_by(|a, b| {
+                    let dist_a =
+                        ((a.x - character_grid.x).pow(2) + (a.y - character_grid.y).pow(2)) as f32;
+                    let dist_b =
+                        ((b.x - character_grid.x).pow(2) + (b.y - character_grid.y).pow(2)) as f32;
+                    dist_a.partial_cmp(&dist_b).unwrap()
+                });
 
                 info!(
-                    "Evaluating adjacent positions for resource at {:?}",
+                    "Found {} possible approach positions for resource at {:?}",
+                    sorted_positions.len(),
                     resource_grid
                 );
 
-                let destination = approach_positions
-                    .iter()
-                    .filter(|pos| {
-                        let resource_dx = (pos.x - resource_grid.x).abs();
-                        let resource_dy = (pos.y - resource_grid.y).abs();
-                        let chebyshev_dist = resource_dx.max(resource_dy);
+                for dest in sorted_positions {
+                    move_target.destination = Some(dest);
+                    move_target.path.clear();
 
-                        let is_adjacent = chebyshev_dist == 1;
+                    info!(
+                        "Trying movement destination to {:?} to approach resource at {:?}",
+                        dest, resource_grid
+                    );
 
-                        info!(
-                            "  Position {:?}: distance to resource = {}, is adjacent = {}",
-                            pos, chebyshev_dist, is_adjacent
-                        );
-
-                        is_adjacent
-                    })
-                    .min_by_key(|pos| {
-                        let char_dx = pos.x - character_grid.x;
-                        let char_dy = pos.y - character_grid.y;
-                        let squared_dist = char_dx * char_dx + char_dy * char_dy;
-
-                        info!(
-                            "  Position {:?}: distance to character = {}",
-                            pos,
-                            (squared_dist as f32).sqrt()
-                        );
-
-                        squared_dist
-                    });
-
-                match destination {
-                    Some(dest) => {
-                        info!("DEBUG - Selected approach destination: {:?}", dest);
-
-                        let dest_dx = dest.x - character_grid.x;
-                        let dest_dy = dest.y - character_grid.y;
-                        let squared_distance = dest_dx * dest_dx + dest_dy * dest_dy;
-                        let distance = (squared_distance as f32).sqrt();
-
-                        info!(
-                            "DEBUG - Distance to destination: dx={}, dy={}, squared={}, sqrt={:.2}",
-                            dest_dx, dest_dy, squared_distance, distance
-                        );
-
-                        if distance > 30.0 {
-                            info!(
-                                "Resource too far away (distance: {:.1}), cannot gather",
-                                distance
-                            );
-                            commands
-                                .entity(character_entity)
-                                .remove::<GatheringIntent>();
-                            return;
-                        }
-
-                        move_target.destination = Some(*dest);
-                        move_target.path.clear();
-
-                        info!(
-                            "Setting movement destination to {:?} to approach resource at {:?}",
-                            dest, resource_grid
-                        );
-                    }
-                    None => {
-                        info!(
-                            "No valid adjacent position found for resource at {:?}",
-                            resource_grid
-                        );
-                        commands
-                            .entity(character_entity)
-                            .remove::<GatheringIntent>();
-                        return;
-                    }
+                    info!("Moving to gather {}", resource_name);
+                    break;
                 }
             }
 
-            info!("Moving to gather {}", resource_name);
             break;
         }
     }
@@ -371,6 +283,40 @@ fn start_gathering(
     if !found_resource {
         info!("No resource found at click position, deferring to movement system");
     }
+}
+
+// Helper function to find valid adjacent positions to a resource
+fn find_adjacent_positions(
+    resource_pos: GridCoords,
+    obstacles: &Query<&GridCoords, With<crate::components::movement::Collider>>,
+) -> Vec<GridCoords> {
+    let possible_offsets = [
+        (-1, 0),
+        (1, 0),
+        (0, -1),
+        (0, 1), // Cardinal directions
+        (-1, -1),
+        (1, -1),
+        (-1, 1),
+        (1, 1), // Diagonals
+    ];
+
+    let mut valid_positions = Vec::new();
+
+    for (dx, dy) in possible_offsets.iter() {
+        let pos = GridCoords {
+            x: resource_pos.x + dx,
+            y: resource_pos.y + dy,
+        };
+
+        let is_blocked = obstacles.iter().any(|o| o.x == pos.x && o.y == pos.y);
+
+        if !is_blocked {
+            valid_positions.push(pos);
+        }
+    }
+
+    valid_positions
 }
 
 // This system checks if characters with GatheringIntent are close enough to start gathering
