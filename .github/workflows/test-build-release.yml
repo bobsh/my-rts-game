@@ -479,10 +479,10 @@ jobs:
           name: "Nightly Build ${{ steps.timestamp.outputs.value }}"
           tag_name: "nightly-${{ steps.timestamp.outputs.value }}"
           files: |
-            windows-installer/*.exe
-            windows-zip/*.zip
-            wasm-zip/*.zip
-            linux-packages/*.deb
-            linux-packages/*.rpm
+            artifacts/windows-installer/*.exe
+            artifacts/windows-zip/*.zip
+            artifacts/wasm-zip/*.zip
+            artifacts/linux-packages/*.deb
+            artifacts/linux-packages/*.rpm
           prerelease: true
           generate_release_notes: true
