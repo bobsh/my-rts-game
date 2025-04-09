@@ -1,3 +1,4 @@
+pub mod audio;
 pub mod camera;
 pub mod construction;
 pub mod inventory;
@@ -7,4 +8,4 @@ pub mod resource_gathering;
 pub mod scene;
 pub mod selection;
 pub mod ui;
-pub mod window; // Add this line to expose the ldtk_calibration module
+pub mod window;

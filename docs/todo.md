@@ -53,4 +53,5 @@
 - [x] Remove the other character, lets just start with 1 for now, or maybe spawn 2 of the same type, but lets keep it simple and for now not assign a rpg class.
 - [x] Fix resource gathering pathfinding to try alternative positions when a path isn't found
 - [x] Linux build target
+- [x] Add background music
 - [ ] Fog of war
