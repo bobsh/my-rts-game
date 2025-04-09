@@ -5,6 +5,7 @@ use bevy_ecs_ldtk::prelude::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
 use crate::components::entities::EntitiesPlugin;
+use crate::systems::audio::AudioSystemPlugin;
 use crate::systems::camera::CameraPlugin;
 use crate::systems::construction::ConstructionPlugin;
 use crate::systems::inventory::InventoryPlugin;
@@ -14,7 +15,7 @@ use crate::systems::resource_gathering::ResourceGatheringPlugin;
 use crate::systems::scene::ScenePlugin;
 use crate::systems::selection::SelectionPlugin;
 use crate::systems::ui::UiPlugin;
-use crate::systems::window::WindowPlugin; // Add this import
+use crate::systems::window::WindowPlugin;
 
 pub struct RtsPlugin;
 
@@ -34,6 +35,7 @@ impl Plugin for RtsPlugin {
             .add_plugins(WindowPlugin)
             .add_plugins(SelectionPlugin)
             .add_plugins(ScenePlugin)
-            .add_plugins(UiPlugin);
+            .add_plugins(UiPlugin)
+            .add_plugins(AudioSystemPlugin); // Add the audio plugin
     }
 }
