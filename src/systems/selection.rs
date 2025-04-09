@@ -61,7 +61,7 @@ fn selection_system(
             // Check if we clicked on a selectable entity
             for (entity, transform, sprite) in selectable_query.iter() {
                 // Get entity size from sprite
-                let entity_size = get_entity_size(sprite, &images);
+                let entity_size = get_entity_size(sprite, entity, &images);
 
                 // Simple AABB collision detection with dynamic size
                 let min_x = transform.translation().x - entity_size.x / 2.0;
@@ -86,11 +86,17 @@ fn selection_system(
     }
 }
 
-fn get_entity_size(sprite: &Sprite, images: &Res<Assets<Image>>) -> Vec2 {
+fn get_entity_size(sprite: &Sprite, _entity: Entity, images: &Res<Assets<Image>>) -> Vec2 {
     // First priority: Use custom_size if available (explicitly set size)
     if let Some(custom_size) = sprite.custom_size {
         return custom_size;
     }
+
+    // Return the size stored in the entity
+    // return Vec2::new(
+    //     entity.height as f32,
+    //     entity.width as f32,
+    // );
 
     // Second priority: Get size from the actual image asset
     if let Some(image) = images.get(&sprite.image) {
@@ -147,15 +153,15 @@ fn highlight_selected(query: Query<(&Transform, Option<&Selected>), With<Selecta
 
 fn draw_selection_boxes(
     mut gizmos: Gizmos,
-    selection_query: Query<(&GlobalTransform, &Sprite), With<Selected>>,
+    selection_query: Query<(Entity, &GlobalTransform, &Sprite), With<Selected>>,
     images: Res<Assets<Image>>,
 ) {
-    for (transform, sprite) in selection_query.iter() {
+    for (entity, transform, sprite) in selection_query.iter() {
         // Get position from transform
         let position = transform.translation();
 
         // Get entity size
-        let entity_size = get_entity_size(sprite, &images);
+        let entity_size = get_entity_size(sprite, entity, &images);
 
         // Make selection box slightly larger than the entity
         let box_size = entity_size + Vec2::new(6.0, 6.0);
