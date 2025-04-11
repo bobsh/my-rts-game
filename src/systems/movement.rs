@@ -1,5 +1,4 @@
 use crate::components::movement::{Movable, MoveTarget, Moving};
-use crate::systems::ldtk_calibration::LdtkCalibration;
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 use pathfinding::prelude::astar;
@@ -20,7 +19,6 @@ pub fn calculate_cursor_grid_position(
     cursor_position: Vec2,
     camera_q: &Query<(&Camera, &GlobalTransform)>,
     ldtk_worlds: &Query<&GlobalTransform, With<LdtkProjectHandle>>,
-    ldtk_calibration: &LdtkCalibration,
 ) -> Option<GridCoords> {
     // Process the cursor ray and get world position
     let (camera, camera_transform) = camera_q.single();
@@ -39,8 +37,8 @@ pub fn calculate_cursor_grid_position(
 
     // Convert to grid coordinates with fixed grid offset as specified
     let target_grid = GridCoords {
-        x: ((ldtk_relative_pos.x) / 64.0).floor() as i32 + ldtk_calibration.grid_offset.x,
-        y: ((ldtk_relative_pos.y) / 64.0).floor() as i32 + ldtk_calibration.grid_offset.y,
+        x: ((ldtk_relative_pos.x) / 64.0).floor() as i32,
+        y: ((ldtk_relative_pos.y) / 64.0).floor() as i32,
     };
 
     Some(target_grid)
@@ -107,7 +105,6 @@ fn handle_movement_input(
     mut move_targets: Query<&mut MoveTarget>,
     ldtk_tile_query: Query<&GridCoords, With<crate::components::movement::Collider>>,
     gatherers: Query<Entity, With<crate::systems::resource_gathering::Gathering>>,
-    ldtk_calibration: Res<LdtkCalibration>,
     ldtk_worlds: Query<&GlobalTransform, With<LdtkProjectHandle>>,
 ) {
     // Only process right-click inputs
@@ -133,7 +130,7 @@ fn handle_movement_input(
 
     // Calculate grid position from cursor
     let Some(target_grid) =
-        calculate_cursor_grid_position(cursor_position, &camera_q, &ldtk_worlds, &ldtk_calibration)
+        calculate_cursor_grid_position(cursor_position, &camera_q, &ldtk_worlds)
     else {
         return;
     };

@@ -5,7 +5,6 @@ use crate::components::skills::{SkillProgression, Skills};
 use crate::components::ui::EntityInfoPanel;
 use crate::components::unit::Selectable;
 use crate::components::unit::Selected;
-use crate::systems::ldtk_calibration::LdtkCalibration;
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::GridCoords;
 use bevy_ecs_ldtk::prelude::LdtkProjectHandle;
@@ -138,7 +137,6 @@ fn start_gathering(
         Option<&Quarry>,
     )>,
     gathering_intent_query: Query<&GatheringIntent>,
-    ldtk_calibration: Res<LdtkCalibration>,
     obstacles: Query<&GridCoords, With<crate::components::movement::Collider>>,
     ldtk_worlds: Query<&GlobalTransform, With<LdtkProjectHandle>>,
     ldtk_tile_query: Query<&GridCoords, With<crate::components::movement::Collider>>,
@@ -159,7 +157,10 @@ fn start_gathering(
 
     let cursor_pos = cursor_ray.origin.truncate();
 
-    info!("Resource gathering cursor position: {:?}", cursor_pos);
+    info!(
+        "<start_gathering> Resource gathering cursor position: {:?}",
+        cursor_pos
+    );
 
     let Some((character_entity, _skills, character_coords, is_gathering)) =
         selected_characters.iter().next()
@@ -184,7 +185,9 @@ fn start_gathering(
             && cursor_pos.y <= max_y
         {
             if is_tree.is_none() && is_mine.is_none() && is_quarry.is_none() {
-                info!("Clicked on a sprite that isn't a valid resource, ignoring");
+                info!(
+                    "<start_gathering>  Clicked on a sprite that isn't a valid resource, ignoring"
+                );
                 continue;
             }
 
@@ -209,7 +212,7 @@ fn start_gathering(
 
             // If character is currently gathering, stop it
             if is_gathering.is_some() {
-                info!("Interrupting current gathering to gather a different resource");
+                info!("<start_gathering> Interrupting current gathering to gather a different resource");
                 commands.entity(character_entity).remove::<Gathering>();
             }
 
@@ -221,37 +224,26 @@ fn start_gathering(
             commands.entity(character_entity).remove::<Gathering>();
 
             if let Ok(mut move_target) = move_targets.get_mut(character_entity) {
-                let world_to_grid_pos = pos - ldtk_calibration.offset;
+                let world_to_grid_pos = pos;
 
-                let raw_grid_x = (world_to_grid_pos.x / 64.0).round() as i32;
-                let raw_grid_y = (world_to_grid_pos.y / 64.0).round() as i32;
+                let raw_grid_x = (world_to_grid_pos.x / 64.0).floor() as i32;
+                let raw_grid_y = (world_to_grid_pos.y / 64.0).floor() as i32;
 
                 let resource_grid = GridCoords {
-                    x: raw_grid_x + ldtk_calibration.grid_offset.x,
-                    y: raw_grid_y + ldtk_calibration.grid_offset.y,
+                    x: raw_grid_x,
+                    y: raw_grid_y,
                 };
 
                 let character_grid = character_coords;
 
-                info!("DEBUG - Character position: {:?}", character_grid);
-                info!(
-                    "DEBUG - Resource raw grid position: ({}, {})",
-                    raw_grid_x, raw_grid_y
-                );
-                info!(
-                    "DEBUG - Resource position (after adjustment): {:?}",
-                    resource_grid
-                );
-                info!(
-                    "DEBUG - Resource world pos: {:?}, LdtkOffset: {:?}",
-                    pos, ldtk_calibration.offset
-                );
+                info!("<start_gathering> Character position: {:?}", character_grid);
+                info!("<start_gathering> Resource position: {:?}", resource_grid);
 
                 let adjacent_positions = find_adjacent_positions(resource_grid, &obstacles);
 
                 if adjacent_positions.is_empty() {
                     info!(
-                        "No valid adjacent positions found for resource at {:?}",
+                        "<start_gathering> No valid adjacent positions found for resource at {:?}",
                         resource_grid
                     );
                     commands
@@ -270,7 +262,7 @@ fn start_gathering(
                 });
 
                 info!(
-                    "Found {} possible approach positions for resource at {:?}",
+                    "<start_gathering> Found {} possible approach positions for resource at {:?}",
                     sorted_positions.len(),
                     resource_grid
                 );
@@ -280,11 +272,11 @@ fn start_gathering(
                     move_target.path.clear();
 
                     info!(
-                        "Trying movement destination to {:?} to approach resource at {:?}",
+                        "<start_gathering> Trying movement destination to {:?} to approach resource at {:?}",
                         dest, resource_grid
                     );
 
-                    info!("Moving to gather {}", resource_name);
+                    info!("<start_gathering> Moving to gather {}", resource_name);
                 }
             }
 
@@ -295,7 +287,7 @@ fn start_gathering(
     if !found_resource {
         // If clicking on an empty area, interrupt gathering if in progress
         if is_gathering.is_some() {
-            info!("Interrupting gathering to move elsewhere");
+            info!("<start_gathering> Interrupting gathering to move elsewhere");
             commands.entity(character_entity).remove::<Gathering>();
 
             // Use the helper functions from movement.rs to set the new destination
@@ -303,7 +295,6 @@ fn start_gathering(
                 cursor_position,
                 &camera_q,
                 &ldtk_worlds,
-                &ldtk_calibration,
             ) {
                 crate::systems::movement::set_movement_target(
                     character_entity,
@@ -322,7 +313,9 @@ fn start_gathering(
                 .remove::<GatheringIntent>();
         }
 
-        info!("No resource found at click position, deferring to movement system");
+        info!(
+            "<start_gathering> No resource found at click position, deferring to movement system"
+        );
     }
 }
 
@@ -331,6 +324,11 @@ fn find_adjacent_positions(
     resource_pos: GridCoords,
     obstacles: &Query<&GridCoords, With<crate::components::movement::Collider>>,
 ) -> Vec<GridCoords> {
+    info!(
+        "Finding adjacent positions for resource at {:?}",
+        resource_pos
+    );
+
     let possible_offsets = [
         (-1, 0),
         (1, 0),
@@ -380,7 +378,6 @@ fn check_gathering_proximity(
         Option<&Mine>,
         Option<&Quarry>,
     )>,
-    ldtk_calibration: Res<LdtkCalibration>,
 ) {
     const GATHERING_RANGE_GRID: f32 = 1.5;
     const GATHERING_RANGE_WORLD: f32 = 300.0;
@@ -390,7 +387,7 @@ fn check_gathering_proximity(
             resources.get(intent.target)
         {
             if is_tree.is_none() && is_mine.is_none() && is_quarry.is_none() {
-                info!("Invalid resource target, removing gathering intent");
+                info!("<check_gathering_proximity> Invalid resource target, removing gathering intent");
                 commands.entity(entity).remove::<GatheringIntent>();
                 continue;
             }
@@ -402,29 +399,28 @@ fn check_gathering_proximity(
             } else if is_quarry.is_some() {
                 ResourceType::Stone
             } else {
-                info!("Resource doesn't match any known type, removing gathering intent");
+                info!("<check_gathering_proximity> Resource doesn't match any known type, removing gathering intent");
                 commands.entity(entity).remove::<GatheringIntent>();
                 continue;
             };
 
             if actual_resource_type != intent.resource_type {
                 info!(
-                    "Resource type mismatch: expected {:?}, found {:?}",
+                    "<check_gathering_proximity> Resource type mismatch: expected {:?}, found {:?}",
                     intent.resource_type, actual_resource_type
                 );
                 commands.entity(entity).remove::<GatheringIntent>();
                 continue;
             }
 
-            let world_to_grid_pos =
-                resource_transform.translation().truncate() - ldtk_calibration.offset;
+            let world_to_grid_pos = resource_transform.translation().truncate();
 
-            let raw_grid_x = (world_to_grid_pos.x / 64.0).round() as i32;
-            let raw_grid_y = (world_to_grid_pos.y / 64.0).round() as i32;
+            let raw_grid_x = (world_to_grid_pos.x / 64.0).floor() as i32;
+            let raw_grid_y = (world_to_grid_pos.y / 64.0).floor() as i32;
 
             let resource_grid = GridCoords {
-                x: raw_grid_x + 30,
-                y: raw_grid_y + 29,
+                x: raw_grid_x,
+                y: raw_grid_y,
             };
 
             // Use Chebyshev distance (max of |dx|, |dy|) to handle diagonal positions
@@ -441,7 +437,7 @@ fn check_gathering_proximity(
                 .translation()
                 .distance(resource_transform.translation());
 
-            info!("Distance check - Chebyshev: {}, Euclidean: {:.1} (max: {:.1}), World: {:.1} (max: {:.1})",
+            info!("<check_gathering_proximity> Distance check - Chebyshev: {}, Euclidean: {:.1} (max: {:.1}), World: {:.1} (max: {:.1})",
                   chebyshev_distance, grid_distance, GATHERING_RANGE_GRID, world_distance, GATHERING_RANGE_WORLD);
 
             // Allow gathering if adjacent (Chebyshev distance = 1) or within range
@@ -469,11 +465,11 @@ fn check_gathering_proximity(
                 };
 
                 info!(
-                    "Started gathering {} (Grid dist: {:.1}, World dist: {:.1})",
+                    "<check_gathering_proximity> Started gathering {} (Grid dist: {:.1}, World dist: {:.1})",
                     resource_name, grid_distance, world_distance
                 );
             } else {
-                info!("Too far from resource: Chebyshev distance {} cells (need 1), Grid distance {:.1} cells (need {:.1})",
+                info!("<check_gathering_proximity> Too far from resource: Chebyshev distance {} cells (need 1), Grid distance {:.1} cells (need {:.1})",
                      chebyshev_distance, grid_distance, GATHERING_RANGE_GRID);
             }
         }

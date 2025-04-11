@@ -2,7 +2,6 @@ pub mod audio;
 pub mod camera;
 pub mod construction;
 pub mod inventory;
-pub mod ldtk_calibration;
 pub mod movement;
 pub mod resource_gathering;
 pub mod scene;
