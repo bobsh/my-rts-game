@@ -9,7 +9,6 @@ use crate::systems::audio::AudioSystemPlugin;
 use crate::systems::camera::CameraPlugin;
 use crate::systems::construction::ConstructionPlugin;
 use crate::systems::inventory::InventoryPlugin;
-use crate::systems::ldtk_calibration::LdtkCalibrationPlugin;
 use crate::systems::movement::MovementPlugin;
 use crate::systems::resource_gathering::ResourceGatheringPlugin;
 use crate::systems::scene::ScenePlugin;
@@ -26,7 +25,6 @@ impl Plugin for RtsPlugin {
                 WorldInspectorPlugin::new().run_if(input_toggle_active(false, KeyCode::F10)),
             )
             .add_plugins(EntitiesPlugin)
-            .add_plugins(LdtkCalibrationPlugin) // Add this plugin first so its transforms take effect
             .add_plugins(MovementPlugin)
             .add_plugins(ResourceGatheringPlugin)
             .add_plugins(ConstructionPlugin)
@@ -36,6 +34,6 @@ impl Plugin for RtsPlugin {
             .add_plugins(SelectionPlugin)
             .add_plugins(ScenePlugin)
             .add_plugins(UiPlugin)
-            .add_plugins(AudioSystemPlugin); // Add the audio plugin
+            .add_plugins(AudioSystemPlugin);
     }
 }

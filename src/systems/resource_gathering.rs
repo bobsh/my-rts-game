@@ -5,7 +5,6 @@ use crate::components::skills::{SkillProgression, Skills};
 use crate::components::ui::EntityInfoPanel;
 use crate::components::unit::Selectable;
 use crate::components::unit::Selected;
-use crate::systems::ldtk_calibration::LdtkCalibration;
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::GridCoords;
 use bevy_ecs_ldtk::prelude::LdtkProjectHandle;
@@ -138,7 +137,6 @@ fn start_gathering(
         Option<&Quarry>,
     )>,
     gathering_intent_query: Query<&GatheringIntent>,
-    ldtk_calibration: Res<LdtkCalibration>,
     obstacles: Query<&GridCoords, With<crate::components::movement::Collider>>,
     ldtk_worlds: Query<&GlobalTransform, With<LdtkProjectHandle>>,
     ldtk_tile_query: Query<&GridCoords, With<crate::components::movement::Collider>>,
@@ -221,14 +219,14 @@ fn start_gathering(
             commands.entity(character_entity).remove::<Gathering>();
 
             if let Ok(mut move_target) = move_targets.get_mut(character_entity) {
-                let world_to_grid_pos = pos - ldtk_calibration.offset;
+                let world_to_grid_pos = pos;
 
                 let raw_grid_x = (world_to_grid_pos.x / 64.0).round() as i32;
                 let raw_grid_y = (world_to_grid_pos.y / 64.0).round() as i32;
 
                 let resource_grid = GridCoords {
-                    x: raw_grid_x + ldtk_calibration.grid_offset.x,
-                    y: raw_grid_y + ldtk_calibration.grid_offset.y,
+                    x: raw_grid_x,
+                    y: raw_grid_y,
                 };
 
                 let character_grid = character_coords;
@@ -241,10 +239,6 @@ fn start_gathering(
                 info!(
                     "DEBUG - Resource position (after adjustment): {:?}",
                     resource_grid
-                );
-                info!(
-                    "DEBUG - Resource world pos: {:?}, LdtkOffset: {:?}",
-                    pos, ldtk_calibration.offset
                 );
 
                 let adjacent_positions = find_adjacent_positions(resource_grid, &obstacles);
@@ -303,7 +297,6 @@ fn start_gathering(
                 cursor_position,
                 &camera_q,
                 &ldtk_worlds,
-                &ldtk_calibration,
             ) {
                 crate::systems::movement::set_movement_target(
                     character_entity,
@@ -380,7 +373,6 @@ fn check_gathering_proximity(
         Option<&Mine>,
         Option<&Quarry>,
     )>,
-    ldtk_calibration: Res<LdtkCalibration>,
 ) {
     const GATHERING_RANGE_GRID: f32 = 1.5;
     const GATHERING_RANGE_WORLD: f32 = 300.0;
@@ -417,14 +409,14 @@ fn check_gathering_proximity(
             }
 
             let world_to_grid_pos =
-                resource_transform.translation().truncate() - ldtk_calibration.offset;
+                resource_transform.translation().truncate();
 
             let raw_grid_x = (world_to_grid_pos.x / 64.0).round() as i32;
             let raw_grid_y = (world_to_grid_pos.y / 64.0).round() as i32;
 
             let resource_grid = GridCoords {
-                x: raw_grid_x + 30,
-                y: raw_grid_y + 29,
+                x: raw_grid_x,
+                y: raw_grid_y,
             };
 
             // Use Chebyshev distance (max of |dx|, |dy|) to handle diagonal positions

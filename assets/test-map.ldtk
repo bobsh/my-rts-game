@@ -14,7 +14,7 @@
 	"nextUid": 60,
 	"identifierStyle": "Capitalize",
 	"toc": [],
-	"worldLayout": "Free",
+	"worldLayout": "LinearHorizontal",
 	"worldGridWidth": 256,
 	"worldGridHeight": 256,
 	"defaultLevelWidth": 2560,
@@ -781,7 +781,7 @@
 			"enumTags": [],
 			"customData": [],
 			"savedSelections": [],
-			"cachedPixelData": { "opaqueTiles": "0", "averageColors": "6766" }
+			"cachedPixelData": { "opaqueTiles": "0", "averageColors": "5656" }
 		},
 		{
 			"__cWid": 1,
@@ -865,19 +865,19 @@
 			"identifier": "Level_0",
 			"iid": "370904d0-e920-11ef-87ba-f5addcd7e788",
 			"uid": 0,
-			"worldX": -1920,
-			"worldY": -192,
+			"worldX": -1,
+			"worldY": -1,
 			"worldDepth": 0,
 			"pxWid": 2560,
 			"pxHei": 2048,
-			"__bgColor": "#696A79",
-			"bgColor": null,
+			"__bgColor": "#000000",
+			"bgColor": "#000000",
 			"useAutoIdentifier": true,
 			"bgRelPath": null,
 			"bgPos": null,
 			"bgPivotX": 0.5,
 			"bgPivotY": 0.5,
-			"__smartColor": "#ADADB5",
+			"__smartColor": "#737373",
 			"__bgPos": null,
 			"externalRelPath": null,
 			"fieldInstances": [],
@@ -918,9 +918,7 @@
 							"height": 64,
 							"defUid": 23,
 							"px": [1344,1280],
-							"fieldInstances": [],
-							"__worldX": -576,
-							"__worldY": 1088
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -934,9 +932,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1152,64],
-							"fieldInstances": [],
-							"__worldX": -768,
-							"__worldY": -128
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -950,9 +946,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1152,0],
-							"fieldInstances": [],
-							"__worldX": -768,
-							"__worldY": -192
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -966,9 +960,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1216,64],
-							"fieldInstances": [],
-							"__worldX": -704,
-							"__worldY": -128
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -982,9 +974,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1280,128],
-							"fieldInstances": [],
-							"__worldX": -640,
-							"__worldY": -64
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -998,9 +988,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1344,128],
-							"fieldInstances": [],
-							"__worldX": -576,
-							"__worldY": -64
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1014,9 +1002,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1408,128],
-							"fieldInstances": [],
-							"__worldX": -512,
-							"__worldY": -64
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1030,9 +1016,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1472,128],
-							"fieldInstances": [],
-							"__worldX": -448,
-							"__worldY": -64
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1046,9 +1030,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1472,64],
-							"fieldInstances": [],
-							"__worldX": -448,
-							"__worldY": -128
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1062,9 +1044,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1472,0],
-							"fieldInstances": [],
-							"__worldX": -448,
-							"__worldY": -192
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1078,9 +1058,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1600,0],
-							"fieldInstances": [],
-							"__worldX": -320,
-							"__worldY": -192
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1094,9 +1072,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1536,0],
-							"fieldInstances": [],
-							"__worldX": -384,
-							"__worldY": -192
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1110,9 +1086,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1536,64],
-							"fieldInstances": [],
-							"__worldX": -384,
-							"__worldY": -128
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1126,9 +1100,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1600,64],
-							"fieldInstances": [],
-							"__worldX": -320,
-							"__worldY": -128
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1142,9 +1114,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1600,128],
-							"fieldInstances": [],
-							"__worldX": -320,
-							"__worldY": -64
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1158,9 +1128,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1664,128],
-							"fieldInstances": [],
-							"__worldX": -256,
-							"__worldY": -64
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1174,9 +1142,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1664,64],
-							"fieldInstances": [],
-							"__worldX": -256,
-							"__worldY": -128
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1190,9 +1156,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1664,0],
-							"fieldInstances": [],
-							"__worldX": -256,
-							"__worldY": -192
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1206,9 +1170,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1728,64],
-							"fieldInstances": [],
-							"__worldX": -192,
-							"__worldY": -128
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1222,9 +1184,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1728,128],
-							"fieldInstances": [],
-							"__worldX": -192,
-							"__worldY": -64
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1238,9 +1198,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1728,192],
-							"fieldInstances": [],
-							"__worldX": -192,
-							"__worldY": 0
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1254,9 +1212,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1664,192],
-							"fieldInstances": [],
-							"__worldX": -256,
-							"__worldY": 0
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1270,9 +1226,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1792,128],
-							"fieldInstances": [],
-							"__worldX": -128,
-							"__worldY": -64
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1286,9 +1240,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1792,192],
-							"fieldInstances": [],
-							"__worldX": -128,
-							"__worldY": 0
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1302,9 +1254,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1728,256],
-							"fieldInstances": [],
-							"__worldX": -192,
-							"__worldY": 64
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1318,9 +1268,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1792,256],
-							"fieldInstances": [],
-							"__worldX": -128,
-							"__worldY": 64
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1334,9 +1282,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1856,256],
-							"fieldInstances": [],
-							"__worldX": -64,
-							"__worldY": 64
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1350,9 +1296,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1856,192],
-							"fieldInstances": [],
-							"__worldX": -64,
-							"__worldY": 0
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1366,9 +1310,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1792,320],
-							"fieldInstances": [],
-							"__worldX": -128,
-							"__worldY": 128
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1382,9 +1324,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1856,320],
-							"fieldInstances": [],
-							"__worldX": -64,
-							"__worldY": 128
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1398,9 +1338,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1920,256],
-							"fieldInstances": [],
-							"__worldX": 0,
-							"__worldY": 64
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1414,9 +1352,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1920,320],
-							"fieldInstances": [],
-							"__worldX": 0,
-							"__worldY": 128
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1430,9 +1366,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1984,256],
-							"fieldInstances": [],
-							"__worldX": 64,
-							"__worldY": 64
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1446,9 +1380,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1984,320],
-							"fieldInstances": [],
-							"__worldX": 64,
-							"__worldY": 128
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1462,9 +1394,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [2048,320],
-							"fieldInstances": [],
-							"__worldX": 128,
-							"__worldY": 128
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1478,9 +1408,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1920,384],
-							"fieldInstances": [],
-							"__worldX": 0,
-							"__worldY": 192
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1494,9 +1422,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1984,384],
-							"fieldInstances": [],
-							"__worldX": 64,
-							"__worldY": 192
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1510,9 +1436,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [2048,384],
-							"fieldInstances": [],
-							"__worldX": 128,
-							"__worldY": 192
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1526,9 +1450,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [2112,384],
-							"fieldInstances": [],
-							"__worldX": 192,
-							"__worldY": 192
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1542,9 +1464,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [2048,512],
-							"fieldInstances": [],
-							"__worldX": 128,
-							"__worldY": 320
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1558,9 +1478,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1984,512],
-							"fieldInstances": [],
-							"__worldX": 64,
-							"__worldY": 320
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1574,9 +1492,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1920,512],
-							"fieldInstances": [],
-							"__worldX": 0,
-							"__worldY": 320
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1590,9 +1506,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1856,512],
-							"fieldInstances": [],
-							"__worldX": -64,
-							"__worldY": 320
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1606,9 +1520,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1792,512],
-							"fieldInstances": [],
-							"__worldX": -128,
-							"__worldY": 320
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1622,9 +1534,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1728,512],
-							"fieldInstances": [],
-							"__worldX": -192,
-							"__worldY": 320
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1638,9 +1548,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1664,512],
-							"fieldInstances": [],
-							"__worldX": -256,
-							"__worldY": 320
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1654,9 +1562,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1600,448],
-							"fieldInstances": [],
-							"__worldX": -320,
-							"__worldY": 256
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1670,9 +1576,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1536,448],
-							"fieldInstances": [],
-							"__worldX": -384,
-							"__worldY": 256
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1686,9 +1590,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1472,448],
-							"fieldInstances": [],
-							"__worldX": -448,
-							"__worldY": 256
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1702,9 +1604,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1408,448],
-							"fieldInstances": [],
-							"__worldX": -512,
-							"__worldY": 256
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1718,9 +1618,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1408,384],
-							"fieldInstances": [],
-							"__worldX": -512,
-							"__worldY": 192
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1734,9 +1632,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1344,384],
-							"fieldInstances": [],
-							"__worldX": -576,
-							"__worldY": 192
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1750,9 +1646,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1280,384],
-							"fieldInstances": [],
-							"__worldX": -640,
-							"__worldY": 192
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1766,9 +1660,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1216,384],
-							"fieldInstances": [],
-							"__worldX": -704,
-							"__worldY": 192
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1782,9 +1674,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1152,384],
-							"fieldInstances": [],
-							"__worldX": -768,
-							"__worldY": 192
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1798,9 +1688,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1152,448],
-							"fieldInstances": [],
-							"__worldX": -768,
-							"__worldY": 256
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1814,9 +1702,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1088,448],
-							"fieldInstances": [],
-							"__worldX": -832,
-							"__worldY": 256
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1830,9 +1716,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1024,448],
-							"fieldInstances": [],
-							"__worldX": -896,
-							"__worldY": 256
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1846,9 +1730,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [960,448],
-							"fieldInstances": [],
-							"__worldX": -960,
-							"__worldY": 256
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1862,9 +1744,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [896,448],
-							"fieldInstances": [],
-							"__worldX": -1024,
-							"__worldY": 256
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1878,9 +1758,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1728,576],
-							"fieldInstances": [],
-							"__worldX": -192,
-							"__worldY": 384
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1894,9 +1772,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1792,576],
-							"fieldInstances": [],
-							"__worldX": -128,
-							"__worldY": 384
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1910,9 +1786,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1856,576],
-							"fieldInstances": [],
-							"__worldX": -64,
-							"__worldY": 384
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1926,9 +1800,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1920,576],
-							"fieldInstances": [],
-							"__worldX": 0,
-							"__worldY": 384
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1942,9 +1814,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1984,576],
-							"fieldInstances": [],
-							"__worldX": 64,
-							"__worldY": 384
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1958,9 +1828,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1920,640],
-							"fieldInstances": [],
-							"__worldX": 0,
-							"__worldY": 448
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1974,9 +1842,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1664,640],
-							"fieldInstances": [],
-							"__worldX": -256,
-							"__worldY": 448
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -1990,9 +1856,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1664,704],
-							"fieldInstances": [],
-							"__worldX": -256,
-							"__worldY": 512
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2006,9 +1870,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1664,768],
-							"fieldInstances": [],
-							"__worldX": -256,
-							"__worldY": 576
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2022,9 +1884,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1600,768],
-							"fieldInstances": [],
-							"__worldX": -320,
-							"__worldY": 576
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2038,9 +1898,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1536,768],
-							"fieldInstances": [],
-							"__worldX": -384,
-							"__worldY": 576
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2054,9 +1912,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1472,768],
-							"fieldInstances": [],
-							"__worldX": -448,
-							"__worldY": 576
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2070,9 +1926,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1408,768],
-							"fieldInstances": [],
-							"__worldX": -512,
-							"__worldY": 576
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2086,9 +1940,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1280,768],
-							"fieldInstances": [],
-							"__worldX": -640,
-							"__worldY": 576
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2102,9 +1954,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1280,704],
-							"fieldInstances": [],
-							"__worldX": -640,
-							"__worldY": 512
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2118,9 +1968,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1216,768],
-							"fieldInstances": [],
-							"__worldX": -704,
-							"__worldY": 576
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2134,9 +1982,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1152,832],
-							"fieldInstances": [],
-							"__worldX": -768,
-							"__worldY": 640
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2150,9 +1996,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1088,896],
-							"fieldInstances": [],
-							"__worldX": -832,
-							"__worldY": 704
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2166,9 +2010,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1088,960],
-							"fieldInstances": [],
-							"__worldX": -832,
-							"__worldY": 768
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2182,9 +2024,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1088,1024],
-							"fieldInstances": [],
-							"__worldX": -832,
-							"__worldY": 832
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2198,9 +2038,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1152,1024],
-							"fieldInstances": [],
-							"__worldX": -768,
-							"__worldY": 832
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2214,9 +2052,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1216,1024],
-							"fieldInstances": [],
-							"__worldX": -704,
-							"__worldY": 832
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2230,9 +2066,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1280,1024],
-							"fieldInstances": [],
-							"__worldX": -640,
-							"__worldY": 832
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2246,9 +2080,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1344,960],
-							"fieldInstances": [],
-							"__worldX": -576,
-							"__worldY": 768
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2262,9 +2094,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1408,960],
-							"fieldInstances": [],
-							"__worldX": -512,
-							"__worldY": 768
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2278,9 +2108,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1408,896],
-							"fieldInstances": [],
-							"__worldX": -512,
-							"__worldY": 704
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Quarry",
@@ -2294,9 +2122,7 @@
 							"height": 64,
 							"defUid": 24,
 							"px": [1152,960],
-							"fieldInstances": [],
-							"__worldX": -768,
-							"__worldY": 768
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Mine",
@@ -2310,9 +2136,7 @@
 							"height": 64,
 							"defUid": 21,
 							"px": [768,1600],
-							"fieldInstances": [{ "__identifier": "remaining_resources", "__type": "Float", "__value": 1000, "__tile": null, "defUid": 22, "realEditorValues": [] }],
-							"__worldX": -1152,
-							"__worldY": 1408
+							"fieldInstances": [{ "__identifier": "remaining_resources", "__type": "Float", "__value": 1000, "__tile": null, "defUid": 22, "realEditorValues": [] }]
 						},
 						{
 							"__identifier": "Quarry",
@@ -2326,9 +2150,7 @@
 							"height": 64,
 							"defUid": 24,
 							"px": [1088,384],
-							"fieldInstances": [],
-							"__worldX": -832,
-							"__worldY": 192
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Mine",
@@ -2342,9 +2164,7 @@
 							"height": 64,
 							"defUid": 21,
 							"px": [2048,256],
-							"fieldInstances": [{ "__identifier": "remaining_resources", "__type": "Float", "__value": 1000, "__tile": null, "defUid": 22, "realEditorValues": [] }],
-							"__worldX": 128,
-							"__worldY": 64
+							"fieldInstances": [{ "__identifier": "remaining_resources", "__type": "Float", "__value": 1000, "__tile": null, "defUid": 22, "realEditorValues": [] }]
 						},
 						{
 							"__identifier": "Quarry",
@@ -2358,9 +2178,7 @@
 							"height": 64,
 							"defUid": 24,
 							"px": [1984,768],
-							"fieldInstances": [],
-							"__worldX": 64,
-							"__worldY": 576
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Quarry",
@@ -2374,9 +2192,7 @@
 							"height": 64,
 							"defUid": 24,
 							"px": [2496,1088],
-							"fieldInstances": [],
-							"__worldX": 576,
-							"__worldY": 896
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2390,9 +2206,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [2368,384],
-							"fieldInstances": [],
-							"__worldX": 448,
-							"__worldY": 192
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2406,9 +2220,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [2368,320],
-							"fieldInstances": [],
-							"__worldX": 448,
-							"__worldY": 128
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2422,9 +2234,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [2368,256],
-							"fieldInstances": [],
-							"__worldX": 448,
-							"__worldY": 64
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2438,9 +2248,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [2368,192],
-							"fieldInstances": [],
-							"__worldX": 448,
-							"__worldY": 0
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2454,9 +2262,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [2368,128],
-							"fieldInstances": [],
-							"__worldX": 448,
-							"__worldY": -64
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2470,9 +2276,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [2368,64],
-							"fieldInstances": [],
-							"__worldX": 448,
-							"__worldY": -128
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2486,9 +2290,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [2432,64],
-							"fieldInstances": [],
-							"__worldX": 512,
-							"__worldY": -128
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2502,9 +2304,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [2432,0],
-							"fieldInstances": [],
-							"__worldX": 512,
-							"__worldY": -192
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2518,9 +2318,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [2496,0],
-							"fieldInstances": [],
-							"__worldX": 576,
-							"__worldY": -192
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2534,9 +2332,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [2496,64],
-							"fieldInstances": [],
-							"__worldX": 576,
-							"__worldY": -128
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2550,9 +2346,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [2432,192],
-							"fieldInstances": [],
-							"__worldX": 512,
-							"__worldY": 0
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2566,9 +2360,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [2496,192],
-							"fieldInstances": [],
-							"__worldX": 576,
-							"__worldY": 0
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2582,9 +2374,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [2496,256],
-							"fieldInstances": [],
-							"__worldX": 576,
-							"__worldY": 64
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2598,9 +2388,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [2432,256],
-							"fieldInstances": [],
-							"__worldX": 512,
-							"__worldY": 64
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2614,9 +2402,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [2432,320],
-							"fieldInstances": [],
-							"__worldX": 512,
-							"__worldY": 128
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2630,9 +2416,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [2496,320],
-							"fieldInstances": [],
-							"__worldX": 576,
-							"__worldY": 128
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2646,9 +2430,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [2496,384],
-							"fieldInstances": [],
-							"__worldX": 576,
-							"__worldY": 192
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2662,9 +2444,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [2432,384],
-							"fieldInstances": [],
-							"__worldX": 512,
-							"__worldY": 192
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2678,9 +2458,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [2432,448],
-							"fieldInstances": [],
-							"__worldX": 512,
-							"__worldY": 256
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2694,9 +2472,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [2496,448],
-							"fieldInstances": [],
-							"__worldX": 576,
-							"__worldY": 256
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2710,9 +2486,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1536,1280],
-							"fieldInstances": [],
-							"__worldX": -384,
-							"__worldY": 1088
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2726,9 +2500,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1600,1280],
-							"fieldInstances": [],
-							"__worldX": -320,
-							"__worldY": 1088
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2742,9 +2514,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1664,1280],
-							"fieldInstances": [],
-							"__worldX": -256,
-							"__worldY": 1088
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2758,9 +2528,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1728,1280],
-							"fieldInstances": [],
-							"__worldX": -192,
-							"__worldY": 1088
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2774,9 +2542,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1728,1216],
-							"fieldInstances": [],
-							"__worldX": -192,
-							"__worldY": 1024
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2790,9 +2556,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1728,1152],
-							"fieldInstances": [],
-							"__worldX": -192,
-							"__worldY": 960
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2806,9 +2570,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1728,1088],
-							"fieldInstances": [],
-							"__worldX": -192,
-							"__worldY": 896
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2822,9 +2584,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1792,1024],
-							"fieldInstances": [],
-							"__worldX": -128,
-							"__worldY": 832
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2838,9 +2598,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1856,1024],
-							"fieldInstances": [],
-							"__worldX": -64,
-							"__worldY": 832
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2854,9 +2612,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1856,1088],
-							"fieldInstances": [],
-							"__worldX": -64,
-							"__worldY": 896
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2870,9 +2626,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1920,1024],
-							"fieldInstances": [],
-							"__worldX": 0,
-							"__worldY": 832
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2886,9 +2640,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1920,960],
-							"fieldInstances": [],
-							"__worldX": 0,
-							"__worldY": 768
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2902,9 +2654,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1920,896],
-							"fieldInstances": [],
-							"__worldX": 0,
-							"__worldY": 704
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2918,9 +2668,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1984,896],
-							"fieldInstances": [],
-							"__worldX": 64,
-							"__worldY": 704
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2934,9 +2682,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1984,960],
-							"fieldInstances": [],
-							"__worldX": 64,
-							"__worldY": 768
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2950,9 +2696,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1984,832],
-							"fieldInstances": [],
-							"__worldX": 64,
-							"__worldY": 640
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2966,9 +2710,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [2048,832],
-							"fieldInstances": [],
-							"__worldX": 128,
-							"__worldY": 640
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2982,9 +2724,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [2048,768],
-							"fieldInstances": [],
-							"__worldX": 128,
-							"__worldY": 576
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -2998,9 +2738,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [2048,704],
-							"fieldInstances": [],
-							"__worldX": 128,
-							"__worldY": 512
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3014,9 +2752,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [2112,704],
-							"fieldInstances": [],
-							"__worldX": 192,
-							"__worldY": 512
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3030,9 +2766,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [2112,640],
-							"fieldInstances": [],
-							"__worldX": 192,
-							"__worldY": 448
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3046,9 +2780,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [2112,768],
-							"fieldInstances": [],
-							"__worldX": 192,
-							"__worldY": 576
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3062,9 +2794,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [2176,768],
-							"fieldInstances": [],
-							"__worldX": 256,
-							"__worldY": 576
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3078,9 +2808,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [2176,704],
-							"fieldInstances": [],
-							"__worldX": 256,
-							"__worldY": 512
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3094,9 +2822,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [2176,640],
-							"fieldInstances": [],
-							"__worldX": 256,
-							"__worldY": 448
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3110,9 +2836,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [2240,640],
-							"fieldInstances": [],
-							"__worldX": 320,
-							"__worldY": 448
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3126,9 +2850,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [2240,704],
-							"fieldInstances": [],
-							"__worldX": 320,
-							"__worldY": 512
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3142,9 +2864,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [2240,768],
-							"fieldInstances": [],
-							"__worldX": 320,
-							"__worldY": 576
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3158,9 +2878,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [2304,768],
-							"fieldInstances": [],
-							"__worldX": 384,
-							"__worldY": 576
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3174,9 +2892,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [2304,704],
-							"fieldInstances": [],
-							"__worldX": 384,
-							"__worldY": 512
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3190,9 +2906,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [2304,640],
-							"fieldInstances": [],
-							"__worldX": 384,
-							"__worldY": 448
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3206,9 +2920,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [2368,768],
-							"fieldInstances": [],
-							"__worldX": 448,
-							"__worldY": 576
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3222,9 +2934,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [2368,832],
-							"fieldInstances": [],
-							"__worldX": 448,
-							"__worldY": 640
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3238,9 +2948,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [2368,896],
-							"fieldInstances": [],
-							"__worldX": 448,
-							"__worldY": 704
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3254,9 +2962,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [2368,704],
-							"fieldInstances": [],
-							"__worldX": 448,
-							"__worldY": 512
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3270,9 +2976,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [2432,896],
-							"fieldInstances": [],
-							"__worldX": 512,
-							"__worldY": 704
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3286,9 +2990,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [2432,960],
-							"fieldInstances": [],
-							"__worldX": 512,
-							"__worldY": 768
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3302,9 +3004,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [2432,1024],
-							"fieldInstances": [],
-							"__worldX": 512,
-							"__worldY": 832
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3318,9 +3018,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [2496,1024],
-							"fieldInstances": [],
-							"__worldX": 576,
-							"__worldY": 832
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3334,9 +3032,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [2432,1216],
-							"fieldInstances": [],
-							"__worldX": 512,
-							"__worldY": 1024
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3350,9 +3046,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [2496,1216],
-							"fieldInstances": [],
-							"__worldX": 576,
-							"__worldY": 1024
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3366,9 +3060,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [2496,768],
-							"fieldInstances": [],
-							"__worldX": 576,
-							"__worldY": 576
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3382,9 +3074,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [2496,704],
-							"fieldInstances": [],
-							"__worldX": 576,
-							"__worldY": 512
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3398,9 +3088,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [0,1664],
-							"fieldInstances": [],
-							"__worldX": -1920,
-							"__worldY": 1472
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3414,9 +3102,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [0,1536],
-							"fieldInstances": [],
-							"__worldX": -1920,
-							"__worldY": 1344
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3430,9 +3116,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [128,1280],
-							"fieldInstances": [],
-							"__worldX": -1792,
-							"__worldY": 1088
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3446,9 +3130,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [0,1728],
-							"fieldInstances": [],
-							"__worldX": -1920,
-							"__worldY": 1536
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3462,9 +3144,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [0,1856],
-							"fieldInstances": [],
-							"__worldX": -1920,
-							"__worldY": 1664
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3478,9 +3158,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [0,1920],
-							"fieldInstances": [],
-							"__worldX": -1920,
-							"__worldY": 1728
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3494,9 +3172,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [0,1984],
-							"fieldInstances": [],
-							"__worldX": -1920,
-							"__worldY": 1792
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3510,9 +3186,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [64,1984],
-							"fieldInstances": [],
-							"__worldX": -1856,
-							"__worldY": 1792
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3526,9 +3200,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [64,1792],
-							"fieldInstances": [],
-							"__worldX": -1856,
-							"__worldY": 1600
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3542,9 +3214,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [64,1920],
-							"fieldInstances": [],
-							"__worldX": -1856,
-							"__worldY": 1728
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3558,9 +3228,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [64,1856],
-							"fieldInstances": [],
-							"__worldX": -1856,
-							"__worldY": 1664
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3574,9 +3242,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [64,1728],
-							"fieldInstances": [],
-							"__worldX": -1856,
-							"__worldY": 1536
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3590,9 +3256,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [64,1664],
-							"fieldInstances": [],
-							"__worldX": -1856,
-							"__worldY": 1472
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3606,9 +3270,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [64,1600],
-							"fieldInstances": [],
-							"__worldX": -1856,
-							"__worldY": 1408
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3622,9 +3284,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [64,1536],
-							"fieldInstances": [],
-							"__worldX": -1856,
-							"__worldY": 1344
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3638,9 +3298,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [128,1728],
-							"fieldInstances": [],
-							"__worldX": -1792,
-							"__worldY": 1536
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3654,9 +3312,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [128,1856],
-							"fieldInstances": [],
-							"__worldX": -1792,
-							"__worldY": 1664
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3670,9 +3326,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [128,1920],
-							"fieldInstances": [],
-							"__worldX": -1792,
-							"__worldY": 1728
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3686,9 +3340,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [256,1984],
-							"fieldInstances": [],
-							"__worldX": -1664,
-							"__worldY": 1792
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3702,9 +3354,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [192,1984],
-							"fieldInstances": [],
-							"__worldX": -1728,
-							"__worldY": 1792
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3718,9 +3368,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [128,1984],
-							"fieldInstances": [],
-							"__worldX": -1792,
-							"__worldY": 1792
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3734,9 +3382,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [256,1920],
-							"fieldInstances": [],
-							"__worldX": -1664,
-							"__worldY": 1728
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3750,9 +3396,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [192,1856],
-							"fieldInstances": [],
-							"__worldX": -1728,
-							"__worldY": 1664
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3766,9 +3410,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [256,1792],
-							"fieldInstances": [],
-							"__worldX": -1664,
-							"__worldY": 1600
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3782,9 +3424,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [192,1728],
-							"fieldInstances": [],
-							"__worldX": -1728,
-							"__worldY": 1536
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3798,9 +3438,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [128,1600],
-							"fieldInstances": [],
-							"__worldX": -1792,
-							"__worldY": 1408
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3814,9 +3452,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [0,1472],
-							"fieldInstances": [],
-							"__worldX": -1920,
-							"__worldY": 1280
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3830,9 +3466,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [0,1408],
-							"fieldInstances": [],
-							"__worldX": -1920,
-							"__worldY": 1216
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3846,9 +3480,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [64,1472],
-							"fieldInstances": [],
-							"__worldX": -1856,
-							"__worldY": 1280
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3862,9 +3494,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [192,1664],
-							"fieldInstances": [],
-							"__worldX": -1728,
-							"__worldY": 1472
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3878,9 +3508,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [256,1728],
-							"fieldInstances": [],
-							"__worldX": -1664,
-							"__worldY": 1536
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3894,9 +3522,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [320,1856],
-							"fieldInstances": [],
-							"__worldX": -1600,
-							"__worldY": 1664
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3910,9 +3536,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [320,1984],
-							"fieldInstances": [],
-							"__worldX": -1600,
-							"__worldY": 1792
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3926,9 +3550,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [448,1984],
-							"fieldInstances": [],
-							"__worldX": -1472,
-							"__worldY": 1792
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3942,9 +3564,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [384,1984],
-							"fieldInstances": [],
-							"__worldX": -1536,
-							"__worldY": 1792
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3958,9 +3578,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [384,1920],
-							"fieldInstances": [],
-							"__worldX": -1536,
-							"__worldY": 1728
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3974,9 +3592,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [512,1984],
-							"fieldInstances": [],
-							"__worldX": -1408,
-							"__worldY": 1792
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -3990,9 +3606,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [576,1984],
-							"fieldInstances": [],
-							"__worldX": -1344,
-							"__worldY": 1792
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4006,9 +3620,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [704,1984],
-							"fieldInstances": [],
-							"__worldX": -1216,
-							"__worldY": 1792
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4022,9 +3634,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [640,1984],
-							"fieldInstances": [],
-							"__worldX": -1280,
-							"__worldY": 1792
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4038,9 +3648,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [448,1920],
-							"fieldInstances": [],
-							"__worldX": -1472,
-							"__worldY": 1728
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4054,9 +3662,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [384,1856],
-							"fieldInstances": [],
-							"__worldX": -1536,
-							"__worldY": 1664
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4070,9 +3676,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [320,1792],
-							"fieldInstances": [],
-							"__worldX": -1600,
-							"__worldY": 1600
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4086,9 +3690,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [192,1600],
-							"fieldInstances": [],
-							"__worldX": -1728,
-							"__worldY": 1408
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4102,9 +3704,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [128,1472],
-							"fieldInstances": [],
-							"__worldX": -1792,
-							"__worldY": 1280
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4118,9 +3718,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [64,1344],
-							"fieldInstances": [],
-							"__worldX": -1856,
-							"__worldY": 1152
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4134,9 +3732,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [0,1280],
-							"fieldInstances": [],
-							"__worldX": -1920,
-							"__worldY": 1088
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4150,9 +3746,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [0,1344],
-							"fieldInstances": [],
-							"__worldX": -1920,
-							"__worldY": 1152
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4166,9 +3760,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1024,1024],
-							"fieldInstances": [],
-							"__worldX": -896,
-							"__worldY": 832
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4182,9 +3774,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [960,1088],
-							"fieldInstances": [],
-							"__worldX": -960,
-							"__worldY": 896
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4198,9 +3788,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [896,1152],
-							"fieldInstances": [],
-							"__worldX": -1024,
-							"__worldY": 960
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4214,9 +3802,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [960,1216],
-							"fieldInstances": [],
-							"__worldX": -960,
-							"__worldY": 1024
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4230,9 +3816,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1024,1216],
-							"fieldInstances": [],
-							"__worldX": -896,
-							"__worldY": 1024
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4246,9 +3830,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [896,1216],
-							"fieldInstances": [],
-							"__worldX": -1024,
-							"__worldY": 1024
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4262,9 +3844,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [832,1152],
-							"fieldInstances": [],
-							"__worldX": -1088,
-							"__worldY": 960
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4278,9 +3858,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [896,1088],
-							"fieldInstances": [],
-							"__worldX": -1024,
-							"__worldY": 896
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4294,9 +3872,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [960,1024],
-							"fieldInstances": [],
-							"__worldX": -960,
-							"__worldY": 832
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4310,9 +3886,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1024,832],
-							"fieldInstances": [],
-							"__worldX": -896,
-							"__worldY": 640
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4326,9 +3900,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1088,832],
-							"fieldInstances": [],
-							"__worldX": -832,
-							"__worldY": 640
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4342,9 +3914,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [960,896],
-							"fieldInstances": [],
-							"__worldX": -960,
-							"__worldY": 704
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4358,9 +3928,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [896,960],
-							"fieldInstances": [],
-							"__worldX": -1024,
-							"__worldY": 768
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4374,9 +3942,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [640,1152],
-							"fieldInstances": [],
-							"__worldX": -1280,
-							"__worldY": 960
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4390,9 +3956,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [704,1216],
-							"fieldInstances": [],
-							"__worldX": -1216,
-							"__worldY": 1024
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4406,9 +3970,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [768,1216],
-							"fieldInstances": [],
-							"__worldX": -1152,
-							"__worldY": 1024
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4422,9 +3984,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [832,1216],
-							"fieldInstances": [],
-							"__worldX": -1088,
-							"__worldY": 1024
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4438,9 +3998,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [832,1024],
-							"fieldInstances": [],
-							"__worldX": -1088,
-							"__worldY": 832
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4454,9 +4012,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [768,1088],
-							"fieldInstances": [],
-							"__worldX": -1152,
-							"__worldY": 896
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4470,9 +4026,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [576,1344],
-							"fieldInstances": [],
-							"__worldX": -1344,
-							"__worldY": 1152
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4486,9 +4040,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [704,1280],
-							"fieldInstances": [],
-							"__worldX": -1216,
-							"__worldY": 1088
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4502,9 +4054,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [704,1344],
-							"fieldInstances": [],
-							"__worldX": -1216,
-							"__worldY": 1152
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4518,9 +4068,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [640,1344],
-							"fieldInstances": [],
-							"__worldX": -1280,
-							"__worldY": 1152
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4534,9 +4082,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [640,1216],
-							"fieldInstances": [],
-							"__worldX": -1280,
-							"__worldY": 1024
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4550,9 +4096,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [768,1088],
-							"fieldInstances": [],
-							"__worldX": -1152,
-							"__worldY": 896
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4566,9 +4110,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [576,1152],
-							"fieldInstances": [],
-							"__worldX": -1344,
-							"__worldY": 960
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4582,9 +4124,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [832,1024],
-							"fieldInstances": [],
-							"__worldX": -1088,
-							"__worldY": 832
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4598,9 +4138,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [896,1024],
-							"fieldInstances": [],
-							"__worldX": -1024,
-							"__worldY": 832
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4614,9 +4152,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1024,960],
-							"fieldInstances": [],
-							"__worldX": -896,
-							"__worldY": 768
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4630,9 +4166,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [512,1216],
-							"fieldInstances": [],
-							"__worldX": -1408,
-							"__worldY": 1024
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4646,9 +4180,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [576,1216],
-							"fieldInstances": [],
-							"__worldX": -1344,
-							"__worldY": 1024
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4662,9 +4194,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [640,1344],
-							"fieldInstances": [],
-							"__worldX": -1280,
-							"__worldY": 1152
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4678,9 +4208,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [832,1344],
-							"fieldInstances": [],
-							"__worldX": -1088,
-							"__worldY": 1152
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4694,9 +4222,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1088,1152],
-							"fieldInstances": [],
-							"__worldX": -832,
-							"__worldY": 960
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4710,9 +4236,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [896,1088],
-							"fieldInstances": [],
-							"__worldX": -1024,
-							"__worldY": 896
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4726,9 +4250,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1536,1472],
-							"fieldInstances": [],
-							"__worldX": -384,
-							"__worldY": 1280
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4742,9 +4264,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1472,1344],
-							"fieldInstances": [],
-							"__worldX": -448,
-							"__worldY": 1152
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4758,9 +4278,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1472,1472],
-							"fieldInstances": [],
-							"__worldX": -448,
-							"__worldY": 1280
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4774,9 +4292,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1472,1536],
-							"fieldInstances": [],
-							"__worldX": -448,
-							"__worldY": 1344
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4790,9 +4306,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1536,1472],
-							"fieldInstances": [],
-							"__worldX": -384,
-							"__worldY": 1280
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4806,9 +4320,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1600,1344],
-							"fieldInstances": [],
-							"__worldX": -320,
-							"__worldY": 1152
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4822,9 +4334,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1600,1408],
-							"fieldInstances": [],
-							"__worldX": -320,
-							"__worldY": 1216
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4838,9 +4348,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1728,1344],
-							"fieldInstances": [],
-							"__worldX": -192,
-							"__worldY": 1152
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4854,9 +4362,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1792,1280],
-							"fieldInstances": [],
-							"__worldX": -128,
-							"__worldY": 1088
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4870,9 +4376,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1536,1344],
-							"fieldInstances": [],
-							"__worldX": -384,
-							"__worldY": 1152
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4886,9 +4390,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1536,1408],
-							"fieldInstances": [],
-							"__worldX": -384,
-							"__worldY": 1216
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4902,9 +4404,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1472,1408],
-							"fieldInstances": [],
-							"__worldX": -448,
-							"__worldY": 1216
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4918,9 +4418,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1664,1344],
-							"fieldInstances": [],
-							"__worldX": -256,
-							"__worldY": 1152
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4934,9 +4432,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1792,1344],
-							"fieldInstances": [],
-							"__worldX": -128,
-							"__worldY": 1152
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4950,9 +4446,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1856,1152],
-							"fieldInstances": [],
-							"__worldX": -64,
-							"__worldY": 960
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4966,9 +4460,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1792,1152],
-							"fieldInstances": [],
-							"__worldX": -128,
-							"__worldY": 960
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Tree",
@@ -4982,9 +4474,7 @@
 							"height": 64,
 							"defUid": 26,
 							"px": [1792,1088],
-							"fieldInstances": [],
-							"__worldX": -128,
-							"__worldY": 896
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Wall",
@@ -4998,9 +4488,7 @@
 							"height": 64,
 							"defUid": 51,
 							"px": [960,1792],
-							"fieldInstances": [],
-							"__worldX": -960,
-							"__worldY": 1600
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Wall",
@@ -5014,9 +4502,7 @@
 							"height": 64,
 							"defUid": 51,
 							"px": [896,1792],
-							"fieldInstances": [],
-							"__worldX": -1024,
-							"__worldY": 1600
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Wall",
@@ -5030,9 +4516,7 @@
 							"height": 64,
 							"defUid": 51,
 							"px": [1024,1792],
-							"fieldInstances": [],
-							"__worldX": -896,
-							"__worldY": 1600
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Wall",
@@ -5046,9 +4530,7 @@
 							"height": 64,
 							"defUid": 51,
 							"px": [1088,1792],
-							"fieldInstances": [],
-							"__worldX": -832,
-							"__worldY": 1600
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Wall",
@@ -5062,9 +4544,7 @@
 							"height": 64,
 							"defUid": 51,
 							"px": [1152,1792],
-							"fieldInstances": [],
-							"__worldX": -768,
-							"__worldY": 1600
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Wall",
@@ -5078,9 +4558,7 @@
 							"height": 64,
 							"defUid": 51,
 							"px": [1216,1792],
-							"fieldInstances": [],
-							"__worldX": -704,
-							"__worldY": 1600
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Wall",
@@ -5094,9 +4572,7 @@
 							"height": 64,
 							"defUid": 51,
 							"px": [1280,1792],
-							"fieldInstances": [],
-							"__worldX": -640,
-							"__worldY": 1600
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Wall",
@@ -5110,9 +4586,7 @@
 							"height": 64,
 							"defUid": 51,
 							"px": [1344,1792],
-							"fieldInstances": [],
-							"__worldX": -576,
-							"__worldY": 1600
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Wall",
@@ -5126,9 +4600,7 @@
 							"height": 64,
 							"defUid": 51,
 							"px": [1344,1728],
-							"fieldInstances": [],
-							"__worldX": -576,
-							"__worldY": 1536
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Wall",
@@ -5142,9 +4614,7 @@
 							"height": 64,
 							"defUid": 51,
 							"px": [1344,1664],
-							"fieldInstances": [],
-							"__worldX": -576,
-							"__worldY": 1472
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Wall",
@@ -5158,9 +4628,7 @@
 							"height": 64,
 							"defUid": 51,
 							"px": [1344,1600],
-							"fieldInstances": [],
-							"__worldX": -576,
-							"__worldY": 1408
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Wall",
@@ -5174,9 +4642,7 @@
 							"height": 64,
 							"defUid": 51,
 							"px": [1280,1600],
-							"fieldInstances": [],
-							"__worldX": -640,
-							"__worldY": 1408
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Wall",
@@ -5190,9 +4656,7 @@
 							"height": 64,
 							"defUid": 51,
 							"px": [1216,1600],
-							"fieldInstances": [],
-							"__worldX": -704,
-							"__worldY": 1408
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Wall",
@@ -5206,9 +4670,7 @@
 							"height": 64,
 							"defUid": 51,
 							"px": [1152,1600],
-							"fieldInstances": [],
-							"__worldX": -768,
-							"__worldY": 1408
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Wall",
@@ -5222,9 +4684,7 @@
 							"height": 64,
 							"defUid": 51,
 							"px": [1088,1600],
-							"fieldInstances": [],
-							"__worldX": -832,
-							"__worldY": 1408
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Wall",
@@ -5238,9 +4698,7 @@
 							"height": 64,
 							"defUid": 51,
 							"px": [1024,1600],
-							"fieldInstances": [],
-							"__worldX": -896,
-							"__worldY": 1408
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Wall",
@@ -5254,9 +4712,7 @@
 							"height": 64,
 							"defUid": 51,
 							"px": [960,1600],
-							"fieldInstances": [],
-							"__worldX": -960,
-							"__worldY": 1408
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Wall",
@@ -5270,9 +4726,7 @@
 							"height": 64,
 							"defUid": 51,
 							"px": [896,1600],
-							"fieldInstances": [],
-							"__worldX": -1024,
-							"__worldY": 1408
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Wall",
@@ -5286,9 +4740,7 @@
 							"height": 64,
 							"defUid": 51,
 							"px": [896,1664],
-							"fieldInstances": [],
-							"__worldX": -1024,
-							"__worldY": 1472
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Door",
@@ -5302,9 +4754,7 @@
 							"height": 64,
 							"defUid": 52,
 							"px": [896,1728],
-							"fieldInstances": [],
-							"__worldX": -1024,
-							"__worldY": 1536
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Chest",
@@ -5318,9 +4768,7 @@
 							"height": 64,
 							"defUid": 54,
 							"px": [1280,1664],
-							"fieldInstances": [],
-							"__worldX": -640,
-							"__worldY": 1472
+							"fieldInstances": []
 						}
 					]
 				},
@@ -5360,9 +4808,7 @@
 							"height": 64,
 							"defUid": 53,
 							"px": [960,1664],
-							"fieldInstances": [],
-							"__worldX": -960,
-							"__worldY": 1472
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Rough_floor",
@@ -5376,9 +4822,7 @@
 							"height": 64,
 							"defUid": 53,
 							"px": [1024,1664],
-							"fieldInstances": [],
-							"__worldX": -896,
-							"__worldY": 1472
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Rough_floor",
@@ -5392,9 +4836,7 @@
 							"height": 64,
 							"defUid": 53,
 							"px": [1088,1664],
-							"fieldInstances": [],
-							"__worldX": -832,
-							"__worldY": 1472
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Rough_floor",
@@ -5408,9 +4850,7 @@
 							"height": 64,
 							"defUid": 53,
 							"px": [1152,1664],
-							"fieldInstances": [],
-							"__worldX": -768,
-							"__worldY": 1472
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Rough_floor",
@@ -5424,9 +4864,7 @@
 							"height": 64,
 							"defUid": 53,
 							"px": [1216,1664],
-							"fieldInstances": [],
-							"__worldX": -704,
-							"__worldY": 1472
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Rough_floor",
@@ -5440,9 +4878,7 @@
 							"height": 64,
 							"defUid": 53,
 							"px": [1280,1664],
-							"fieldInstances": [],
-							"__worldX": -640,
-							"__worldY": 1472
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Rough_floor",
@@ -5456,9 +4892,7 @@
 							"height": 64,
 							"defUid": 53,
 							"px": [1280,1728],
-							"fieldInstances": [],
-							"__worldX": -640,
-							"__worldY": 1536
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Rough_floor",
@@ -5472,9 +4906,7 @@
 							"height": 64,
 							"defUid": 53,
 							"px": [1216,1728],
-							"fieldInstances": [],
-							"__worldX": -704,
-							"__worldY": 1536
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Rough_floor",
@@ -5488,9 +4920,7 @@
 							"height": 64,
 							"defUid": 53,
 							"px": [1152,1728],
-							"fieldInstances": [],
-							"__worldX": -768,
-							"__worldY": 1536
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Rough_floor",
@@ -5504,9 +4934,7 @@
 							"height": 64,
 							"defUid": 53,
 							"px": [1088,1728],
-							"fieldInstances": [],
-							"__worldX": -832,
-							"__worldY": 1536
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Rough_floor",
@@ -5520,9 +4948,7 @@
 							"height": 64,
 							"defUid": 53,
 							"px": [1024,1728],
-							"fieldInstances": [],
-							"__worldX": -896,
-							"__worldY": 1536
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Rough_floor",
@@ -5536,9 +4962,7 @@
 							"height": 64,
 							"defUid": 53,
 							"px": [960,1728],
-							"fieldInstances": [],
-							"__worldX": -960,
-							"__worldY": 1536
+							"fieldInstances": []
 						}
 					]
 				},
@@ -6849,23 +6273,14 @@
 					"entityInstances": []
 				}
 			],
-			"__neighbours": [
-				{ "levelIid": "262ff9d0-e920-11ef-929f-290c5b4e3ba9", "dir": "n" },
-				{ "levelIid": "ff97fe10-e920-11ef-929f-3d74139c8281", "dir": "ne" },
-				{ "levelIid": "024f07c0-e920-11ef-929f-0b09f4f4ff85", "dir": "e" },
-				{ "levelIid": "0460d0c0-e920-11ef-929f-e1f806b516d5", "dir": "se" },
-				{ "levelIid": "06f18dc0-e920-11ef-929f-8b4f48a8cb92", "dir": "s" },
-				{ "levelIid": "09559570-e920-11ef-929f-937b557f9fdb", "dir": "sw" },
-				{ "levelIid": "0ba06fd0-e920-11ef-929f-33960c5ce487", "dir": "w" },
-				{ "levelIid": "0e488560-e920-11ef-929f-9bea44a1e278", "dir": "nw" }
-			]
+			"__neighbours": []
 		},
 		{
 			"identifier": "Level_1",
 			"iid": "262ff9d0-e920-11ef-929f-290c5b4e3ba9",
 			"uid": 34,
-			"worldX": -1920,
-			"worldY": -2240,
+			"worldX": -1,
+			"worldY": -1,
 			"worldDepth": 0,
 			"pxWid": 2560,
 			"pxHei": 2048,
@@ -8238,20 +7653,14 @@
 					"entityInstances": []
 				}
 			],
-			"__neighbours": [
-				{ "levelIid": "370904d0-e920-11ef-87ba-f5addcd7e788", "dir": "s" },
-				{ "levelIid": "ff97fe10-e920-11ef-929f-3d74139c8281", "dir": "e" },
-				{ "levelIid": "024f07c0-e920-11ef-929f-0b09f4f4ff85", "dir": "se" },
-				{ "levelIid": "0ba06fd0-e920-11ef-929f-33960c5ce487", "dir": "sw" },
-				{ "levelIid": "0e488560-e920-11ef-929f-9bea44a1e278", "dir": "w" }
-			]
+			"__neighbours": []
 		},
 		{
 			"identifier": "Level_2",
 			"iid": "ff97fe10-e920-11ef-929f-3d74139c8281",
 			"uid": 40,
-			"worldX": 640,
-			"worldY": -2240,
+			"worldX": -1,
+			"worldY": -1,
 			"worldDepth": 0,
 			"pxWid": 2560,
 			"pxHei": 2048,
@@ -9624,20 +9033,14 @@
 					"entityInstances": []
 				}
 			],
-			"__neighbours": [
-				{ "levelIid": "370904d0-e920-11ef-87ba-f5addcd7e788", "dir": "sw" },
-				{ "levelIid": "262ff9d0-e920-11ef-929f-290c5b4e3ba9", "dir": "w" },
-				{ "levelIid": "3ea61ce0-e920-11ef-929f-7329985947a3", "dir": "e" },
-				{ "levelIid": "41529f40-e920-11ef-929f-a988f4329ce2", "dir": "se" },
-				{ "levelIid": "024f07c0-e920-11ef-929f-0b09f4f4ff85", "dir": "s" }
-			]
+			"__neighbours": []
 		},
 		{
 			"identifier": "Level_3",
 			"iid": "3ea61ce0-e920-11ef-929f-7329985947a3",
 			"uid": 47,
-			"worldX": 3200,
-			"worldY": -2240,
+			"worldX": -1,
+			"worldY": -1,
 			"worldDepth": 0,
 			"pxWid": 2560,
 			"pxHei": 2048,
@@ -11010,14 +10413,14 @@
 					"entityInstances": []
 				}
 			],
-			"__neighbours": [ { "levelIid": "ff97fe10-e920-11ef-929f-3d74139c8281", "dir": "w" }, { "levelIid": "41529f40-e920-11ef-929f-a988f4329ce2", "dir": "s" }, { "levelIid": "024f07c0-e920-11ef-929f-0b09f4f4ff85", "dir": "sw" } ]
+			"__neighbours": []
 		},
 		{
 			"identifier": "Level_4",
 			"iid": "41529f40-e920-11ef-929f-a988f4329ce2",
 			"uid": 48,
-			"worldX": 3200,
-			"worldY": -192,
+			"worldX": -1,
+			"worldY": -1,
 			"worldDepth": 0,
 			"pxWid": 2560,
 			"pxHei": 2048,
@@ -12390,20 +11793,14 @@
 					"entityInstances": []
 				}
 			],
-			"__neighbours": [
-				{ "levelIid": "ff97fe10-e920-11ef-929f-3d74139c8281", "dir": "nw" },
-				{ "levelIid": "3ea61ce0-e920-11ef-929f-7329985947a3", "dir": "n" },
-				{ "levelIid": "43c0b910-e920-11ef-929f-59c36198aeed", "dir": "s" },
-				{ "levelIid": "024f07c0-e920-11ef-929f-0b09f4f4ff85", "dir": "w" },
-				{ "levelIid": "0460d0c0-e920-11ef-929f-e1f806b516d5", "dir": "sw" }
-			]
+			"__neighbours": []
 		},
 		{
 			"identifier": "Level_5",
 			"iid": "43c0b910-e920-11ef-929f-59c36198aeed",
 			"uid": 49,
-			"worldX": 3200,
-			"worldY": 1856,
+			"worldX": -1,
+			"worldY": -1,
 			"worldDepth": 0,
 			"pxWid": 2560,
 			"pxHei": 2048,
@@ -13776,14 +13173,14 @@
 					"entityInstances": []
 				}
 			],
-			"__neighbours": [ { "levelIid": "41529f40-e920-11ef-929f-a988f4329ce2", "dir": "n" }, { "levelIid": "024f07c0-e920-11ef-929f-0b09f4f4ff85", "dir": "nw" }, { "levelIid": "0460d0c0-e920-11ef-929f-e1f806b516d5", "dir": "w" } ]
+			"__neighbours": []
 		},
 		{
 			"identifier": "Level_6",
 			"iid": "024f07c0-e920-11ef-929f-0b09f4f4ff85",
 			"uid": 41,
-			"worldX": 640,
-			"worldY": -192,
+			"worldX": -1,
+			"worldY": -1,
 			"worldDepth": 0,
 			"pxWid": 2560,
 			"pxHei": 2048,
@@ -15156,23 +14553,14 @@
 					"entityInstances": []
 				}
 			],
-			"__neighbours": [
-				{ "levelIid": "370904d0-e920-11ef-87ba-f5addcd7e788", "dir": "w" },
-				{ "levelIid": "262ff9d0-e920-11ef-929f-290c5b4e3ba9", "dir": "nw" },
-				{ "levelIid": "ff97fe10-e920-11ef-929f-3d74139c8281", "dir": "n" },
-				{ "levelIid": "3ea61ce0-e920-11ef-929f-7329985947a3", "dir": "ne" },
-				{ "levelIid": "41529f40-e920-11ef-929f-a988f4329ce2", "dir": "e" },
-				{ "levelIid": "43c0b910-e920-11ef-929f-59c36198aeed", "dir": "se" },
-				{ "levelIid": "0460d0c0-e920-11ef-929f-e1f806b516d5", "dir": "s" },
-				{ "levelIid": "06f18dc0-e920-11ef-929f-8b4f48a8cb92", "dir": "sw" }
-			]
+			"__neighbours": []
 		},
 		{
 			"identifier": "Level_7",
 			"iid": "0460d0c0-e920-11ef-929f-e1f806b516d5",
 			"uid": 42,
-			"worldX": 640,
-			"worldY": 1856,
+			"worldX": -1,
+			"worldY": -1,
 			"worldDepth": 0,
 			"pxWid": 2560,
 			"pxHei": 2048,
@@ -16545,20 +15933,14 @@
 					"entityInstances": []
 				}
 			],
-			"__neighbours": [
-				{ "levelIid": "370904d0-e920-11ef-87ba-f5addcd7e788", "dir": "nw" },
-				{ "levelIid": "41529f40-e920-11ef-929f-a988f4329ce2", "dir": "ne" },
-				{ "levelIid": "43c0b910-e920-11ef-929f-59c36198aeed", "dir": "e" },
-				{ "levelIid": "024f07c0-e920-11ef-929f-0b09f4f4ff85", "dir": "n" },
-				{ "levelIid": "06f18dc0-e920-11ef-929f-8b4f48a8cb92", "dir": "w" }
-			]
+			"__neighbours": []
 		},
 		{
 			"identifier": "Level_8",
 			"iid": "06f18dc0-e920-11ef-929f-8b4f48a8cb92",
 			"uid": 43,
-			"worldX": -1920,
-			"worldY": 1856,
+			"worldX": -1,
+			"worldY": -1,
 			"worldDepth": 0,
 			"pxWid": 2560,
 			"pxHei": 2048,
@@ -17931,20 +17313,14 @@
 					"entityInstances": []
 				}
 			],
-			"__neighbours": [
-				{ "levelIid": "370904d0-e920-11ef-87ba-f5addcd7e788", "dir": "n" },
-				{ "levelIid": "024f07c0-e920-11ef-929f-0b09f4f4ff85", "dir": "ne" },
-				{ "levelIid": "0460d0c0-e920-11ef-929f-e1f806b516d5", "dir": "e" },
-				{ "levelIid": "09559570-e920-11ef-929f-937b557f9fdb", "dir": "w" },
-				{ "levelIid": "0ba06fd0-e920-11ef-929f-33960c5ce487", "dir": "nw" }
-			]
+			"__neighbours": []
 		},
 		{
 			"identifier": "Level_9",
 			"iid": "09559570-e920-11ef-929f-937b557f9fdb",
 			"uid": 44,
-			"worldX": -4480,
-			"worldY": 1856,
+			"worldX": -1,
+			"worldY": -1,
 			"worldDepth": 0,
 			"pxWid": 2560,
 			"pxHei": 2048,
@@ -19317,14 +18693,14 @@
 					"entityInstances": []
 				}
 			],
-			"__neighbours": [ { "levelIid": "370904d0-e920-11ef-87ba-f5addcd7e788", "dir": "ne" }, { "levelIid": "06f18dc0-e920-11ef-929f-8b4f48a8cb92", "dir": "e" }, { "levelIid": "0ba06fd0-e920-11ef-929f-33960c5ce487", "dir": "n" } ]
+			"__neighbours": []
 		},
 		{
 			"identifier": "Level_10",
 			"iid": "0ba06fd0-e920-11ef-929f-33960c5ce487",
 			"uid": 45,
-			"worldX": -4480,
-			"worldY": -192,
+			"worldX": -1,
+			"worldY": -1,
 			"worldDepth": 0,
 			"pxWid": 2560,
 			"pxHei": 2048,
@@ -20697,20 +20073,14 @@
 					"entityInstances": []
 				}
 			],
-			"__neighbours": [
-				{ "levelIid": "370904d0-e920-11ef-87ba-f5addcd7e788", "dir": "e" },
-				{ "levelIid": "262ff9d0-e920-11ef-929f-290c5b4e3ba9", "dir": "ne" },
-				{ "levelIid": "06f18dc0-e920-11ef-929f-8b4f48a8cb92", "dir": "se" },
-				{ "levelIid": "09559570-e920-11ef-929f-937b557f9fdb", "dir": "s" },
-				{ "levelIid": "0e488560-e920-11ef-929f-9bea44a1e278", "dir": "n" }
-			]
+			"__neighbours": []
 		},
 		{
 			"identifier": "Level_11",
 			"iid": "0e488560-e920-11ef-929f-9bea44a1e278",
 			"uid": 46,
-			"worldX": -4480,
-			"worldY": -2240,
+			"worldX": -1,
+			"worldY": -1,
 			"worldDepth": 0,
 			"pxWid": 2560,
 			"pxHei": 2048,
@@ -22083,7 +21453,7 @@
 					"entityInstances": []
 				}
 			],
-			"__neighbours": [ { "levelIid": "370904d0-e920-11ef-87ba-f5addcd7e788", "dir": "se" }, { "levelIid": "262ff9d0-e920-11ef-929f-290c5b4e3ba9", "dir": "e" }, { "levelIid": "0ba06fd0-e920-11ef-929f-33960c5ce487", "dir": "s" } ]
+			"__neighbours": []
 		}
 	],
 	"worlds": [],

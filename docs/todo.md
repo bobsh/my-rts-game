@@ -54,4 +54,6 @@
 - [x] Fix resource gathering pathfinding to try alternative positions when a path isn't found
 - [x] Linux build target
 - [x] Add background music
+- [x] Rethink the multi-map thing, I'm not sure we want it to really unload maps and load them in like that
+- [x] Remove the Ldtk calibration resource
 - [ ] Fog of war
