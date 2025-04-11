@@ -154,10 +154,8 @@ fn handle_movement_input(
 
 // System to calculate a path when a destination is set
 fn calculate_path(
-    _commands: Commands,
     mut query: Query<(Entity, &GridCoords, &mut MoveTarget), (With<Movable>, Without<Moving>)>,
     obstacles: Query<&GridCoords, With<crate::components::movement::Collider>>,
-    _ldtk_level: Query<&LevelIid>,
 ) {
     for (entity, current_pos, mut move_target) in &mut query {
         if let Some(destination) = move_target.destination {
@@ -281,7 +279,6 @@ fn calculate_path(
 fn move_along_path(
     mut commands: Commands,
     mut query: Query<(Entity, &GridCoords, &mut MoveTarget, &Movable), Without<Moving>>,
-    _time: Res<Time>,
 ) {
     for (entity, current_pos, mut move_target, _movable) in &mut query {
         if !move_target.path.is_empty() {

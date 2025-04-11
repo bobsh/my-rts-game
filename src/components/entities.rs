@@ -75,22 +75,6 @@ struct TreeBundle {
     grid_coords: GridCoords,
 }
 
-#[derive(Default, Component)]
-pub struct House;
-
-#[derive(Default, Bundle, LdtkEntity)]
-struct HouseBundle {
-    house: House,
-    selectable: Selectable,
-    collider: Collider,
-    #[sprite_sheet]
-    sprite_sheet: Sprite,
-    #[grid_coords]
-    grid_coords: GridCoords,
-    inventory: Inventory,
-    inventory_settings: InventorySettings,
-}
-
 #[derive(Default, Bundle, LdtkEntity)]
 struct WallBundle {
     selectable: Selectable,
