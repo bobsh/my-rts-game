@@ -157,7 +157,10 @@ fn start_gathering(
 
     let cursor_pos = cursor_ray.origin.truncate();
 
-    info!("<start_gathering> Resource gathering cursor position: {:?}", cursor_pos);
+    info!(
+        "<start_gathering> Resource gathering cursor position: {:?}",
+        cursor_pos
+    );
 
     let Some((character_entity, _skills, character_coords, is_gathering)) =
         selected_characters.iter().next()
@@ -182,7 +185,9 @@ fn start_gathering(
             && cursor_pos.y <= max_y
         {
             if is_tree.is_none() && is_mine.is_none() && is_quarry.is_none() {
-                info!("<start_gathering>  Clicked on a sprite that isn't a valid resource, ignoring");
+                info!(
+                    "<start_gathering>  Clicked on a sprite that isn't a valid resource, ignoring"
+                );
                 continue;
             }
 
@@ -232,10 +237,7 @@ fn start_gathering(
                 let character_grid = character_coords;
 
                 info!("<start_gathering> Character position: {:?}", character_grid);
-                info!(
-                    "<start_gathering> Resource position: {:?}",
-                    resource_grid
-                );
+                info!("<start_gathering> Resource position: {:?}", resource_grid);
 
                 let adjacent_positions = find_adjacent_positions(resource_grid, &obstacles);
 
@@ -311,7 +313,9 @@ fn start_gathering(
                 .remove::<GatheringIntent>();
         }
 
-        info!("<start_gathering> No resource found at click position, deferring to movement system");
+        info!(
+            "<start_gathering> No resource found at click position, deferring to movement system"
+        );
     }
 }
 
@@ -320,7 +324,10 @@ fn find_adjacent_positions(
     resource_pos: GridCoords,
     obstacles: &Query<&GridCoords, With<crate::components::movement::Collider>>,
 ) -> Vec<GridCoords> {
-    info!("Finding adjacent positions for resource at {:?}", resource_pos);
+    info!(
+        "Finding adjacent positions for resource at {:?}",
+        resource_pos
+    );
 
     let possible_offsets = [
         (-1, 0),
@@ -406,8 +413,7 @@ fn check_gathering_proximity(
                 continue;
             }
 
-            let world_to_grid_pos =
-                resource_transform.translation().truncate();
+            let world_to_grid_pos = resource_transform.translation().truncate();
 
             let raw_grid_x = (world_to_grid_pos.x / 64.0).floor() as i32;
             let raw_grid_y = (world_to_grid_pos.y / 64.0).floor() as i32;
