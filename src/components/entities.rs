@@ -102,15 +102,6 @@ struct WallBundle {
 }
 
 #[derive(Default, Bundle, LdtkEntity)]
-struct RoughFloorBundle {
-    selectable: Selectable,
-    #[sprite_sheet]
-    sprite_sheet: Sprite,
-    #[grid_coords]
-    grid_coords: GridCoords,
-}
-
-#[derive(Default, Bundle, LdtkEntity)]
 struct DoorBundle {
     selectable: Selectable,
     #[sprite_sheet]
@@ -119,16 +110,29 @@ struct DoorBundle {
     grid_coords: GridCoords,
 }
 
+#[derive(Default, Component)]
+pub struct Chest;
+
+#[derive(Default, Bundle, LdtkEntity)]
+struct ChestBundle {
+    chest: Chest,
+    selectable: Selectable,
+    #[sprite_sheet]
+    sprite_sheet: Sprite,
+    #[grid_coords]
+    grid_coords: GridCoords,
+    inventory: Inventory,
+    inventory_settings: InventorySettings,
+}
+
 impl Plugin for EntitiesPlugin {
     fn build(&self, app: &mut App) {
         app.register_ldtk_entity::<CharacterBundle>("Character")
             .register_ldtk_entity::<MineBundle>("Mine")
             .register_ldtk_entity::<QuarryBundle>("Quarry")
             .register_ldtk_entity::<TreeBundle>("Tree")
-            .register_ldtk_entity::<HouseBundle>("House")
             .register_ldtk_entity::<WallBundle>("Wall")
-            .register_ldtk_entity::<RoughFloorBundle>("Rough_floor")
-            .register_ldtk_entity::<RoughFloorBundle>("Chest")
+            .register_ldtk_entity::<ChestBundle>("Chest")
             .register_ldtk_entity::<DoorBundle>("Door");
     }
 }

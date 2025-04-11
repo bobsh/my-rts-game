@@ -1,9 +1,8 @@
 use crate::components::entities::{Mine, Quarry, Tree};
 use crate::components::inventory::*;
-use crate::components::movement::{Movable, MoveTarget, Moving};
+use crate::components::movement::{MoveTarget, Moving};
 use crate::components::skills::{SkillProgression, Skills};
 use crate::components::ui::EntityInfoPanel;
-use crate::components::unit::Selectable;
 use crate::components::unit::Selected;
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::GridCoords;
@@ -37,23 +36,6 @@ pub struct Gathering {
 pub struct GatheringIntent {
     pub target: Entity,
     pub resource_type: ResourceType,
-}
-
-// Simplified character marker
-#[derive(Component, Debug, Default)]
-pub struct Character;
-
-// Character bundle - move this to entities.rs
-#[derive(Bundle)]
-pub struct CharacterBundle {
-    pub character: Character,
-    pub skills: Skills,
-    pub skill_progression: SkillProgression,
-    pub selectable: Selectable,
-    pub movable: Movable,
-    pub move_target: MoveTarget,
-    pub inventory: Inventory,
-    pub inventory_settings: InventorySettings,
 }
 
 // Update the gathering process to use target and skill_modifier
