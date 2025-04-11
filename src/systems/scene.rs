@@ -16,7 +16,7 @@ impl Plugin for ScenePlugin {
 pub fn setup_scene(mut commands: Commands, asset_server: Res<AssetServer>) {
     // Position the camera above the house area where the worker and warrior start
     // Using coordinates based on your map layout - adjust as needed for your specific map
-    commands.spawn((Camera2d, Transform::from_xyz(1000.0, 800.0, 0.0)));
+    commands.spawn((Camera2d, Transform::from_xyz(4000.0, 3000.0, 0.0)));
 
     // Load the ldtk map file
     let map_handle = asset_server.load("test-map.ldtk");
