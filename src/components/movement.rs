@@ -27,18 +27,3 @@ pub struct Moving {
 
 #[derive(Component, Default)]
 pub struct Collider;
-
-// New component to track if an entity is busy doing something else
-#[derive(Component)]
-#[allow(dead_code)]
-pub struct Busy {
-    pub reason: BusyReason,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[allow(dead_code)]
-pub enum BusyReason {
-    Gathering,
-    Building,
-    Fighting,
-}

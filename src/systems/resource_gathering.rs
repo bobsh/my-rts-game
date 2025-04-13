@@ -674,7 +674,6 @@ fn update_character_info_ui(
 }
 
 fn handle_resource_transfer(
-    _commands: Commands,
     keyboard: Res<ButtonInput<KeyCode>>,
     mouse_button: Res<ButtonInput<MouseButton>>,
     mut selected_entity: Query<(Entity, &mut Inventory, &InventorySettings), With<Selected>>,

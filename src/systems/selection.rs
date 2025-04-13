@@ -4,7 +4,6 @@ use bevy::input::ButtonInput;
 use bevy::prelude::*;
 use bevy::sprite::Sprite;
 use bevy::window::PrimaryWindow;
-use bevy_ecs_ldtk::prelude::*;
 
 pub struct SelectionPlugin;
 
@@ -12,7 +11,6 @@ impl Plugin for SelectionPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Update, selection_system)
             .add_systems(Update, update_selection_ring)
-            .add_systems(Update, highlight_selected)
             .add_systems(Update, draw_selection_boxes);
     }
 }
@@ -26,9 +24,6 @@ fn selection_system(
     selectable_query: Query<(Entity, &GlobalTransform, &Sprite), With<Selectable>>,
     selected_query: Query<Entity, With<Selected>>,
     selection_ring_query: Query<Entity, With<SelectionRing>>,
-    // Use the LdtkProject component instead of the Bundle
-    _ldtk_worlds: Query<&GlobalTransform, With<LdtkProjectHandle>>,
-    _asset_server: Res<AssetServer>,
     images: Res<Assets<Image>>,
 ) {
     // Only process clicks
@@ -138,15 +133,6 @@ fn update_selection_ring(
                 ring_transform.translation.z = position.z - 0.1;
                 break;
             }
-        }
-    }
-}
-
-fn highlight_selected(query: Query<(&Transform, Option<&Selected>), With<Selectable>>) {
-    for (_transform, selected) in query.iter() {
-        if selected.is_some() {
-            // Selected units are highlighted by the selection ring
-            // This system is now mostly redundant with the animated ring
         }
     }
 }

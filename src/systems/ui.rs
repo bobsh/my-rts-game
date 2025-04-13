@@ -1,4 +1,4 @@
-use crate::components::inventory::{Inventory, InventorySettings}; // Add this import
+use crate::components::inventory::Inventory;
 use crate::components::ui::{EntityInfoPanel, EntityNameText};
 use crate::components::unit::Selected;
 use bevy::prelude::*;
@@ -54,10 +54,8 @@ fn setup_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
 
 fn update_entity_info_panel(
     selected_entities: Query<(Entity, Option<&Name>, Option<&Inventory>), With<Selected>>,
-    _house_query: Query<Entity, With<Name>>,
     mut panel_query: Query<&mut Node, With<EntityInfoPanel>>,
     mut entity_name_text: Query<&mut Text, With<EntityNameText>>,
-    _inventory_settings: Query<&InventorySettings>,
 ) {
     // Get a mutable reference to the panel to control visibility
     if let Ok(mut panel_node) = panel_query.get_single_mut() {

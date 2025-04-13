@@ -64,9 +64,6 @@ fn camera_zoom(
     mut camera_query: Query<&mut Transform, With<Camera>>,
     mut mouse_wheel_events: EventReader<MouseWheel>,
 ) {
-    // Base zoom factor (for native builds)
-    let base_zoom_factor = 0.1;
-
     // Get the current platform
     let is_wasm = cfg!(target_arch = "wasm32");
 
@@ -75,14 +72,13 @@ fn camera_zoom(
         // Try an extremely small value for WASM
         0.01 // 1/100th of the original sensitivity
     } else {
-        base_zoom_factor
+        0.1
     };
 
     let min_zoom = 0.25;
     let max_zoom = 2.0;
 
     for event in mouse_wheel_events.read() {
-        // Apply even more smoothing for WASM
         let mut zoom_amount = event.y * zoom_factor;
 
         // Further smooth the zoom on WASM by clamping large deltas

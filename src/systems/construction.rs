@@ -127,7 +127,6 @@ fn process_construction(
         &mut Skills,
         &mut SkillProgression,
     )>,
-    _asset_server: Res<AssetServer>,
 ) {
     for (entity, mut constructing, mut skills, mut progression) in &mut builders {
         constructing.progress += time.delta_secs();
@@ -161,7 +160,7 @@ fn update_construction_ui(
     construction_query: Query<(Entity, &Constructing), With<Selected>>,
     panel_query: Query<Entity, With<EntityInfoPanel>>,
     mut commands: Commands,
-    _asset_server: Res<AssetServer>,
+    asset_server: Res<AssetServer>,
 ) {
     if let Ok(panel_entity) = panel_query.get_single() {
         if let Ok((_entity, constructing)) = construction_query.get_single() {
@@ -174,7 +173,7 @@ fn update_construction_ui(
                         constructing.building_type, progress_percent
                     )),
                     TextFont {
-                        font: _asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf"),
+                        font: asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf"),
                         font_size: 16.0,
                         ..default()
                     },
