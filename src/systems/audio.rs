@@ -5,7 +5,7 @@ pub struct AudioSystemPlugin;
 
 impl Plugin for AudioSystemPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins(AudioPlugin) // Add the AudioPlugin to initialize the audio system
+        app.add_plugins(AudioPlugin)
             .add_systems(Startup, play_background_music);
     }
 }
