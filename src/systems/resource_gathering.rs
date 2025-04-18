@@ -1,4 +1,4 @@
-use crate::components::entities::{Mine, Quarry, Tree};
+use crate::components::entities::{Forest, Mine, Quarry};
 use crate::components::inventory::*;
 use crate::components::movement::{MoveTarget, Moving};
 use crate::components::skills::{SkillProgression, Skills};
@@ -50,7 +50,7 @@ fn gather_resources(
         &Skills,
     )>,
     mut skill_progression: Query<&mut SkillProgression>,
-    trees: Query<Entity, With<Tree>>,
+    trees: Query<Entity, With<Forest>>,
     mines: Query<Entity, With<Mine>>,
     quarries: Query<Entity, With<Quarry>>,
 ) {
@@ -114,7 +114,7 @@ fn start_gathering(
         Entity,
         &GlobalTransform,
         &Sprite,
-        Option<&Tree>,
+        Option<&Forest>,
         Option<&Mine>,
         Option<&Quarry>,
     )>,
@@ -307,7 +307,7 @@ fn find_adjacent_positions(
     obstacles: &Query<&GridCoords, With<crate::components::movement::Collider>>,
 ) -> Vec<GridCoords> {
     info!(
-        "Finding adjacent positions for resource at {:?}",
+        "<find_adjacent_positions> Finding adjacent positions for resource at {:?}",
         resource_pos
     );
 
@@ -356,7 +356,7 @@ fn check_gathering_proximity(
     resources: Query<(
         &GlobalTransform,
         &Transform,
-        Option<&Tree>,
+        Option<&Forest>,
         Option<&Mine>,
         Option<&Quarry>,
     )>,
@@ -446,10 +446,8 @@ fn check_gathering_proximity(
                     ResourceType::Stone => "Stone",
                 };
 
-                info!(
-                    "<check_gathering_proximity> Started gathering {} (Grid dist: {:.1}, World dist: {:.1})",
-                    resource_name, grid_distance, world_distance
-                );
+                info!("<check_gathering_proximity> Started gathering {} (Grid dist: {:.1}, World dist: {:.1})",
+                      resource_name, grid_distance, world_distance);
             } else {
                 info!("<check_gathering_proximity> Too far from resource: Chebyshev distance {} cells (need 1), Grid distance {:.1} cells (need {:.1})",
                      chebyshev_distance, grid_distance, GATHERING_RANGE_GRID);
