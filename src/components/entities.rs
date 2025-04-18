@@ -60,21 +60,6 @@ struct QuarryBundle {
     grid_coords: GridCoords,
 }
 
-#[derive(Default, Component)]
-pub struct Tree;
-
-#[derive(Default, Bundle, LdtkEntity)]
-struct TreeBundle {
-    collider: Collider,
-    resource_node: ResourceNode,
-    selectable: Selectable,
-    tree: Tree,
-    #[sprite_sheet]
-    sprite_sheet: Sprite,
-    #[grid_coords]
-    grid_coords: GridCoords,
-}
-
 #[derive(Default, Bundle, LdtkEntity)]
 struct WallBundle {
     selectable: Selectable,
@@ -109,14 +94,25 @@ struct ChestBundle {
     inventory_settings: InventorySettings,
 }
 
+#[derive(Default, Component)]
+pub struct Forest;
+
+#[derive(Default, Bundle, LdtkIntCell)]
+struct ForestBundle {
+    forest: Forest,
+    collider: Collider,
+    resource_node: ResourceNode,
+    selectable: Selectable,
+}
+
 impl Plugin for EntitiesPlugin {
     fn build(&self, app: &mut App) {
         app.register_ldtk_entity::<CharacterBundle>("Character")
             .register_ldtk_entity::<MineBundle>("Mine")
             .register_ldtk_entity::<QuarryBundle>("Quarry")
-            .register_ldtk_entity::<TreeBundle>("Tree")
             .register_ldtk_entity::<WallBundle>("Wall")
             .register_ldtk_entity::<ChestBundle>("Chest")
-            .register_ldtk_entity::<DoorBundle>("Door");
+            .register_ldtk_entity::<DoorBundle>("Door")
+            .register_ldtk_int_cell::<ForestBundle>(1);
     }
 }
