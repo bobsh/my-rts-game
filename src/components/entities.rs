@@ -60,25 +60,6 @@ struct QuarryBundle {
     grid_coords: GridCoords,
 }
 
-#[derive(Default, Bundle, LdtkEntity)]
-struct WallBundle {
-    selectable: Selectable,
-    collider: Collider,
-    #[sprite_sheet]
-    sprite_sheet: Sprite,
-    #[grid_coords]
-    grid_coords: GridCoords,
-}
-
-#[derive(Default, Bundle, LdtkEntity)]
-struct DoorBundle {
-    selectable: Selectable,
-    #[sprite_sheet]
-    sprite_sheet: Sprite,
-    #[grid_coords]
-    grid_coords: GridCoords,
-}
-
 #[derive(Default, Component)]
 pub struct Chest;
 
@@ -95,6 +76,19 @@ struct ChestBundle {
 }
 
 #[derive(Default, Component)]
+pub struct Door;
+
+#[derive(Default, Bundle, LdtkEntity)]
+struct DoorBundle {
+    door: Door,
+    selectable: Selectable,
+    #[sprite_sheet]
+    sprite_sheet: Sprite,
+    #[grid_coords]
+    grid_coords: GridCoords,
+}
+
+#[derive(Default, Component)]
 pub struct Forest;
 
 #[derive(Default, Bundle, LdtkIntCell)]
@@ -105,14 +99,51 @@ struct ForestBundle {
     selectable: Selectable,
 }
 
+#[derive(Default, Component)]
+pub struct Mud;
+
+#[derive(Default, Bundle, LdtkIntCell)]
+struct MudBundle {
+    mud: Mud,
+}
+
+#[derive(Default, Component)]
+pub struct Concrete;
+
+#[derive(Default, Bundle, LdtkIntCell)]
+struct ConcreteBundle {
+    concrete: Concrete,
+}
+
+#[derive(Default, Component)]
+pub struct Wall;
+
+#[derive(Default, Bundle, LdtkIntCell)]
+struct WallBundle {
+    wall: Wall,
+    selectable: Selectable,
+    collider: Collider,
+}
+
+#[derive(Default, Component)]
+pub struct Path;
+
+#[derive(Default, Bundle, LdtkIntCell)]
+struct PathBundle {
+    path: Path,
+}
+
 impl Plugin for EntitiesPlugin {
     fn build(&self, app: &mut App) {
         app.register_ldtk_entity::<CharacterBundle>("Character")
             .register_ldtk_entity::<MineBundle>("Mine")
             .register_ldtk_entity::<QuarryBundle>("Quarry")
-            .register_ldtk_entity::<WallBundle>("Wall")
             .register_ldtk_entity::<ChestBundle>("Chest")
             .register_ldtk_entity::<DoorBundle>("Door")
-            .register_ldtk_int_cell::<ForestBundle>(1);
+            .register_ldtk_int_cell::<ForestBundle>(1)
+            .register_ldtk_int_cell::<MudBundle>(2)
+            .register_ldtk_int_cell::<ConcreteBundle>(3)
+            .register_ldtk_int_cell::<WallBundle>(4)
+            .register_ldtk_int_cell::<PathBundle>(5);
     }
 }
