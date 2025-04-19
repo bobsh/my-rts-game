@@ -1,0 +1,18 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Build Project", // Use a simple, unique label
+      "type": "shell", // Change type to shell
+      "command": "cargo build", // Explicitly run cargo build
+      "problemMatcher": [
+        "$rustc"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "detail": "Build the Rust project using cargo build"
+    }
+  ]
+}
