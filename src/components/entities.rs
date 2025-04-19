@@ -133,6 +133,15 @@ struct PathBundle {
     path: Path,
 }
 
+#[derive(Default, Component)]
+pub struct Water;
+
+#[derive(Default, Bundle, LdtkIntCell)]
+struct WaterBundle {
+    water: Water,
+    collider: Collider,
+}
+
 impl Plugin for EntitiesPlugin {
     fn build(&self, app: &mut App) {
         app.register_ldtk_entity::<CharacterBundle>("Character")
@@ -144,6 +153,7 @@ impl Plugin for EntitiesPlugin {
             .register_ldtk_int_cell::<MudBundle>(2)
             .register_ldtk_int_cell::<ConcreteBundle>(3)
             .register_ldtk_int_cell::<WallBundle>(4)
-            .register_ldtk_int_cell::<PathBundle>(5);
+            .register_ldtk_int_cell::<PathBundle>(5)
+            .register_ldtk_int_cell::<WaterBundle>(6);
     }
 }
