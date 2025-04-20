@@ -1,6 +1,7 @@
 use bevy::app::{App, Plugin};
 use bevy::input::common_conditions::input_toggle_active;
 use bevy::prelude::KeyCode;
+use bevy_aseprite_ultra::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
@@ -24,6 +25,7 @@ impl Plugin for RtsPlugin {
             .add_plugins(
                 WorldInspectorPlugin::new().run_if(input_toggle_active(false, KeyCode::F10)),
             )
+            .add_plugins(AsepriteUltraPlugin)
             .add_plugins(EntitiesPlugin)
             .add_plugins(MovementPlugin)
             .add_plugins(ResourceGatheringPlugin)

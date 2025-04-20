@@ -26,6 +26,7 @@ bevy_ecs_ldtk = "0.11"
 bevy-inspector-egui = "0.30"
 pathfinding = "4.3.0"
 bevy_kira_audio =  { version = "0.22", features = ["mp3"] }
+bevy_aseprite_ultra = { version = "0.4.1" }
 
 [build-dependencies]
 winres = "0.1"

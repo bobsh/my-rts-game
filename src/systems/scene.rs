@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy_aseprite_ultra::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 
 pub struct ScenePlugin;
@@ -6,12 +7,18 @@ pub struct ScenePlugin;
 #[derive(Resource)]
 struct SplashTimer(Timer);
 
+#[derive(Resource, Default)]
+struct MapLoadState {
+    requested: bool,
+}
+
 impl Plugin for ScenePlugin {
     fn build(&self, app: &mut App) {
         app.insert_resource(LevelSelection::index(0))
             .insert_resource(LdtkSettings {
                 ..Default::default()
             })
+            .init_resource::<MapLoadState>()
             .add_systems(Startup, setup_scene)
             .add_systems(Update, splash_screen_system);
     }
@@ -26,15 +33,17 @@ pub fn setup_scene(mut commands: Commands, asset_server: Res<AssetServer>) {
     // Camera
     commands.spawn((Camera2d, Transform::from_xyz(4000.0, 3000.0, 0.0)));
 
-    // Splash screen
-    let splash_handle: Handle<Image> = asset_server.load("splashscreen1.gif");
+    // animations in bevy ui
     commands.spawn((
-        Sprite {
-            custom_size: Some(Vec2::ZERO),
-            image: splash_handle,
+        SplashScreen,
+        Node {
+            justify_content: JustifyContent::Center,
             ..default()
         },
-        SplashScreen,
+        AseUiAnimation {
+            aseprite: asset_server.load("splashscreen1.aseprite"),
+            animation: Animation::default(),
+        },
     ));
 
     // Insert a timer resource for splash duration (e.g., 3 seconds)
@@ -48,18 +57,30 @@ fn splash_screen_system(
     time: Res<Time>,
     mut timer: ResMut<SplashTimer>,
     asset_server: Res<AssetServer>,
-    mut splash_query: Query<Entity, With<SplashScreen>>,
-    mut has_loaded_map: Local<bool>,
+    splash_query: Query<Entity, With<SplashScreen>>,
+    mut level_events: EventReader<LevelEvent>,
+    mut map_state: ResMut<MapLoadState>,
 ) {
     timer.0.tick(time.delta());
 
-    if timer.0.finished() && !*has_loaded_map {
-        // Despawn splash screen
-        for entity in splash_query.iter_mut() {
-            commands.entity(entity).despawn_recursive();
+    // Process any level events that indicate our level is fully loaded
+    for event in level_events.read() {
+        match event {
+            // This matches when a level has been completely spawned
+            LevelEvent::Spawned(_) => {
+                if map_state.requested {
+                    info!("Level fully loaded, despawning splash screen...");
+                    for entity in splash_query.iter() {
+                        commands.entity(entity).despawn_recursive();
+                    }
+                }
+            }
+            _ => {} // Ignore other level events
         }
+    }
 
-        // Load LDtk map
+    // If timer is finished but map hasn't been requested yet, request the map
+    if timer.0.finished() && !map_state.requested {
         info!("Loading LDtk map: test-map.ldtk");
         let map_handle = asset_server.load("test-map.ldtk");
         info!("Map handle created: {:?}", map_handle);
@@ -69,7 +90,7 @@ fn splash_screen_system(
             ..Default::default()
         });
 
-        info!("Scene setup complete.");
-        *has_loaded_map = true;
+        map_state.requested = true;
+        // The splash screen will now stay visible until the level is loaded
     }
 }
