@@ -81,6 +81,23 @@ fn splash_screen_system(
 
     // If timer is finished but map hasn't been requested yet, request the map
     if timer.0.finished() && !map_state.requested {
+        info!("Splash timer finished, despawning splash screen and loading please wait screen...");
+        for entity in splash_query.iter() {
+            commands.entity(entity).despawn_recursive();
+        }
+
+        commands.spawn((
+            SplashScreen,
+            Node {
+                justify_content: JustifyContent::Center,
+                ..default()
+            },
+            AseUiAnimation {
+                aseprite: asset_server.load("pleasewait1.aseprite"),
+                animation: Animation::default(),
+            },
+        ));
+
         info!("Loading LDtk map: test-map.ldtk");
         let map_handle = asset_server.load("test-map.ldtk");
         info!("Map handle created: {:?}", map_handle);
