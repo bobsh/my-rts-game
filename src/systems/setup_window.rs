@@ -1,9 +1,9 @@
 use bevy::prelude::*;
 use bevy::winit::WinitWindows;
 
-pub struct WindowPlugin;
+pub struct SetupWindowPlugin;
 
-impl Plugin for WindowPlugin {
+impl Plugin for SetupWindowPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, (setup_window, setup_window_icon));
     }

@@ -13,6 +13,21 @@
         "isDefault": true
       },
       "detail": "Build the Rust project using cargo build"
+    },
+    {
+      "label": "Generate Rust API Docs",
+      "type": "shell",
+      "command": "cargo",
+      "args": [
+        "doc",
+        "--no-deps",
+        "--open"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": []
     }
   ]
 }
