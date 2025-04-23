@@ -107,6 +107,8 @@ fn splash_screen_system(
             ..Default::default()
         });
 
+        info!("Spawned Ldtk world bundle ...");
+
         map_state.requested = true;
         // The splash screen will now stay visible until the level is loaded
     }

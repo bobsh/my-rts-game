@@ -149,11 +149,11 @@ impl Plugin for EntitiesPlugin {
             .register_ldtk_entity::<QuarryBundle>("Quarry")
             .register_ldtk_entity::<ChestBundle>("Chest")
             .register_ldtk_entity::<DoorBundle>("Door")
-            .register_ldtk_int_cell::<ForestBundle>(1)
-            .register_ldtk_int_cell::<MudBundle>(2)
-            .register_ldtk_int_cell::<ConcreteBundle>(3)
-            .register_ldtk_int_cell::<WallBundle>(4)
-            .register_ldtk_int_cell::<PathBundle>(5)
-            .register_ldtk_int_cell::<WaterBundle>(6);
+            .register_ldtk_int_cell_for_layer::<ForestBundle>("IntGrid1", 1)
+            .register_ldtk_int_cell_for_layer::<MudBundle>("IntGrid1", 2)
+            .register_ldtk_int_cell_for_layer::<ConcreteBundle>("IntGrid1", 3)
+            .register_ldtk_int_cell_for_layer::<WallBundle>("IntGrid1", 4)
+            .register_ldtk_int_cell_for_layer::<PathBundle>("IntGrid1", 5)
+            .register_ldtk_int_cell_for_layer::<WaterBundle>("IntGrid1", 6);
     }
 }
