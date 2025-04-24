@@ -2,8 +2,9 @@ use crate::components::inventory::{Inventory, InventorySettings, ResourceType};
 use crate::components::skills::{SkillProgression, Skills};
 use crate::components::ui::EntityInfoPanel;
 use crate::components::unit::Selected;
-use bevy::prelude::*; // Import EntityInfoPanel
+use bevy::prelude::*;
 
+/// Plugin for construction systems.
 pub struct ConstructionPlugin;
 
 impl Plugin for ConstructionPlugin {

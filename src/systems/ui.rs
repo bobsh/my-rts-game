@@ -3,6 +3,7 @@ use crate::components::ui::{EntityInfoPanel, EntityNameText};
 use crate::components::unit::Selected;
 use bevy::prelude::*;
 
+/// Plugin for the UI system.
 pub struct UiPlugin;
 
 impl Plugin for UiPlugin {
@@ -12,6 +13,7 @@ impl Plugin for UiPlugin {
     }
 }
 
+/// System to set up the UI elements.
 fn setup_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
     let font = asset_server.load("fonts/fira_sans/FiraSans-Bold.ttf");
 
@@ -50,8 +52,7 @@ fn setup_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
         });
 }
 
-// Update your UI system to include inventory visualization:
-
+/// System to update the entity info panel based on selected entities.
 fn update_entity_info_panel(
     selected_entities: Query<(Entity, Option<&Name>, Option<&Inventory>), With<Selected>>,
     mut panel_query: Query<&mut Node, With<EntityInfoPanel>>,
@@ -80,17 +81,5 @@ fn update_entity_info_panel(
             // Hide the panel when nothing is selected
             panel_node.display = Display::None;
         }
-    }
-}
-
-// Helper function to identify entity types without importing them directly
-#[allow(dead_code)]
-fn get_entity_type_name(entity: Entity, house_query: &Query<Entity, With<Name>>) -> String {
-    // Try to determine what type of entity this is
-    if house_query.contains(entity) {
-        "House".to_string()
-    } else {
-        // Generic fallback
-        "Entity".to_string()
     }
 }

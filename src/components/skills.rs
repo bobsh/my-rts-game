@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-// Skills component
+/// Skills component
 #[derive(Component, Debug, Clone)]
 pub struct Skills {
     pub mining: f32,      // Effectiveness at mining
@@ -26,7 +26,7 @@ impl Default for Skills {
     }
 }
 
-// Experience gain component
+/// Experience gain component
 #[derive(Component, Debug)]
 pub struct SkillProgression {
     pub mining_xp: f32,

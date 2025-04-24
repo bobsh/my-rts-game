@@ -1,6 +1,7 @@
 use bevy::input::mouse::{MouseButton, MouseMotion, MouseWheel};
 use bevy::prelude::*;
 
+/// State for camera panning and zooming.
 #[derive(Default, Resource)]
 pub struct CameraPanState {
     is_panning: bool,
@@ -16,6 +17,7 @@ impl CameraPanState {
     }
 }
 
+/// Plugin for camera controls.
 pub struct CameraPlugin;
 
 impl Plugin for CameraPlugin {
@@ -25,6 +27,7 @@ impl Plugin for CameraPlugin {
     }
 }
 
+/// System to handle camera panning.
 fn camera_pan(
     mut camera_pan_state: ResMut<CameraPanState>,
     mut camera_query: Query<&mut Transform, With<Camera>>,
@@ -59,6 +62,7 @@ fn camera_pan(
     }
 }
 
+/// System to handle camera zooming.
 fn camera_zoom(
     mut camera_state: ResMut<CameraPanState>,
     mut camera_query: Query<&mut Transform, With<Camera>>,

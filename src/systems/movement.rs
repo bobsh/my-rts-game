@@ -3,6 +3,7 @@ use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 use pathfinding::prelude::astar;
 
+/// Plugin for movement systems.
 pub struct MovementPlugin;
 
 impl Plugin for MovementPlugin {
@@ -95,7 +96,7 @@ pub fn set_movement_target(
     false
 }
 
-// Fixed system to handle right-click movement input
+/// Handles movement input from the user
 #[allow(clippy::too_many_arguments)]
 fn handle_movement_input(
     mouse_button: Res<ButtonInput<MouseButton>>,
@@ -152,7 +153,7 @@ fn handle_movement_input(
     );
 }
 
-// System to calculate a path when a destination is set
+/// System to calculate a path when a destination is set
 fn calculate_path(
     mut query: Query<(Entity, &GridCoords, &mut MoveTarget), (With<Movable>, Without<Moving>)>,
     obstacles: Query<&GridCoords, With<crate::components::movement::Collider>>,
@@ -275,7 +276,7 @@ fn calculate_path(
     }
 }
 
-// System to move along the calculated path
+/// System to move along the calculated path
 fn move_along_path(
     mut commands: Commands,
     mut query: Query<(Entity, &GridCoords, &mut MoveTarget, &Movable), Without<Moving>>,
@@ -314,7 +315,7 @@ fn move_along_path(
     }
 }
 
-// System to update entity position while moving
+/// System to update entity position while moving
 fn update_movement(
     mut commands: Commands,
     mut query: Query<(Entity, &mut Transform, &mut Moving, &Movable)>,

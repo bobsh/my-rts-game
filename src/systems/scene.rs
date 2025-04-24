@@ -2,6 +2,7 @@ use bevy::prelude::*;
 use bevy_aseprite_ultra::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 
+/// Plugin for scene management and loading.
 pub struct ScenePlugin;
 
 #[derive(Resource)]
@@ -27,6 +28,7 @@ impl Plugin for ScenePlugin {
 #[derive(Component)]
 struct SplashScreen;
 
+/// Sets up the initial scene with a camera and splash screen.
 pub fn setup_scene(mut commands: Commands, asset_server: Res<AssetServer>) {
     info!("Setting up scene...");
 
@@ -52,6 +54,7 @@ pub fn setup_scene(mut commands: Commands, asset_server: Res<AssetServer>) {
     info!("Splash screen spawned, waiting before loading map...");
 }
 
+/// System to handle the splash screen and map loading.
 fn splash_screen_system(
     mut commands: Commands,
     time: Res<Time>,
