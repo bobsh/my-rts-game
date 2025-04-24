@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 use bevy::winit::WinitWindows;
 
+/// Plugin to set up the window properties and icon for the application.
 pub struct SetupWindowPlugin;
 
 impl Plugin for SetupWindowPlugin {
@@ -9,7 +10,7 @@ impl Plugin for SetupWindowPlugin {
     }
 }
 
-// Add this system to your startup systems
+/// Sets up the window icon for the application.
 fn setup_window_icon(
     windows: Query<Entity, With<bevy::window::PrimaryWindow>>,
     winit_windows: NonSend<WinitWindows>,
@@ -41,6 +42,8 @@ fn setup_window_icon(
     }
 }
 
+/// Sets up the window properties for the application.
+/// This is particularly important for WebAssembly builds to ensure the canvas fits the parent element.
 fn setup_window(mut window_query: Query<&mut Window>) {
     if let Ok(mut window) = window_query.get_single_mut() {
         // Make sure these are set for WASM display

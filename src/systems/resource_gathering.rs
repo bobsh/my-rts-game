@@ -8,6 +8,7 @@ use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::GridCoords;
 use bevy_ecs_ldtk::prelude::LdtkProjectHandle;
 
+/// Plugin for resource gathering systems.
 pub struct ResourceGatheringPlugin;
 
 impl Plugin for ResourceGatheringPlugin {
@@ -38,7 +39,7 @@ pub struct GatheringIntent {
     pub resource_type: ResourceType,
 }
 
-// Update the gathering process to use target and skill_modifier
+/// This system handles the gathering of resources by characters
 fn gather_resources(
     mut commands: Commands,
     time: Res<Time>,
@@ -102,7 +103,7 @@ fn gather_resources(
     }
 }
 
-// This system adds a GatheringIntent component and sets up movement to the resource
+/// This system adds a GatheringIntent component and sets up movement to the resource
 fn start_gathering(
     mut commands: Commands,
     mouse_button: Res<ButtonInput<MouseButton>>,
@@ -301,7 +302,7 @@ fn start_gathering(
     }
 }
 
-// Helper function to find valid adjacent positions to a resource
+/// Helper function to find adjacent positions for resource gathering
 fn find_adjacent_positions(
     resource_pos: GridCoords,
     obstacles: &Query<&GridCoords, With<crate::components::movement::Collider>>,
@@ -340,7 +341,7 @@ fn find_adjacent_positions(
     valid_positions
 }
 
-// This system checks if characters with GatheringIntent are close enough to start gathering
+/// This system checks if characters with GatheringIntent are close enough to start gathering
 fn check_gathering_proximity(
     mut commands: Commands,
     characters: Query<
@@ -456,6 +457,7 @@ fn check_gathering_proximity(
     }
 }
 
+/// This system updates the skills of characters based on their activities
 fn update_skills_from_activities(
     mut characters: Query<(&mut Skills, &mut SkillProgression)>,
     gatherers: Query<(Entity, &Gathering)>,
@@ -502,6 +504,7 @@ fn update_skills_from_activities(
     }
 }
 
+/// This system updates the character info UI with skills and inventory
 fn update_character_info_ui(
     selected_entities: Query<(Entity, &Skills, Option<&Inventory>), With<Selected>>,
     panel_query: Query<Entity, With<EntityInfoPanel>>,
@@ -671,6 +674,7 @@ fn update_character_info_ui(
     }
 }
 
+/// This system handles the transfer of resources between characters
 fn handle_resource_transfer(
     keyboard: Res<ButtonInput<KeyCode>>,
     mouse_button: Res<ButtonInput<MouseButton>>,

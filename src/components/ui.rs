@@ -1,13 +1,14 @@
 use bevy::prelude::*;
 
-// UI Components
+/// UI component for displaying the entity's information.
 #[derive(Component)]
 pub struct EntityInfoPanel;
 
+/// UI component for displaying the entity's name.
 #[derive(Component)]
 pub struct EntityNameText;
 
-// Add a component to track UI state changes to avoid rebuilding UI every frame
+/// UI component for displaying the entity's name.
 #[derive(Component, Debug, Clone, PartialEq)]
 pub struct UiState {
     pub entity: Entity,

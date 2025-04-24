@@ -5,6 +5,7 @@ use bevy::prelude::*;
 use bevy::sprite::Sprite;
 use bevy::window::PrimaryWindow;
 
+/// Plugin for selection systems.
 pub struct SelectionPlugin;
 
 impl Plugin for SelectionPlugin {
@@ -15,6 +16,7 @@ impl Plugin for SelectionPlugin {
     }
 }
 
+/// System to handle selection of entities with a mouse click.
 #[allow(clippy::too_many_arguments)]
 fn selection_system(
     mut commands: Commands,
@@ -81,6 +83,7 @@ fn selection_system(
     }
 }
 
+/// Function to get the size of an entity based on its sprite and image asset
 fn get_entity_size(sprite: &Sprite, _entity: Entity, images: &Res<Assets<Image>>) -> Vec2 {
     // First priority: Use custom_size if available (explicitly set size)
     if let Some(custom_size) = sprite.custom_size {
@@ -105,7 +108,7 @@ fn get_entity_size(sprite: &Sprite, _entity: Entity, images: &Res<Assets<Image>>
     Vec2::new(64.0, 64.0)
 }
 
-// Update selection ring function
+/// System to update the selection ring position based on the selected unit's position.
 #[allow(clippy::type_complexity)]
 fn update_selection_ring(
     mut params: ParamSet<(
@@ -137,6 +140,7 @@ fn update_selection_ring(
     }
 }
 
+/// System to draw selection boxes around selected entities.
 fn draw_selection_boxes(
     mut gizmos: Gizmos,
     selection_query: Query<(Entity, &GlobalTransform, &Sprite), With<Selected>>,

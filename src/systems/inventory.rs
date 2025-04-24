@@ -3,6 +3,7 @@ use crate::components::ui::EntityInfoPanel;
 use crate::components::unit::Selected;
 use bevy::prelude::*;
 
+/// Plugin for inventory systems.
 pub struct InventoryPlugin;
 
 impl Plugin for InventoryPlugin {
@@ -11,7 +12,7 @@ impl Plugin for InventoryPlugin {
     }
 }
 
-// Update the UI to show inventory when an entity with inventory is selected
+/// Update the UI to show inventory when an entity with inventory is selected
 fn update_inventory_ui(
     selected_entities: Query<(Entity, &Inventory), With<Selected>>,
     inventory_settings: Query<&InventorySettings>,

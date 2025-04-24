@@ -8,6 +8,7 @@ use crate::components::resources::ResourceNode;
 use crate::components::skills::{SkillProgression, Skills};
 use crate::components::unit::Selectable;
 
+/// Plugin for entities in the game.
 pub struct EntitiesPlugin;
 
 #[derive(Default, Component)]
