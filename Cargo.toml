@@ -18,7 +18,7 @@ codegen-units = 1
 lto = "fat"  # Full optimization for actual releases
 
 [dependencies]
-bevy = { version = "0.15", features = ["png", "gif"] }
+bevy = { version = "0.16", features = ["png", "gif"] }
 wgpu = ">0.19.0"
 image = "0.25"
 winit = "0.30"
